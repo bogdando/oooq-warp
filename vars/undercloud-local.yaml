@@ -2,7 +2,6 @@ undercloud_user: stack
 ssh_user: "{{ undercloud_user }}"
 non_root_user: "{{ undercloud_user }}"
 non_root_group: "{{ undercloud_user }}"
-#local_working_dir: /home/{{ undercloud_user }}/.quickstart
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 working_dir: /home/{{ undercloud_user }}
 undercloud_vcpu: 3

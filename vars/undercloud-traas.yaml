@@ -4,7 +4,4 @@ non_root_user: "{{ undercloud_user }}"
 non_root_group: "{{ undercloud_user }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 working_dir: /home/{{ undercloud_user }}
-enable_vbmc: false
-undercloud_vcpu: 4
-undercloud_disk: 50
-undercloud_memory: 4096
+undercloud_network_cidr: 192.168.0.0/24

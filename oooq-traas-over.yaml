@@ -1,47 +1,46 @@
 ---
 # Non local deployments by quickstart
-# Deploy the overcloud
-#- name:  Prepare deployment of the undercloud (ovb)
-#  any_errors_fatal: true
-#  hosts: undercloud
-#  gather_facts: no
-#  become: true
-#  vars_files:
-#    - vars/overcloud-traas.yaml
-#  roles:
-#    - overcloud-prep-config
-#    - overcloud-prep-containers
-#    - overcloud-prep-images
-#    - overcloud-prep-flavors
-#    - overcloud-prep-network
-#    - { role: overcloud-ssl, when: ssl_overcloud|bool }
+- name: Install delorian repos
+  hosts: overcloud
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  vars_files:
+    - vars/overcloud-traas.yaml
+  roles:
+    - repo-setup
+
 - name: Run overcloud prep roles
   hosts: undercloud
   any_errors_fatal: true
   vars_files:
     - vars/overcloud-traas.yaml
-  gather_facts: no
-  become: false
+  gather_facts: false
+  become: true
   roles:
-    - { role: overcloud-prep-images, step_overcloud_image: false, step_glance_upload: true, step_register: false }
+    - overcloud-prep-config
     - overcloud-prep-containers
 
 - name:  Deploy the overcloud (multinode)
   any_errors_fatal: true
   hosts: undercloud
-  gather_facts: no
+  gather_facts: true
   become: false
   vars_files:
     - vars/overcloud-traas.yaml
   roles:
     - overcloud-deploy
+  #TODO parametrize env vars for the deployed-server remaining roles
   environment:
-    TRIPLEO_ROOT: "{{ lookup('env','TRIPLEO_ROOT') }}"
+    OVERCLOUD_ROLES: "{{overcloud_deployed_roles}}"
+    ControllerDeployedServer_hosts: "{{controller_hosts}}"
+    SUBNODES_SSH_KEY: "{{subnodes_ssh_key}}"
+  #  ComputeDeployedServer_hosts: "{{compute_hosts}}"
 
 - name: Add the overcloud nodes to the generated inventory
   any_errors_fatal: true
   hosts: undercloud
-  gather_facts: yes
+  gather_facts: false
   vars_files:
     - vars/overcloud-traas.yaml
   become: false

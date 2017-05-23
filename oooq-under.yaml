@@ -1,13 +1,23 @@
 ---
 # Libvirt local deployments by quickstart
 - name: Install delorian repos (oooq-extras)
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
   hosts: undercloud
   vars_files:
     - vars/undercloud-local.yaml
-  vars:
-    - release: master # install current master delorean
   roles:
     - repo-setup
+
+- name: Install the client
+  hosts: undercloud
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  tasks:
+    - package:
+        name: python-tripleoclient
 
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
