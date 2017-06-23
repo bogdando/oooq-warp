@@ -65,6 +65,7 @@ docker run -it --rm --privileged \
   -v ${IMAGECACHE}:${IMAGECACHE} \
   -v ${OOOQ_PATH}:/tmp/oooq:ro \
   -v $(pwd):/tmp/scripts:ro \
+  -v /etc/passwd:/etc/passwd:ro \
   -u 1000 \
   --entrypoint /bin/bash \
   --name runner bogdando/oooq-runner:0.1 \
