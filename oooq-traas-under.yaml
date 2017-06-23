@@ -3,7 +3,7 @@
 - name: Install delorian repos
   hosts: undercloud
   any_errors_fatal: true
-  gather_facts: false
+  gather_facts: true
   become: true
   vars_files:
     - vars/undercloud-traas.yaml
@@ -22,7 +22,7 @@
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
   any_errors_fatal: true
-  gather_facts: true
+  gather_facts: false
   become: false
   vars_files:
     - vars/undercloud-traas.yaml

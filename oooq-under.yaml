@@ -2,7 +2,7 @@
 # Libvirt local deployments by quickstart
 - name: Install delorian repos (oooq-extras)
   any_errors_fatal: true
-  gather_facts: false
+  gather_facts: true
   become: true
   hosts: undercloud
   vars_files:
@@ -22,7 +22,7 @@
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
   any_errors_fatal: true
-  gather_facts: true
+  gather_facts: false
   become: false
   vars_files:
     - vars/undercloud-local.yaml
