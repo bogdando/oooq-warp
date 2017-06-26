@@ -6,7 +6,7 @@
   gather_facts: true
   become: true
   vars_files:
-    - vars/virthost-local.yaml
+    - ../vars/virthost-local.yaml
   roles:
     - { role: environment/setup, when: teardown|bool }
     - { role: libvirt/teardown, when: teardown|bool }
@@ -21,6 +21,6 @@
   gather_facts: true
   become: false
   vars_files:
-    - vars/virthost-local.yaml
+    - ../vars/virthost-local.yaml
   roles:
     - tripleo-inventory

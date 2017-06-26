@@ -26,6 +26,7 @@ CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 EXT_NET_CIDR=${EXT_NET_CIDR}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
+HACK=${HACK:-false}
 
 docker run -it --rm --privileged \
   --device-read-bps=${DEV}:${IOR} \
@@ -52,6 +53,7 @@ docker run -it --rm --privileged \
   -e COMPUTE_HOSTS=${COMPUTE_HOSTS} \
   -e EXT_NET_CIDR=${EXT_NET_CIDR} \
   -e SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY} \
+  -e HACK=${HACK} \
   ${VMOUNT} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run:/run \

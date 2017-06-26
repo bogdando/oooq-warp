@@ -14,16 +14,7 @@ PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-${HOME}/.quickstart}
 INTERACTIVE=${INTERACTIVE:-true}
-
-function snap {
-  set +e
-  sudo virsh suspend $1
-  sudo virsh snapshot-delete $1  $2
-  sudo virsh snapshot-create-as --name=$2 $1 || sudo virsh snapshot $1
-  sync
-  sudo virsh resume $1
-  set -e
-}
+HACK=${HACK:-false}
 
 function with_ansible {
   ansible-playbook \
@@ -54,5 +45,14 @@ inventory=${LWD}/hosts
 echo "Check nodes connectivity"
 ansible -i ${inventory} -m ping all
 
-echo "Deploy with quickstart, use playbook ${PLAY}"
-with_ansible -i ${inventory} ${SCRIPTS}/${PLAY}
+if [ "$HACK" = "false" ]; then
+  echo "Deploy with quickstart, use playbook ${PLAY}"
+  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/${PLAY}
+else
+  # hacking/racy mode for scripted ansible-playbook calls interleaved by tags:
+  echo "Deploy with quickstart, interleaved hacking (experimental)"
+  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_repos.yml
+  (with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_prep.yml)&
+  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_uc.yml --skip-tags overcloud-prep-containers
+  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_oc.yml
+fi

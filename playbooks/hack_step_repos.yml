@@ -1,0 +1,17 @@
+---
+# Non local deployments by quickstart, hacking/racy mode for manual
+# ansible-playbook calls interleaved by tags
+
+- name: Install delorian repos
+  hosts: undercloud:overcloud
+  any_errors_fatal: true
+  become: true
+  vars_files:
+    - ../vars/undercloud-traas.yaml
+    - ../vars/overcloud-traas.yaml
+  pre_tasks:
+    - setup:
+        gather_subset: '!all'
+        filter: ansible_
+  roles:
+    - {role: repo-setup,  when: configure_repos|bool}

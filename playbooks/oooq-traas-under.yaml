@@ -6,9 +6,9 @@
   gather_facts: true
   become: true
   vars_files:
-    - vars/undercloud-traas.yaml
+    - ../vars/undercloud-traas.yaml
   roles:
-    - repo-setup
+    - {role: repo-setup,  when: configure_repos|bool}
 
 - name: Install the client
   hosts: undercloud
@@ -23,8 +23,8 @@
   hosts: undercloud
   any_errors_fatal: true
   gather_facts: false
-  become: false
+  become: true
   vars_files:
-    - vars/undercloud-traas.yaml
+    - ../vars/undercloud-traas.yaml
   roles:
     - undercloud-deploy

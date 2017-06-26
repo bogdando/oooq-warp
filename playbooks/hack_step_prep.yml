@@ -1,0 +1,23 @@
+---
+# Non local deployments by quickstart, hacking/racy mode for manual
+# ansible-playbook calls interleaved by tags:
+
+- name: Run overcloud prep roles
+  hosts: undercloud
+  any_errors_fatal: true
+  vars_files:
+    - ../vars/overcloud-traas.yaml
+  gather_facts: false
+  become: true
+  pre_tasks:
+    - name: Install the client
+      package:
+        name: python-tripleoclient
+    - name: Check if container images uploading is in progress
+      command: pgrep -f "openstack overcloud container image upload"
+      register: result
+      failed_when: false
+      check_mode: no
+  roles:
+    - overcloud-prep-config
+    - {role: overcloud-prep-containers, when: result|failed}

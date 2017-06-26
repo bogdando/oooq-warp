@@ -23,6 +23,8 @@ overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
 
 ## DEV
 # DLRN repos
+# May be disabled if user data script handles it for pre-provisioned nodes
+configure_repos: true
 release: master
 overcloud_release: "{{release}}"
 gating_repo_enabled: false

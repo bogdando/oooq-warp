@@ -17,6 +17,7 @@ CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 EXT_NET_CIDR=${EXT_NET_CIDR}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
+HACK=${HACK:-false}
 
 sudo mkdir -p ${LWD}
 sudo chown -R ${USER}: ${LWD}
@@ -63,6 +64,7 @@ if [ "$INTERACTIVE" = "true" ]; then
   echo =================================================================================================
   echo export PLAY=oooq-traas.yaml to generate inventory for existing openstack VMs
   echo export PLAY=oooq-traas-under.yaml to deploy an undercloud on openstack
+  echo export HACK=true for an experimental interleaved uc/oc deployment mode
   echo Run create_env_oooq.sh to deploy
   /bin/bash
 else

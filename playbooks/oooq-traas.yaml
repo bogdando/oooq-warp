@@ -7,6 +7,6 @@
   gather_facts: true
   become: false
   vars_files:
-    - vars/inventory-traas.yaml
+    - ../vars/inventory-traas.yaml
   roles:
     - tripleo-inventory

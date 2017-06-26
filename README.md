@@ -64,7 +64,7 @@ To start a scratch local dev env with libvirt and kvm:
   # mkdir -p ${WORKSPACE}
   ```
 * Export a custom PLAY name to start with. The default play is
-  is ``oooq-libvirt-provision.yaml``:
+  is ``oooq-libvirt-provision.yaml`` (see the `playbooks` dir):
   ```
   $ export PLAY=oooq-libvirt-under.yaml
   ```
@@ -103,7 +103,22 @@ An example list of the executed plays:
 
 Use ``INTERACTIVE=false`` to start the chosen ``PLAY`` automatically after the
 provisioning steps done. Otherwise, it returns to the shell prompt of the
-wrapper container.
+wrapper container. The interactive mode may help debugging.
+
+## Hacking mode with interleaving undercloud/overcloud tasks (experimental)
+
+Use ``HACK=true`` to overlap undercloud and overcloud install playbooks for some
+point. While hacky and racy and will likely fail, it can still be a shortcut for
+the total deploy time. The long running steps, like populating container images
+to prepare the overcloud deployment, save *a lot* of time when overlapped with
+the undercloud deployment tasks. And failed playbooks may be just re-applied,
+after all!
+
+It should only be used with the ``INTERACTIVE=true`` as it requires manual
+steps to finish deployments, like turning off the hack mode and retrying of the
+failed playbooks.
+
+This mode is only works with traas playbooks yet.
 
 ## Dev branches and venvs (undercloud)
 

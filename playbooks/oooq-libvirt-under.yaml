@@ -6,9 +6,9 @@
   become: true
   hosts: undercloud
   vars_files:
-    - vars/undercloud-local.yaml
+    - ../vars/undercloud-local.yaml
   roles:
-    - repo-setup
+    - {role: repo-setup,  when: configure_repos|bool}
 
 - name: Install the client
   hosts: undercloud
@@ -23,8 +23,8 @@
   hosts: undercloud
   any_errors_fatal: true
   gather_facts: false
-  become: false
+  become: true
   vars_files:
-    - vars/undercloud-local.yaml
+    - ../vars/undercloud-local.yaml
   roles:
     - undercloud-deploy

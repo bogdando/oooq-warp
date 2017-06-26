@@ -1,0 +1,19 @@
+---
+# Non local deployments by quickstart, hacking/racy mode for manual
+# ansible-playbook calls interleaved by tags:
+
+- name:  Deploy the overcloud (multinode)
+  any_errors_fatal: true
+  hosts: undercloud
+  gather_facts: false
+  become: false
+  vars_files:
+    - ../vars/overcloud-traas.yaml
+  roles:
+    - overcloud-deploy
+  #TODO parametrize env vars for the deployed-server remaining roles
+  environment:
+    OVERCLOUD_ROLES: "{{overcloud_deployed_roles}}"
+    ControllerDeployedServer_hosts: "{{controller_hosts}}"
+    SUBNODES_SSH_KEY: "{{subnodes_ssh_key}}"
+  #  ComputeDeployedServer_hosts: "{{compute_hosts}}"
