@@ -36,12 +36,10 @@ if [ "${VENV}" = "local" ]; then
   set -u
 
   # Hack into oooq-extras dev branch
-  if [ "${OOOQE_BRANCH}" != "master" -o "${OOOQE_FORK}" != "openstack" ]; then
-    sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
-    sudo rsync -aLH /usr/config /root/Envs/oooq/
-    sudo rsync -aLH /usr/playbooks /root/Envs/oooq/
-    sudo rsync -aLH /usr/usr/local/share/ansible/roles /root/Envs/oooq/usr/local/share/ansible/
-  fi
+  sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
+  sudo rsync -aLH /usr/config /root/Envs/oooq/
+  sudo rsync -aLH /usr/playbooks /root/Envs/oooq/
+  sudo rsync -aLH /usr/usr/local/share/ansible/roles /root/Envs/oooq/usr/local/share/ansible/
 fi
 
 # Restore the saved state from the WORKSPACE (ssh keys/setup, inventory)

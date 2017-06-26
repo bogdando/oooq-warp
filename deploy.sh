@@ -16,8 +16,6 @@ LWD=${LWD:-${HOME}/.quickstart}
 MAKE_SNAPSHOTS=${MAKE_SNAPSHOTS:-true}
 QUICKSTARTISH=${QUICKSTARTISH:-false}
 
-export ANSIBLE_CONFIG=${SCRIPTS}/ansible.cfg
-
 function snap {
   set +e
   sudo virsh suspend $1

@@ -63,7 +63,7 @@ docker run -it --rm --privileged \
   -v /lib/modules:/lib/modules \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${IMAGECACHE}:${IMAGECACHE} \
-  -v ${OOOQ_PATH}:/tmp/oooq:ro \
+  -v ${OOOQ_PATH}:/tmp/oooq \
   -v $(pwd):/tmp/scripts:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -u 1000 \
