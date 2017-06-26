@@ -8,7 +8,6 @@
   vars_files:
     - vars/virthost-local.yaml
   roles:
-    # https://review.openstack.org/#/c/447000/
     - { role: environment/setup, when: teardown|bool }
     - { role: libvirt/teardown, when: teardown|bool }
     - { role: libvirt/setup/user, when: teardown|bool, become: false }

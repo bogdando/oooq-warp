@@ -7,12 +7,11 @@ USER=${USER:-bogdando}
 OOOQE_FORK=${OOOQE_FORK:-openstack}
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
 VENV=${VENV:-local}
-PLAY=${PLAY:-oooq-warp.yaml}
+PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-~/.quickstart}
 IMAGECACHE=${IMAGECACHE:-/opt/cache}
 TEARDOWN=${TEARDOWN:-true}
-QUICKSTARTISH=${QUICKSTARTISH:-false}
 INTERACTIVE=${INTERACTIVE:-true}
 CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
@@ -44,7 +43,7 @@ fi
 
 # Restore the saved state from the WORKSPACE (ssh keys/setup, inventory)
 # to allow fast respinning of the local environment omitting VM provisioning tasks
-if [ "${TEARDOWN}" = "false" -o "${TEARDOWN}" = "none" ]; then
+if [ "${TEARDOWN}" = "false" ]; then
   set +e
   for state in 'hosts' 'id_rsa_undercloud' 'id_rsa_virt_power' \
       'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
@@ -58,13 +57,12 @@ sudo chown -R ${USER}: ${HOME}
 cd /tmp/oooq
 if [ "$INTERACTIVE" = "true" ]; then
   echo Note: ansible virthost is now localhost
-  echo export PLAY=oooq-warp.yaml to bootstrap local VMs and generate inventory - default choice
-  echo export PLAY=oooq-under.yaml to deploy only an undercloud locally
-  echo export TEARDOWN=false or none to respin a failed local deployment omitting VMs provisioning tasks
+  echo export PLAY=oooq-libvirt-provision.yaml to bootstrap local VMs and generate inventory - default choice
+  echo export PLAY=oooq-libvirt-under.yaml to deploy only an undercloud locally
+  echo export TEARDOWN=false respin a failed local deployment omitting VMs provisioning tasks
   echo =================================================================================================
   echo export PLAY=oooq-traas.yaml to generate inventory for existing openstack VMs
   echo export PLAY=oooq-traas-under.yaml to deploy an undercloud on openstack
-  echo export QUICKSTARTISH=true to deploy with quickstart.sh instead of ansible-playbook - TBD
   echo Run create_env_oooq.sh to deploy
   /bin/bash
 else

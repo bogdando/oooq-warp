@@ -12,18 +12,16 @@ MEM=${MEM:-7G}
 
 # defaults
 INTERACTIVE=${INTERACTIVE:-true}
-QUICKSTARTISH=${QUICKSTARTISH:-false}
 TEARDOWN=${TEARDOWN:-true}
 USER=${USER:-bogdando}
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
 OOOQE_FORK=${OOOQE_FORK:-openstack}
 WORKSPACE=${WORKSPACE:-/tmp/qs}
 LWD=${LWD:-/home/${USER}/.quickstart}
-PLAY=${PLAY:-oooq-warp.yaml}
+PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 VENV=local
 VMOUNT=""
 [ "${VENV}" != "local" ] && VMOUNT="-v ${VPATH}:/home/${USER}/Envs"
-MAKE_SNAPSHOTS=${MAKE_SNAPSHOTS:-true}
 CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 EXT_NET_CIDR=${EXT_NET_CIDR}
@@ -49,8 +47,6 @@ docker run -it --rm --privileged \
   -e VENV=${VENV} \
   -e OOOQE_BRANCH=${OOOQE_BRANCH} \
   -e OOOQE_FORK=${OOOQE_FORK} \
-  -e MAKE_SNAPSHOTS=${MAKE_SNAPSHOTS} \
-  -e QUICKSTARTISH=${QUICKSTARTISH} \
   -e INTERACTIVE=${INTERACTIVE} \
   -e CONTROLLER_HOSTS=${CONTROLLER_HOSTS} \
   -e COMPUTE_HOSTS=${COMPUTE_HOSTS} \

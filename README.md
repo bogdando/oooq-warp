@@ -6,14 +6,13 @@ While in fact it operates the host's libvirt and nested
 kvm, if configured. Just like containerized nova-compute
 would do.
 
-It omits oooq's shell scripts and goes the ansible way,
-which is an inventory, a play and custom vars to override.
-
-WIP: If you want to deploy with quickstart.sh instead, use
-``QUICKSTARTISH=true``.
+It omits shell scripts/featuresets/devmode from OOOQ/tripleo-ci
+and only uses an inventory vars and playbooks. As these are
+still glued by a shell script, you can as well invoke wanted
+``ansible-playbook`` commands directly, if you wish so.
 
 WIP: It may be used to deploy with traas and openstack provider
-(see t-h-t deployed-server).
+and pre-provisioned VMs (see tripleo's deployed-server).
 
 ## Requirements for the host OS
 
@@ -23,8 +22,13 @@ WIP: It may be used to deploy with traas and openstack provider
   virtualization enabled, for local deployments
 * OpenStack cloud >= Ocata with Heat, for non local (traas) deployments
 
-Note, cloud providers may not allow HW enabled kvm. OOOQ
+Note, public cloud providers may not allow HW enabled kvm. OOOQ
 will not work on QEMU, sorry!
+
+Note, the wrapper docker image wants Ansible >= 2.3, Shade >= 1.21.0
+and Jinja >= 2.9.6, plus those oooq/extras requirements and packages
+that come from the oooq repo's master branch. Feel free to rebuild it
+to update installed versions.
 
 ## Build the wrapper container
 ```
@@ -60,13 +64,10 @@ To start a scratch local dev env with libvirt and kvm:
   # mkdir -p ${WORKSPACE}
   ```
 * Export a custom PLAY name to start with. The default play is
-  is ``oooq-warp.yaml``:
+  is ``oooq-libvirt-provision.yaml``:
   ```
-  $ export PLAY=oooq-under.yaml
+  $ export PLAY=oooq-libvirt-under.yaml
   ```
-  Note, setting ``TEARDOWN=false`` speeds up respinning of failed
-  deployments. Also note that quickstart.sh would expect another TEARDOWN
-  values, see its docs for details.
 * Extract initrd and vmlinuz (does not work from the
   wrapping oooq-runner container):
   ```
@@ -74,24 +75,35 @@ To start a scratch local dev env with libvirt and kvm:
     /home/stack/overcloud-full.vmlinuz \
     /home/stack/overcloud-full.initrd ${WORKSPACE}
   ```
-* Prepare host for nested kvm:
+* Prepare host for nested kvm and do some sysctl magic:
   ```
   # echo "options kvm_intel nested=1" > /etc/modprobe.d/kvm-nested.conf
   # modprobe -r kvm_intel
   # modprobe kvm_intel
   # cat /sys/module/kvm_intel/parameters/nested
+  # echo 0 > /proc/sys/net/bridge/bridge-nf-call-iptables
   ```
+  The latter step is optional, ignore if the command fails.
+
 * Copy data vars ``custom.yaml_example`` as ``custom.yaml`` and check for
   needed data overrides. Note, it contains only common vars. Use var files
   from the ``vars`` dir for advanced configuration overrides.
 * Git checkout the wanted branch of the local OOQ repo. It will be mounted
   into the wrapper container by the given ``OOOQ_PATH``.
 
-Normally, the plays to be executed are: the default ``oooq-warp.yaml``
-with either provisioning steps omitted (``TEARDOWN=true``) or not, then
-the ``oooq-under.yaml`` or a given custom ``PLAY``, like those for Traas
-(see below).
-Use ``INTERACTIVE=false`` to start the chosen ``PLAY`` automatically.
+For traas, provision servers with the openstack CLI and proceed with custom
+playbooks as it's described below.
+
+## Example playbooks for a local libvirt env
+
+An example list of the executed plays:
+* the default ``oooq-libvirt-provision.yaml``, that provisions servers and
+  updates inventory. Use ``TEARDOWN=false`` to omit it.
+* the ``oooq-libvirt-under.yaml`` or an arbitrary custom ``PLAY``.
+
+Use ``INTERACTIVE=false`` to start the chosen ``PLAY`` automatically after the
+provisioning steps done. Otherwise, it returns to the shell prompt of the
+wrapper container.
 
 ## Dev branches and venvs (undercloud)
 
@@ -123,7 +135,7 @@ Inside, make sure to checkout/install required dev branches of components under
 dev/test. Then define a composable role (a heat environemnt) for the undercloud
 for the given script as well. For overcloud custom roles, see OOOQ docs.
 
-## Respinning a failed local env omitting oooq provisioning steps
+## Respinning a failed local libvirt env
 
 If you want to reuse existing customized by oooq images and omit
 all of the long playing oooq provisioning steps:
@@ -131,7 +143,7 @@ all of the long playing oooq provisioning steps:
   Otherwise, when the container exited, you loose the updated
   inventory and ssh keys and may only start from the scratch.
 * Export ``TEARDOWN=false`` then rerun the deploy inside of the
-  container. Or use `none`, if QUICKSTARTISH.
+  container.
 
 To start from the scratch, remove existing VMs' snapshots, export or
 unset``TEARDOWN=true``, unset ``PLAY``, exit container and re-run
@@ -139,7 +151,7 @@ unset``TEARDOWN=true``, unset ``PLAY``, exit container and re-run
 
 ## Troubleshooting local envs
 
-If the undercloud VM refuses to start (permission deinied), try
+If the undercloud VM refuses to start (permission deinied) on Ubuntu, try
 to disable apparmor for libvirt and reconfigure qemu as well:
 ```
 # echo "dynamic_ownership = 0" >> /etc/libvirt/qemu.conf
