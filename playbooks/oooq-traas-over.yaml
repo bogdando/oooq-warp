@@ -8,7 +8,7 @@
   vars_files:
     - ../vars/overcloud-traas.yaml
   roles:
-    - {role: repo-setup,  when: configure_repos|bool
+    - {role: repo-setup,  when: configure_repos|bool}
 
 - name: Run overcloud prep roles
   hosts: undercloud
@@ -36,17 +36,3 @@
     ControllerDeployedServer_hosts: "{{controller_hosts}}"
     SUBNODES_SSH_KEY: "{{subnodes_ssh_key}}"
   #  ComputeDeployedServer_hosts: "{{compute_hosts}}"
-
-- name: Add the overcloud nodes to the generated inventory
-  any_errors_fatal: true
-  hosts: undercloud
-  gather_facts: false
-  vars_files:
-    - ../vars/overcloud-traas.yaml
-  become: false
-  tags:
-    - overcloud-deploy
-  vars:
-      inventory: all
-  roles:
-    - tripleo-inventory
