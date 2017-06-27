@@ -71,7 +71,8 @@ undercloud_update_packages: >-
   os-*
 undercloud_extra_args: >-
   -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
-  --timeout 120
+  -e {{overcloud_templates_path}}/environments/debug.yaml
+  --timeout 60
 
 #  -e {{overcloud_templates_path}}/environments/services-docker/etcd.yaml
 #  --keep-running
