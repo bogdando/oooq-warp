@@ -92,11 +92,11 @@ overcloud_ipv6: false
 enable_swap: false
 extra_args_common: >-
   --ntp-server pool.ntp.org
-  --disable-validations
 
 #  -e {{overcloud_templates_path}}/environments/debug.yaml
 #  -e {{overcloud_templates_path}}/environments/config-debug.yaml
 #  -e {{overcloud_templates_path}}/environments/puppet-pacemaker.yaml \
+validation_args: --disable-validations
 
 # COMPOSABLE
 deploy_composable_scenario: false
