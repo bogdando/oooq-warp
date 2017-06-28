@@ -60,6 +60,7 @@ repo_cmd_after: ''
 #overcloud_templates_path: /var/tmp/overcloud-openstack-tripleo-heat-templates
 
 ## UNDERCLOUD
+undercloud_generate_service_certificate: false
 # https://review.openstack.org/#/c/450792/
 undercloud_update_packages: >-
   openstack-tripleo*
@@ -89,6 +90,12 @@ containerized_overcloud: true
 enable_pacemaker: false
 overcloud_ipv6: false
 enable_swap: false
+ssl_overcloud: false
+tempest_config: false
+run_tempest: false
+test_ping: false
+step_validate_overcloud: false
+step_introspect: false
 extra_args_common: >-
   --ntp-server pool.ntp.org
 
@@ -100,36 +107,3 @@ validation_args: --disable-validations
 # COMPOSABLE
 deploy_composable_scenario: false
 #composable_scenario: scenario005-multinode.yaml
-
-#https://review.openstack.org/#/c/455719/
-# Composable to override defaults in
-# tht's roles_data.yaml
-#composable_roles: true
-# ServicesDefault merges services from the overcloud_services
-#overcloud_roles:
-#  - name: ControllerDeployedServer
-#    CountDefault: 1
-#    tags:
-#      - primary
-#      - controller
-
-#composable_services: true
-#overcloud_services:
-#  - name: 'ControllerServices:'
-#    services:
-#      - OS::TripleO::Services::Kernel
-#      - OS::TripleO::Services::Keystone
-#      - OS::TripleO::Services::NovaApi
-#      - OS::TripleO::Services::RabbitMQ
-#      - OS::TripleO::Services::MySQL
-#      - OS::TripleO::Services::HAproxy
-#      - OS::TripleO::Services::Keepalived
-#      - OS::TripleO::Services::Ntp
-#      - OS::TripleO::Services::Timezone
-#      - OS::TripleO::Services::Docker
-#  - name: 'ComputeServices:'
-#    services:
-#      - OS::TripleO::Services::NovaCompute
-#      - OS::TripleO::Services::NovaLibvirt
-#      - OS::TripleO::Services::ComputeNeutronOvsAgent
-#      - OS::TripleO::Services::Docker

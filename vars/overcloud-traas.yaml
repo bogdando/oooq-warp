@@ -8,23 +8,29 @@ deployed_server: true
 
 node_cound: 1
 flavor_args: ''
-# FIXME given a provisioned traas stack name was 'foo'
+# FIXME given a provisioned traas stack name was 'foo'.
+# Note, flavor args, if any, must be as well defined for overcloud_roles.
 overcloud_nodes:
   - name: foo-overcloud-controller-0
   - name: foo-overcloud-compute-0
 
+# Note, scale args are ignored for composable roles.
+# Use a custom t-h-t env instead.
 extra_args: >
   {{ extra_args_common }}
   -e {{ working_dir }}/network-environment.yaml
   -e {{ overcloud_templates_path }}/environments/deployed-server-noop-ctlplane.yaml
-  --control-scale 1
-  --compute-scale 0
 
+# https://github.com/bogdando/tripleo-heat-templates/blob/dev/environments/custom.yaml
+#  -e {{overcloud_templates_path}}/environments/custom.yaml
+
+#  --control-scale 1
+#  --compute-scale 0
 #  -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
-#  -r {{overcloud_templates_path}}/deployed-server/deployed-server-roles-data.yaml
 
 # Composable deployed-server roles to override defaults in
 # tht's deployed-server/deployed-server-roles-data.yaml
+# Requires https://review.openstack.org/#/c/455719
 composable_roles: true
 # ServicesDefault merges services from the overcloud_services
 # TODO remaining deployed server roles supported
@@ -32,14 +38,17 @@ overcloud_roles:
   - name: ControllerDeployedServer
     HostnameFormatDefault: 'foo-%stackname%-controller-%index%'
     disable_constraints: True
+    ServicesDefault: []
     CountDefault: 1
     tags:
       - primary
       - controller
+
   - name: ComputeDeployedServer
     HostnameFormatDefault: 'foo-%stackname%-compute-%index%'
     disable_constraints: True
     CountDefault: 0
+    ServicesDefault: []
 
 composable_services: true
 overcloud_services:
@@ -58,8 +67,10 @@ overcloud_services:
       - OS::TripleO::Services::Ntp
       - OS::TripleO::Services::Timezone
       - OS::TripleO::Services::TripleoFirewall
-  - name: 'ComputeDeployedServerServices:'
-    services: []
+
+# Doesn't work well for oooq, produces bad indentation
+#  - name: 'ComputeDeployedServerServices:'
+#    services:
 #      - OS::TripleO::Services::NovaCompute
 #      - OS::TripleO::Services::NovaLibvirt
 #      - OS::TripleO::Services::ComputeNeutronOvsAgent
