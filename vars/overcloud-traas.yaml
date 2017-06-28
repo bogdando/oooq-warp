@@ -8,18 +8,19 @@ deployed_server: true
 
 node_cound: 1
 flavor_args: ''
+# FIXME given a provisioned traas stack name was 'foo'
 overcloud_nodes:
   - name: foo-overcloud-controller-0
-#  - name: foo-overcloud-compute-0
+  - name: foo-overcloud-compute-0
 
-# https://review.openstack.org/#/c/470293/
 extra_args: >
   {{ extra_args_common }}
   -e {{ working_dir }}/network-environment.yaml
-  -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
+  -e {{ overcloud_templates_path }}/environments/deployed-server-noop-ctlplane.yaml
   --control-scale 1
   --compute-scale 0
 
+#  -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
 #  -r {{overcloud_templates_path}}/deployed-server/deployed-server-roles-data.yaml
 
 # Composable deployed-server roles to override defaults in
@@ -29,14 +30,16 @@ composable_roles: true
 # TODO remaining deployed server roles supported
 overcloud_roles:
   - name: ControllerDeployedServer
+    HostnameFormatDefault: 'foo-%stackname%-controller-%index%'
     disable_constraints: True
     CountDefault: 1
     tags:
       - primary
       - controller
-#  - name: ComputeDeployedServer
-#    disable_constraints: True
-#    CountDefault: 1
+  - name: ComputeDeployedServer
+    HostnameFormatDefault: 'foo-%stackname%-compute-%index%'
+    disable_constraints: True
+    CountDefault: 0
 
 composable_services: true
 overcloud_services:
@@ -55,27 +58,46 @@ overcloud_services:
       - OS::TripleO::Services::Ntp
       - OS::TripleO::Services::Timezone
       - OS::TripleO::Services::TripleoFirewall
-#  - name: 'ComputeDeployedServerServices:'
-#    services:
+  - name: 'ComputeDeployedServerServices:'
+    services: []
 #      - OS::TripleO::Services::NovaCompute
 #      - OS::TripleO::Services::NovaLibvirt
 #      - OS::TripleO::Services::ComputeNeutronOvsAgent
 #      - OS::TripleO::Services::Docker
+
+# Which nodes roles to ssh in and apply deployed-server magic
 #overcloud_deployed_roles: "ControllerDeployedServer ComputeDeployedServer"
 overcloud_deployed_roles: "ControllerDeployedServer"
 controller_hosts: "{{ lookup('env', 'CONTROLLER_HOSTS') }}"
-compute_hosts: "{{ lookup('env', 'COMPUTE_HOSTS') }}"
+compute_hosts: "{{ lookup('env', 'COMPUTE_HOSTS')|default('') }}"
 subnodes_ssh_key: "{{ lookup('env', 'SUBNODES_SSH_KEY') }}"
 
+# TODO figure out a networking setup from multinode CI scenarios.
+# Do not use host cloud floating IPs subnet for external-ish variables!
+# see also undercloud_networks in oooq
 network_isolation: false
-# https://review.openstack.org/#/c/470293/
+# These seem only wanted for non multinode, when network_isolation is enabled
+#step_adjust_mtu: true
+#mtu: 1350
+#mtu_interface:
+#  - eth0
+#undercloud_external_network_cidr: 10.0.0.0/24
+
+# Host cloud private tenant network CIDR, Traas hardcoded
 undercloud_network_cidr: 192.168.0.0/24
 ctl_plane_ip: "{{ hostvars['undercloud'].undercloud_ip }}"
-undercloud_external_network_cidr: "{{ lookup('env', 'EXT_NET_CIDR') }}"
-external_network_cidr: "{{ lookup('env', 'EXT_NET_CIDR') }}"
+
+# Private VMs' networks for overcloud contol traffic routing,
+# based on the chosen network_isolation
+undercloud_external_network_cidr: "{{ undercloud_network_cidr }}"
+external_network_cidr: "{{ undercloud_external_network_cidr }}"
+
+# Private tenant net defaults and RDO cloud specific DNS servers
 overcloud_dns_servers:
   - "{{ undercloud_network_cidr|nthhost(2) }}"
-  - 8.8.8.8
+  - 38.145.32.66
+  - 38.145.32.79
+
 network_environment_args:
   ExternalNetCidr: "{{ undercloud_external_network_cidr }}"
   ExternalAllocationPools: >
