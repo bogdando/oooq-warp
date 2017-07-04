@@ -70,13 +70,13 @@ undercloud_update_packages: >-
   python-paunch
   python-heat-agent*
   os-*
+# See also flags like:
+#  --keep-running
+#  --heat-native
 undercloud_extra_args: >-
   -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
   --timeout 60
-
-#  -e {{overcloud_templates_path}}/environments/services-docker/etcd.yaml
-#  --keep-running
-#  --heat-native
+  --heat-native
 
 #undercloud_docker_registry_mirror: http://some-registry.lc:5000/registry-1.docker
 containerized_undercloud: true
@@ -107,3 +107,20 @@ validation_args: --disable-validations
 # COMPOSABLE
 deploy_composable_scenario: false
 #composable_scenario: scenario005-multinode.yaml
+
+# OTHER TOP SCOPE OVERRIDES
+# traas-overcloud
+# Override tht deployed-server-environment.yaml and drop it from oooq multinode_args
+multinode_args: ""
+use_resource_registry_nic_configs: true
+resource_registry_args:
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-static-bridge.yaml"
+  #OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-static-bridge.yaml"
+  OS::TripleO::Server: "{{ overcloud_templates_path }}/deployed-server/deployed-server.yaml"
+  OS::TripleO::DeployedServer::ControlPlanePort: OS::Neutron::Port
+  OS::TripleO::DeployedServer::Bootstrap: OS::Heat::None
+
+# Drop docker-network.yaml from oooq container_args to not conflict
+container_args: >-
+  -e {{ overcloud_templates_path }}/environments/docker.yaml
+  -e {{ working_dir }}/containers-default-parameters.yaml

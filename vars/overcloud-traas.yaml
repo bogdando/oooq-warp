@@ -9,28 +9,21 @@ deployed_server: true
 node_cound: 1
 flavor_args: ''
 # FIXME given a provisioned traas stack name was 'foo'.
-# Note, flavor args, if any, must be as well defined for overcloud_roles.
 overcloud_nodes:
   - name: foo-overcloud-controller-0
   - name: foo-overcloud-compute-0
 
 # Note, scale args are ignored for composable roles.
-# Use a custom t-h-t env instead.
+# Add a custom t-h-t env instead, for example
+# https://github.com/bogdando/tripleo-heat-templates/blob/dev/environments/custom.yaml:
+#  -e {{overcloud_templates_path}}/environments/custom.yaml
 extra_args: >
   {{ extra_args_common }}
   -e {{ working_dir }}/network-environment.yaml
   -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
 
-# https://github.com/bogdando/tripleo-heat-templates/blob/dev/environments/custom.yaml
-#  -e {{overcloud_templates_path}}/environments/custom.yaml
-
-#  --control-scale 1
-#  --compute-scale 0
-#  -e {{ overcloud_templates_path }}/environments/deployed-server-noop-ctlplane.yaml
-
 # Composable deployed-server roles to override defaults in
 # tht's deployed-server/deployed-server-roles-data.yaml
-# Requires https://review.openstack.org/#/c/455719
 composable_roles: true
 # ServicesDefault merges services from the overcloud_services
 # TODO remaining deployed server roles supported
@@ -68,7 +61,7 @@ overcloud_services:
       - OS::TripleO::Services::Timezone
       - OS::TripleO::Services::TripleoFirewall
 
-# Doesn't work well for oooq, produces bad indentation
+# FIXME Doesn't work well for oooq, produces bad indentation
 #  - name: 'ComputeDeployedServerServices:'
 #    services:
 #      - OS::TripleO::Services::NovaCompute
@@ -87,7 +80,7 @@ subnodes_ssh_key: "{{ lookup('env', 'SUBNODES_SSH_KEY') }}"
 # Do not use host cloud floating IPs subnet for external-ish variables!
 # see also undercloud_networks in oooq
 network_isolation: false
-# These seem only wanted for non multinode, when network_isolation is enabled
+# Enable these, when network_isolation is enabled
 #step_adjust_mtu: true
 #mtu: 1350
 #mtu_interface:

@@ -30,7 +30,7 @@ function finalize {
 }
 trap finalize EXIT
 
-if [ "${TEARDOWN}" != "false" -a "${PLAY}" = "oooq-libvirt-provision.yaml" ]; then
+if [ "${TEARDOWN}" = "true" -a "${PLAY}" = "oooq-libvirt-provision.yaml" ]; then
   # provision VMs, generate inventory, exit if INTERACTIVE mode
   # TODO traas provision to come here as well
   inventory=${SCRIPTS}/inventory.ini

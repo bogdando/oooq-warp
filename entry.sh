@@ -63,6 +63,7 @@ if [ "$INTERACTIVE" = "true" ]; then
   echo =================================================================================================
   echo export PLAY=oooq-traas.yaml to generate inventory for existing openstack VMs
   echo export PLAY=oooq-traas-under.yaml to deploy an undercloud on openstack
+  echo export PLAY=oooq-traas-over.yaml to deploy an overcloud on on openstack
   echo export HACK=true for an experimental interleaved uc/oc deployment mode
   echo Run create_env_oooq.sh to deploy
   /bin/bash

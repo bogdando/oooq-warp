@@ -179,6 +179,13 @@ to disable apparmor for libvirt and reconfigure qemu as well:
 
 ## Traas multinode pre-provisioned deployment with openstack provider
 
+Note that you should disable Neutron ports security for pre-provisioned VMs
+running at the host cloud as an overcloud deployment prerequisite:
+```
+neutron port-update --no-security-groups $PORT
+neutron port-update  $PORT --port-security-enabled=False
+```
+
 Update the ``vars/inventory-traas.yaml`` vars file with required info, like
 OpenStack cloud access secrets and endpoints. Now you need to generate an
 ansible inventory for the undercloud/overcloud VMs on OpenStack (see
@@ -215,3 +222,7 @@ Use the ``openstack --os-cloud my-cool-cloud server list`` outputs to get
 a list of controllers/computes/etc private IPs for export.
 SSH keys placement is up to cloud init scripts for the pre-provisioned hosts.
 Traas creates them under the centos user home by default.
+
+The `custom.yaml_defaults` also provides some top level overrides
+for oooq roles' vars. Those are needed to reify multinode/deployed-server
+networking.
