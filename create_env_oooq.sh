@@ -1,6 +1,6 @@
 #!/bin/bash
 # Override vars for oooq wrapper then poke deploy
 # Do not use this as a separate.
-set -uxe
+set -xe
 cd /tmp/oooq
-deploy.sh
+deploy.sh $@

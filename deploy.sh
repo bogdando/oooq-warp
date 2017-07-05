@@ -4,6 +4,7 @@
 # must be executed from the oooq root dir
 set -uxe
 
+ARGS=${@:-" "}
 USER=${USER:-bogdando}
 SCRIPTS=/tmp/scripts
 LOG_LEVEL=${LOG_LEVEL:--v}
@@ -22,6 +23,7 @@ function with_ansible {
     --forks=$ANSIBLE_FORKS --timeout $ANSIBLE_TIMEOUT \
     -e teardown=$TEARDOWN \
     -e @${SCRIPTS}/custom.yaml \
+    ${ARGS} \
     $LOG_LEVEL $@
 }
 
