@@ -96,8 +96,10 @@ run_tempest: false
 test_ping: false
 step_validate_overcloud: false
 step_introspect: false
+# https://review.openstack.org/#/c/480263/
 extra_args_common: >-
   --ntp-server pool.ntp.org
+  --pre-provisioned
 
 #  -e {{overcloud_templates_path}}/environments/debug.yaml
 #  -e {{overcloud_templates_path}}/environments/config-debug.yaml
