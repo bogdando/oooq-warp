@@ -74,7 +74,6 @@ undercloud_update_packages: "'*'"
 undercloud_extra_args: >-
   -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
   --timeout 60
-  --heat-native
 
 #undercloud_docker_registry_mirror: http://some-registry.lc:5000/registry-1.docker
 containerized_undercloud: true
@@ -97,7 +96,7 @@ step_introspect: false
 # https://review.openstack.org/#/c/480263/
 extra_args_common: >-
   --ntp-server pool.ntp.org
-  --pre-provisioned
+  --deployed-server
 
 #  -e {{overcloud_templates_path}}/environments/debug.yaml
 #  -e {{overcloud_templates_path}}/environments/config-debug.yaml
@@ -111,11 +110,12 @@ deploy_composable_scenario: false
 # OTHER TOP SCOPE OVERRIDES
 # traas-overcloud
 # Override tht deployed-server-environment.yaml and drop it from oooq multinode_args
+# ...which one to pick??? https://bugs.launchpad.net/tripleo/+bug/1702280 :-(
 multinode_args: ""
 use_resource_registry_nic_configs: true
 resource_registry_args:
   OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-static-bridge.yaml"
-  #OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-static-bridge.yaml"
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-static.yaml"
   OS::TripleO::Server: "{{ overcloud_templates_path }}/deployed-server/deployed-server.yaml"
   OS::TripleO::DeployedServer::ControlPlanePort: OS::Neutron::Port
   OS::TripleO::DeployedServer::Bootstrap: OS::Heat::None
