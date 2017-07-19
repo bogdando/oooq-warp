@@ -27,11 +27,7 @@ if [ "${VENV}" = "local" ]; then
   set +u
   . /usr/bin/virtualenvwrapper.sh
   . ${HOME}/Envs/oooq/bin/activate
-  if [[ "$PLAY" =~ "traas" ]]; then
-    . /tmp/scripts/ssh_config_nonlocal
-  else
-    . /tmp/scripts/ssh_config
-  fi
+  [[ "$PLAY" =~ "libvirt" ]] && (. /tmp/scripts/ssh_config)
   set -u
 
   # Hack into oooq-extras dev branch
