@@ -61,18 +61,16 @@ repo_cmd_after: ''
 
 ## UNDERCLOUD
 undercloud_generate_service_certificate: false
-# https://review.openstack.org/#/c/450792/
-undercloud_update_packages: >-
-  openstack-tripleo*
-  openstack-puppet-modules
-  puppet-*
-  python-tripleoclient
-  python-paunch
-  python-heat-agent*
-  os-*
-# See also flags like:
-#  --keep-running
-#  --heat-native
+# You should better off using '*'
+undercloud_update_packages: "'*'"
+#undercloud_update_packages: >-
+#  openstack-tripleo*
+#  openstack-puppet-modules
+#  puppet-*
+#  python-tripleoclient
+#  python-paunch
+#  python-heat-agent*
+#  os-*
 undercloud_extra_args: >-
   -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
   --timeout 60
