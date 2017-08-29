@@ -11,7 +11,8 @@ flavor_args: ''
 # FIXME given a provisioned traas stack name was 'foo'.
 overcloud_nodes:
   - name: foo-overcloud-controller-0
-  - name: foo-overcloud-compute-0
+
+#  - name: foo-overcloud-compute-0
 
 # Note, scale args are ignored for composable roles.
 # Add a custom t-h-t env instead, for example
@@ -38,12 +39,12 @@ overcloud_roles:
       - primary
       - controller
 
-  - name: ComputeDeployedServer
-    HostnameFormatDefault: 'foo-%stackname%-compute-%index%'
-    disable_upgrade_deployment: True
-    disable_constraints: True
-    CountDefault: 0
-    ServicesDefault: []
+#  - name: ComputeDeployedServer
+#    HostnameFormatDefault: 'foo-%stackname%-compute-%index%'
+#    disable_upgrade_deployment: True
+#    disable_constraints: True
+#    CountDefault: 0
+#    ServicesDefault: []
 
 composable_services: true
 overcloud_services:
@@ -77,8 +78,9 @@ overcloud_services:
 deployed_server_overcloud_roles:
   - name: ControllerDeployedServer
     hosts: "{{ lookup('env', 'CONTROLLER_HOSTS') }}"
-  - name: ComputeDeployedServer
-    hosts: "{{ lookup('env', 'COMPUTE_HOSTS')|default('') }}"
+
+#  - name: ComputeDeployedServer
+#    hosts: "{{ lookup('env', 'COMPUTE_HOSTS')|default('') }}"
 subnodes_ssh_key: "{{ lookup('env', 'SUBNODES_SSH_KEY') }}"
 
 # TODO figure out a networking setup from multinode CI scenarios.
