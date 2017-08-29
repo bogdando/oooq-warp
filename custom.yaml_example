@@ -80,10 +80,24 @@ containerized_undercloud: true
 step_install_undercloud: true
 undercloud_install_script: undercloud-deploy.sh.j2
 
+# Define these, if UC container images must be pulled from a custom registry.
+# Normally, they don't
+#undercloud_docker_registry_host: some local (non UC) registry
+#undercloud_docker_registry_port: a port
+#undercloud_docker_registry_namespace: tripleoupstream
+#undercloud_docker_registry_insecure: true
+
 ## OVERCLOUD
 #overcloud_nodes: false
 step_deploy_overcloud: true
 containerized_overcloud: true
+# push overcloud images to UC serving a local registry
+# NOTE: overcloud prep containers hardcodes a 8787 port
+local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
+# pull overcloud images from
+docker_registry_host: docker.io
+docker_image_tag: latest
+docker_registry_namespace: tripleoupstream
 enable_pacemaker: false
 overcloud_ipv6: false
 enable_swap: false
