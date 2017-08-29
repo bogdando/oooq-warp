@@ -12,8 +12,8 @@
   roles:
     - overcloud-deploy
   #TODO parametrize env vars for the deployed-server remaining roles
+  #NOTE FooCustomRoleName_hosts must be explicitely exported
   environment:
-    OVERCLOUD_ROLES: "{{overcloud_deployed_roles}}"
-    ControllerDeployedServer_hosts: "{{controller_hosts}}"
+    ControllerDeployedServer_hosts: "{{ lookup('env', 'CONTROLLER_HOSTS') }}"
     SUBNODES_SSH_KEY: "{{subnodes_ssh_key}}"
-  #  ComputeDeployedServer_hosts: "{{compute_hosts}}"
+    OVERCLOUD_SSH_USER: "{{ssh_user}}"
