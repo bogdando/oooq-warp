@@ -119,8 +119,8 @@ network_environment_args:
   ControlPlaneDefaultRoute: "{{ undercloud_network_cidr|nthhost(1) }}"
   EC2MetadataIp: "{{ ctl_plane_ip }}"
   DnsServers: "{{ overcloud_dns_servers }}"
-  NeutronPublicInterface: nic2
-  HypervisorNeutronPublicInterface: nic2
+  NeutronPublicInterface: eth1
+  HypervisorNeutronPublicInterface: eth1
 
 undercloud_user: centos
 ssh_user: "{{ undercloud_user }}"
