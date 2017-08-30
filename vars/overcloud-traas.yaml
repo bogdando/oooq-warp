@@ -17,9 +17,9 @@ overcloud_nodes:
 # Note, scale args are ignored for composable roles.
 # Add a custom t-h-t env instead, for example
 # https://github.com/bogdando/tripleo-heat-templates/blob/dev/environments/custom.yaml:
-#  -e {{overcloud_templates_path}}/environments/custom.yaml
 extra_args: >
   {{ extra_args_common }}
+  -e {{overcloud_templates_path}}/environments/custom.yaml
   -e {{ working_dir }}/network-environment.yaml
   -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
   -e {{ overcloud_templates_path }}/environments/split-stack-consistent-hostname-format.yaml
