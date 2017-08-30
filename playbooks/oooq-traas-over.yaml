@@ -21,6 +21,19 @@
     - overcloud-prep-config
     - overcloud-prep-containers
 
+- name: Make overcloud-status to not fail
+  hosts: localhost
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  vars_files:
+    - ../vars/overcloud-traas.yaml
+  tasks:
+    - file:
+        state: directory
+        path: /home/{{ ssh_user }}
+        owner: "{{ lookup('env', 'USER') }}"
+
 - name:  Deploy the overcloud (multinode)
   any_errors_fatal: true
   hosts: undercloud
