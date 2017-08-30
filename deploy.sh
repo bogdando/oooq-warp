@@ -54,7 +54,7 @@ else
   # hacking/racy mode for scripted ansible-playbook calls interleaved by tags:
   echo "Deploy with quickstart, interleaved hacking (experimental)"
   with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_repos.yml
-  (with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_prep.yml)&
+  (while true; do with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_prep.yml; [ $? -eq 0 ] && break; sleep 20; done)&
   with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_uc.yml --skip-tags overcloud-prep-containers
   with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_oc.yml
 fi
