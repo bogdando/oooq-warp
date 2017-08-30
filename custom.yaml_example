@@ -138,3 +138,8 @@ resource_registry_args:
 container_args: >-
   -e {{ overcloud_templates_path }}/environments/docker.yaml
   -e {{ working_dir }}/containers-default-parameters.yaml
+
+## https://review.openstack.org/#/c/496950
+#prepare_service_env_args: >-
+#  -e {{ overcloud_templates_path }}/environments/docker.yaml
+
