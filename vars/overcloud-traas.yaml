@@ -22,7 +22,9 @@ extra_args: >
   -e {{overcloud_templates_path}}/environments/custom.yaml
   -e {{ working_dir }}/network-environment.yaml
   -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
-  -e {{ overcloud_templates_path }}/environments/split-stack-consistent-hostname-format.yaml
+
+# NOTE: this does not match the custom host names format, overriden in t-h-t custom.yaml instead
+#  -e {{ overcloud_templates_path }}/environments/split-stack-consistent-hostname-format.yaml
 
 # Composable deployed-server roles to override defaults in
 # tht's deployed-server/deployed-server-roles-data.yaml
