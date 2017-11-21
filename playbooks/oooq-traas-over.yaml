@@ -1,5 +1,15 @@
 ---
 # Non local deployments by quickstart
+- name: Validate CONTROLLER_HOSTS exported for deployed server
+  hosts: localhost
+  connection: local
+  any_errors_fatal: true
+  gather_facts: false
+  tasks:
+    - assert:
+        that:
+          - "{{ lookup('env', 'CONTROLLER_HOSTS') != '' }}"
+
 - name: Install delorian repos
   hosts: overcloud
   any_errors_fatal: true
