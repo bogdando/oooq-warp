@@ -1,0 +1,51 @@
+---
+# Non local deployments by quickstart, from oooq-traas-over.yaml, but for k8s
+- name: Install delorian repos
+  hosts: overcloud
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  vars_files:
+    - ../vars/kubespray-traas.yaml
+  roles:
+    - {role: repo-setup,  when: configure_repos|bool}
+
+- name: Run overcloud prep roles
+  hosts: undercloud
+  any_errors_fatal: true
+  vars_files:
+    - ../vars/kubespray-traas.yaml
+  gather_facts: false
+  become: true
+  roles:
+    - overcloud-prep-config
+    - overcloud-prep-containers
+
+- name: Make overcloud-status to not fail
+  hosts: localhost
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  vars_files:
+    - ../vars/kubespray-traas.yaml
+  tasks:
+    - file:
+        state: directory
+        path: /home/{{ ssh_user }}
+        owner: "{{ lookup('env', 'USER') }}"
+
+- name:  Deploy the overcloud (multinode)
+  any_errors_fatal: true
+  hosts: undercloud
+  gather_facts: true
+  become: false
+  vars_files:
+    - ../vars/kubespray-traas.yaml
+  roles:
+    - overcloud-deploy
+  #TODO parametrize env vars for the deployed-server remaining roles
+  #NOTE FooCustomRoleName_hosts must be explicitely exported
+  environment:
+    ControllerDeployedServer_hosts: "{{ lookup('env', 'CONTROLLER_HOSTS') }}"
+    SUBNODES_SSH_KEY: "{{subnodes_ssh_key}}"
+    OVERCLOUD_SSH_USER: "{{ssh_user}}"

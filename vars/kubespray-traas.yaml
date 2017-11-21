@@ -1,4 +1,5 @@
-# reworked general multinode job configuration from oooq
+# from overcloud-traas.yaml, with external_deployments and configs download
+# added from tripleo-quickstart/tree/config/general_config/featureset010.yml
 deploy_multinode: true
 step_overcloud_image: false
 step_glance_upload: false
@@ -8,11 +9,16 @@ deployed_server: true
 
 # Drop docker-network.yaml from oooq container_args to not conflict
 container_args: >-
-  -e {{ overcloud_templates_path }}/environments/docker.yaml
+  -e {{ overcloud_templates_path }}/environments/kubernetes.yaml
   -e {{ working_dir }}/containers-default-parameters.yaml
 
 prepare_service_env_args: >-
-  -e {{ overcloud_templates_path }}/environments/docker.yaml
+  -e {{ overcloud_templates_path }}/environments/kubernetes.yaml
+
+deploy_steps_ansible_workflow: true
+config_download_args: >-
+  -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml
+  --config-download
 
 node_cound: 1
 flavor_args: ''
@@ -30,6 +36,7 @@ extra_args: >
   -e {{overcloud_templates_path}}/environments/custom.yaml
   -e {{ working_dir }}/network-environment.yaml
   -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
+  -e {{overcloud_templates_path}}/environments/kubernetes.yaml
 
 # NOTE: this does not match the custom host names format, overriden in t-h-t custom.yaml instead
 #  -e {{ overcloud_templates_path }}/environments/split-stack-consistent-hostname-format.yaml
@@ -48,6 +55,12 @@ overcloud_roles:
     tags:
       - primary
       - controller
+    networks:
+      - External
+      - InternalApi
+      - Storage
+      - StorageMgmt
+      - Tenant
 
 #  - name: ComputeDeployedServer
 #    HostnameFormatDefault: 'foo-%stackname%-compute-%index%'
@@ -62,25 +75,20 @@ overcloud_services:
     services:
       - OS::TripleO::Services::Docker
       - OS::TripleO::Services::Kernel
-      - OS::TripleO::Services::Keystone
-      - OS::TripleO::Services::NovaApi
-      - OS::TripleO::Services::RabbitMQ
-      - OS::TripleO::Services::MySQL
-      - OS::TripleO::Services::Memcached
-      - OS::TripleO::Services::MySQLClient
+      - OS::TripleO::Services::Ntp
+      - OS::TripleO::Services::Snmp
+      - OS::TripleO::Services::Timezone
+      - OS::TripleO::Services::TripleoPackages
+      - OS::TripleO::Services::TripleoFirewall
       - OS::TripleO::Services::HAproxy
       - OS::TripleO::Services::Keepalived
-      - OS::TripleO::Services::Ntp
-      - OS::TripleO::Services::Timezone
-      - OS::TripleO::Services::TripleoFirewall
+      - OS::TripleO::Services::Sshd
+      - OS::TripleO::Services::Kubernetes::Master
+      - OS::TripleO::Services::Kubernetes::Worker
 
 # FIXME Doesn't work well for oooq, produces bad indentation
 #  - name: 'ComputeDeployedServerServices:'
 #    services:
-#      - OS::TripleO::Services::NovaCompute
-#      - OS::TripleO::Services::NovaLibvirt
-#      - OS::TripleO::Services::ComputeNeutronOvsAgent
-#      - OS::TripleO::Services::Docker
 
 # Which nodes roles to ssh in and apply deployed-server magic
 # TODO remaining deployed server roles supported
