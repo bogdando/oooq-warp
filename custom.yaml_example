@@ -33,6 +33,7 @@ gating_repo_enabled: false
 #  - type: tripleo-repos
 #    bundle: current
 #    release: master
+# TODO: rework with dlrn_hash_tag: current-tripleo / dlrn_hash_tag_newest: current ?
 dlrn_hash: current
 repos:
   - type: generic
@@ -73,18 +74,24 @@ undercloud_update_packages: "'*'"
 #  os-*
 undercloud_extra_args: >-
   -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
+  -e {{overcloud_templates_path}}/environments/debug.yaml
+  -e {{overcloud_templates_path}}/environments/config-debug.yaml
   --timeout 60
+  --heat-native
+# See https://bugs.launchpad.net/tripleo/+bug/1733381 , fails w/o heat-native :/
 
 #undercloud_docker_registry_mirror: http://some-registry.lc:5000/registry-1.docker
 containerized_undercloud: true
 step_install_undercloud: true
 undercloud_install_script: undercloud-deploy.sh.j2
 
+composable_undercloud_roles: true
+
 # Define these, if UC container images must be pulled from a custom registry.
 # Normally, they don't
 #undercloud_docker_registry_host: some local (non UC) registry
 #undercloud_docker_registry_port: a port
-#undercloud_docker_registry_namespace: tripleoupstream
+#undercloud_docker_registry_namespace: tripleomaster
 #undercloud_docker_registry_insecure: true
 
 ## OVERCLOUD
@@ -96,8 +103,8 @@ containerized_overcloud: true
 local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
 # pull overcloud images from
 docker_registry_host: docker.io
-docker_image_tag: latest
-docker_registry_namespace: tripleoupstream
+docker_image_tag: current-tripleo
+docker_registry_namespace: tripleomaster
 enable_pacemaker: false
 overcloud_ipv6: false
 enable_swap: false
@@ -107,11 +114,11 @@ run_tempest: false
 test_ping: false
 step_validate_overcloud: false
 step_introspect: false
-# https://review.openstack.org/#/c/480263/
 extra_args_common: >-
   --ntp-server pool.ntp.org
   --deployed-server
 
+#  --verbose
 #  -e {{overcloud_templates_path}}/environments/debug.yaml
 #  -e {{overcloud_templates_path}}/environments/config-debug.yaml
 #  -e {{overcloud_templates_path}}/environments/puppet-pacemaker.yaml
@@ -139,7 +146,6 @@ container_args: >-
   -e {{ overcloud_templates_path }}/environments/docker.yaml
   -e {{ working_dir }}/containers-default-parameters.yaml
 
-## https://review.openstack.org/#/c/496950
-#prepare_service_env_args: >-
-#  -e {{ overcloud_templates_path }}/environments/docker.yaml
+prepare_service_env_args: >-
+  -e {{ overcloud_templates_path }}/environments/docker.yaml
 
