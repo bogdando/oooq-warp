@@ -98,10 +98,11 @@ containerized_overcloud: true
 # push overcloud images to UC serving a local registry
 # NOTE: overcloud prep containers hardcodes a 8787 port
 local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
+additional_insecure_registry: true
 # pull overcloud images from
-docker_registry_host: docker.io
-docker_image_tag: current-tripleo
-docker_registry_namespace: tripleomaster
+docker_registry_host: "{{ local_docker_registry_host }}"
+docker_image_tag: "{{ undercloud_docker_image_tag }}"
+docker_registry_namespace: "{{ undercloud_docker_registry_namespace }}"
 enable_pacemaker: false
 overcloud_ipv6: false
 enable_swap: false
