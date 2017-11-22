@@ -5,4 +5,5 @@ non_root_group: "{{ undercloud_user }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 working_dir: /home/{{ undercloud_user }}
 undercloud_network_cidr: 192.168.0.0/24
-undercloud_undercloud_hostname: foo-undercloud.novalocal
+undercloud_undercloud_hostname: foo-undercloud.rdocloud
+overcloud_cloud_domain: rdocloud

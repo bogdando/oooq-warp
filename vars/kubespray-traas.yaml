@@ -146,3 +146,4 @@ non_root_user: "{{ undercloud_user }}"
 non_root_group: "{{ undercloud_user }}"
 local_working_dir: /home/{{ undercloud_user }}
 working_dir: /home/{{ undercloud_user }}
+overcloud_cloud_domain: rdocloud
