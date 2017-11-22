@@ -84,15 +84,12 @@ undercloud_extra_args: >-
 containerized_undercloud: true
 step_install_undercloud: true
 undercloud_install_script: undercloud-deploy.sh.j2
-
 composable_undercloud_roles: true
-
-# Define these, if UC container images must be pulled from a custom registry.
-# Normally, they don't
-#undercloud_docker_registry_host: some local (non UC) registry
+# https://review.openstack.org/#/c/522187/
+undercloud_docker_registry_host: docker.io
 #undercloud_docker_registry_port: a port
-#undercloud_docker_registry_namespace: tripleomaster
-#undercloud_docker_registry_insecure: true
+undercloud_docker_registry_namespace: tripleomaster
+undercloud_docker_image_tag: current-tripleo
 
 ## OVERCLOUD
 #overcloud_nodes: false
