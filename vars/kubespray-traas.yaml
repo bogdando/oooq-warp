@@ -18,10 +18,12 @@ prepare_service_env_args: >-
 # It does not that we want here, yet. Use a custom port mappings template
 # instead!
 #deploy_steps_ansible_workflow: true
+# note: --config-download doesn't work well yet, stack updates ok, yet the deploy
+# command hangs after 'Starting ssh admin enablement workflow' done.
+
 #https://review.openstack.org/#/c/522776
 config_download_args: >-
   -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml
-  --config-download
   --overcloud-ssh-user centos
   --overcloud-ssh-key /home/centos/.ssh/id_rsa
 
