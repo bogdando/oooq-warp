@@ -1,0 +1,11 @@
+# TBD parametrization with oooq's deploy_steps_ansible_workflow
+# Just copy it undercloud and update with the deployed server controller's ctlplane IP/name
+resource_registry:
+  OS::TripleO::DeployedServer::ControlPlanePort: /var/tmp/overcloud-openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+parameter_defaults:
+  DeployedServerPortMap:
+    foo-overcloud-controller-0-ctlplane:
+      fixed_ips:
+        - ip_address: 192.168.0.9
+      subnets:
+        - cidr: 24

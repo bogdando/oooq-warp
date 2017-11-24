@@ -6,8 +6,6 @@ step_glance_upload: false
 step_register: false
 hypervisor_wait: false
 deployed_server: true
-overcloud_user: centos
-overcloud_key: /home/centos/.ssh/id_rsa
 
 # Drop docker-network.yaml from oooq container_args to not conflict
 container_args: >-
@@ -24,8 +22,8 @@ prepare_service_env_args: >-
 config_download_args: >-
   -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml
   --config-download
-  --overcloud-ssh-user {{ overcloud_user }}
-  --overcloud-ssh-key {{ overcloud_key }}
+  --overcloud-ssh-user centos
+  --overcloud-ssh-key /home/centos/.ssh/id_rsa
 
 node_cound: 1
 flavor_args: ''
@@ -147,6 +145,8 @@ network_environment_args:
   NeutronPublicInterface: eth1
   HypervisorNeutronPublicInterface: eth1
 
+overcloud_user: centos
+overcloud_key: /home/centos/.ssh/id_rsa
 undercloud_user: centos
 ssh_user: "{{ undercloud_user }}"
 non_root_user: "{{ undercloud_user }}"
