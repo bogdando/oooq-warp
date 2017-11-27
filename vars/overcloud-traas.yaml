@@ -173,3 +173,8 @@ non_root_group: "{{ undercloud_user }}"
 local_working_dir: /home/{{ undercloud_user }}
 working_dir: /home/{{ undercloud_user }}
 overcloud_cloud_domain: rdocloud
+overcloud_cloud_name: overcloud.rdocloud
+overcloud_cloud_name_internal: overcloud.internalapi.rdocloud
+overcloud_cloud_name_storage:  overcloud.storage.rdocloud
+overcloud_cloud_name_storage_management: overcloud.storagemanagement.rdocloud
+overcloud_cloud_name_ctlplane: overcloud.ctlplane.rdocloud
