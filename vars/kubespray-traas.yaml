@@ -52,7 +52,6 @@ overcloud_roles:
   - name: ControllerDeployedServer
     HostnameFormatDefault: 'foo-%stackname%-controller-%index%'
     disable_constraints: True
-    disable_upgrade_deployment: True
     ServicesDefault: []
     CountDefault: 1
     tags:
@@ -64,6 +63,9 @@ overcloud_roles:
       - Storage
       - StorageMgmt
       - Tenant
+
+# requires https://bugs.launchpad.net/tripleo/+bug/1733837 resolved
+#    disable_upgrade_deployment: True
 
 #  - name: ComputeDeployedServer
 #    HostnameFormatDefault: 'foo-%stackname%-compute-%index%'
