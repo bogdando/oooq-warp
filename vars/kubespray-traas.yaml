@@ -52,6 +52,7 @@ overcloud_roles:
   - name: ControllerDeployedServer
     HostnameFormatDefault: 'foo-%stackname%-controller-%index%'
     disable_constraints: True
+    disable_upgrade_deployment: True
     ServicesDefault: []
     CountDefault: 1
     tags:
