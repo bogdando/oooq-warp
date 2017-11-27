@@ -138,3 +138,4 @@ resource_registry_args:
   OS::TripleO::Server: "{{ overcloud_templates_path }}/deployed-server/deployed-server.yaml"
   OS::TripleO::DeployedServer::ControlPlanePort: OS::Neutron::Port
   OS::TripleO::DeployedServer::Bootstrap: OS::Heat::None
+  OS::TripleO::DeployedServer::ControlPlanePort: "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
