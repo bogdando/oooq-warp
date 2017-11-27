@@ -141,6 +141,8 @@ network_environment_args:
   DnsServers: "{{ overcloud_dns_servers }}"
   NeutronPublicInterface: eth1
   HypervisorNeutronPublicInterface: eth1
+  HostnameMap:
+    overcloud-controller-0: foo-overcloud-controller-0
   DeployedServerPortMap:
     control_virtual_ip:
       fixed_ips:
