@@ -165,6 +165,8 @@ network_environment_args:
 
 #  ControllerDeployedServerFlavor: foo
 #  ExtraConfig: {}
+#  ControlVirtualIP: <pre_provisioned_configufed_ip>
+#  RedisVirtualIP: <pre_provisioned_configufed_ip2>
 
 overcloud_user: centos
 overcloud_key: /home/centos/.ssh/id_rsa
