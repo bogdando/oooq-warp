@@ -36,17 +36,12 @@ overcloud_nodes:
 #  - name: foo-overcloud-compute-0
 
 # Note, scale args are ignored for composable roles.
-# Add a custom t-h-t env instead, for example
-# https://github.com/bogdando/tripleo-heat-templates/blob/dev/environments/custom.yaml:
+# Add a custom t-h-t env instead
 extra_args: >
   {{ extra_args_common }}
-  -e {{overcloud_templates_path}}/environments/custom.yaml
   -e {{ working_dir }}/network-environment.yaml
   -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
   -e {{overcloud_templates_path}}/environments/kubernetes.yaml
-
-# NOTE: this does not match the custom host names format, overriden in t-h-t custom.yaml instead
-#  -e {{ overcloud_templates_path }}/environments/split-stack-consistent-hostname-format.yaml
 
 # Composable deployed-server roles to override defaults in
 # tht's deployed-server/deployed-server-roles-data.yaml
@@ -137,6 +132,7 @@ overcloud_dns_servers:
   - 38.145.32.66
   - 38.145.32.79
 
+# FIXME Hack: merge environments/custom.yaml parameter_defaults into a single template
 network_environment_args:
   ExternalNetCidr: "{{ undercloud_external_network_cidr }}"
   ExternalAllocationPools: >
@@ -160,6 +156,17 @@ network_environment_args:
         - ip_address: "{{ first_controller_ip }}"
       subnets:
         - cidr: 24
+  ControllerDeployedServerCount: 1
+  ControllerDeployedServerExtraConfig:
+    nova::compute::libvirt::services::libvirt_virt_type: qemu
+    nova::compute::libvirt::libvirt_virt_type: qemu
+    nova::compute::libvirt::libvirt_cpu_mode: 'none'
+  ComputeDeployedServerCount: 0
+  ControllerHostnameFormat: 'foo-%stackname%-controller-%index%'
+  DockerPuppetDebug: true
+
+#  ControllerDeployedServerFlavor: foo
+#  ExtraConfig: {}
 
 overcloud_user: centos
 overcloud_key: /home/centos/.ssh/id_rsa
