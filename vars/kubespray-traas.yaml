@@ -50,7 +50,7 @@ composable_roles: true
 # TODO remaining deployed server roles supported
 overcloud_roles:
   - name: ControllerDeployedServer
-    HostnameFormatDefault: 'foo-%stackname%-controller-%index%'
+    HostnameFormatDefault: '%stackname%-controller-%index%'
     disable_constraints: True
     ServicesDefault: []
     CountDefault: 1
@@ -68,7 +68,7 @@ overcloud_roles:
 #    disable_upgrade_deployment: True
 
 #  - name: ComputeDeployedServer
-#    HostnameFormatDefault: 'foo-%stackname%-compute-%index%'
+#    HostnameFormatDefault: '%stackname%-compute-%index%'
 #    disable_upgrade_deployment: True
 #    disable_constraints: True
 #    CountDefault: 0
@@ -149,8 +149,6 @@ network_environment_args:
   DnsServers: "{{ overcloud_dns_servers }}"
   NeutronPublicInterface: eth1
   HypervisorNeutronPublicInterface: eth1
-  HostnameMap:
-    overcloud-controller-0: foo-overcloud-controller-0
   DeployedServerPortMap:
     control_virtual_ip:
       fixed_ips:
@@ -168,13 +166,15 @@ network_environment_args:
     nova::compute::libvirt::libvirt_virt_type: qemu
     nova::compute::libvirt::libvirt_cpu_mode: 'none'
   ComputeDeployedServerCount: 0
-  ControllerHostnameFormat: 'foo-%stackname%-controller-%index%'
+  ControllerHostnameFormat: '%stackname%-controller-%index%'
   DockerPuppetDebug: true
 
 #  ControllerDeployedServerFlavor: foo
 #  ExtraConfig: {}
 #  ControlVirtualIP: <pre_provisioned_configufed_ip>
 #  RedisVirtualIP: <pre_provisioned_configufed_ip2>
+#  HostnameMap:
+#    overcloud-controller-0: foo-overcloud-controller-0
 
 overcloud_user: centos
 overcloud_key: /home/centos/.ssh/id_rsa
