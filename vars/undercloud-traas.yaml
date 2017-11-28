@@ -4,6 +4,6 @@ non_root_user: "{{ undercloud_user }}"
 non_root_group: "{{ undercloud_user }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 working_dir: /home/{{ undercloud_user }}
-undercloud_network_cidr: "{{ (hostvars['undercloud'].undercloud_ip + '/24')|ipaddr('0') }}"
+undercloud_network_cidr: 192.168.0.0/24
 undercloud_undercloud_hostname: foo-undercloud.rdocloud
 overcloud_cloud_domain: rdocloud

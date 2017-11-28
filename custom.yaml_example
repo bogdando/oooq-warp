@@ -142,4 +142,4 @@ resource_registry_args:
   #OS::TripleO::Network::Ports::ControlPlaneVipPort: "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
   #OS::TripleO::Network::Ports::RedisVipPort: "{{ overcloud_templates_path }}/network/ports/noop.yaml"
   # Or provision a port undercloud, e.g.:
-  # OS::TripleO::DeployedServer::ControlPlanePort: OS::Neutron::Port
+  #OS::TripleO::DeployedServer::ControlPlanePort: OS::Neutron::Port
