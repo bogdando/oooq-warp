@@ -133,12 +133,9 @@ network_environment_args:
   DnsServers: "{{ overcloud_dns_servers }}"
   NeutronPublicInterface: eth1
   HypervisorNeutronPublicInterface: eth1
+  HostnameMap:
+    overcloud-controller-0: foo-overcloud-controller-0
   DeployedServerPortMap:
-    control_virtual_ip:
-      fixed_ips:
-        - ip_address: "{{ first_controller_ip }}"
-      subnets:
-        - cidr: 24
     foo-overcloud-controller-0-ctlplane:
       fixed_ips:
         - ip_address: "{{ first_controller_ip }}"
@@ -149,16 +146,12 @@ network_environment_args:
     nova::compute::libvirt::services::libvirt_virt_type: qemu
     nova::compute::libvirt::libvirt_virt_type: qemu
     nova::compute::libvirt::libvirt_cpu_mode: 'none'
-  ComputeDeployedServerCount: 0
-  ControllerHostnameFormat: '%stackname%-controller-%index%'
   DockerPuppetDebug: true
 
 #  ControllerDeployedServerFlavor: foo
 #  ExtraConfig: {}
 #  ControlVirtualIP: <pre_provisioned_configufed_ip>
 #  RedisVirtualIP: <pre_provisioned_configufed_ip2>
-#  HostnameMap:
-#    overcloud-controller-0: foo-overcloud-controller-0
 
 overcloud_user: centos
 overcloud_key: /home/centos/.ssh/id_rsa
