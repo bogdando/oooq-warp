@@ -20,7 +20,11 @@ and pre-provisioned VMs (see tripleo's deployed-server).
 * Docker >= 1.13
 * Libvirt and kvm (latest perhaps) with HW access/nested
   virtualization enabled, for local deployments
-* OpenStack cloud >= Ocata with Heat, for non local (traas) deployments
+
+For non local (traas) deployments:
+* OpenStack cloud >= Ocata with Heat
+* OpenStack client installed locally
+* OpenStack creds file and pem/pub key files to access the hosting cloud
 
 Note, public cloud providers may not allow HW enabled kvm. OOOQ
 will not work on QEMU, sorry!
@@ -185,6 +189,9 @@ running at the host cloud as an overcloud deployment prerequisite:
 neutron port-update --no-security-groups $PORT
 neutron port-update  $PORT --port-security-enabled=False
 ```
+
+Follow an [all-in-one undercloud example guide](rdocloud-guide.md)
+(RDO cloud), or read below for advanced deployment scenarios.
 
 Update the ``vars/inventory-traas.yaml`` vars file with required info, like
 OpenStack cloud access secrets and endpoints. Now you need to generate an
