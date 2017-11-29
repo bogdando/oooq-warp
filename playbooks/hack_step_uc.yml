@@ -2,6 +2,20 @@
 # Non local deployments by quickstart, hacking/racy mode for manual
 # ansible-playbook calls interleaved by tags:
 
+- name: Upload custom tht env files
+  hosts: localhost
+  connection: local
+  any_errors_fatal: true
+  gather_facts: false
+  vars_files:
+    - ../vars/undercloud-traas.yaml
+  tasks:
+    - copy:
+        src: /tmp/scripts/tht
+        dest: "{{working_dir}}/tht"
+        force: yes
+        owner: "{{undercloud_user}}"
+
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
   any_errors_fatal: true

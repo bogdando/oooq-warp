@@ -36,6 +36,7 @@ undercloud_update_packages: "'*'"
 undercloud_extra_services: >-
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-aodh.yaml
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-gnocchi.yaml
+  -e {{working_dir}}/tht/environments/all-in-one.yaml
 undercloud_extra_args: >-
   --timeout 90
   --heat-native
@@ -56,7 +57,6 @@ test_ping: false
 step_introspect: false
 extra_args_common: >-
   --ntp-server pool.ntp.org
-  --deployed-server
 validation_args: --disable-validations
 deploy_composable_scenario: false
 multinode_args: ""

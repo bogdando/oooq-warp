@@ -126,8 +126,6 @@ This mode is only works with traas playbooks yet.
 
 ## Dev branches and venvs (undercloud)
 
-TODO: overcloud dev branches
-
 By default, the wrapper uses predefined python virtual env named oooq.
 Container build time, upstream dependencies are installed into it.
 If you want to mount in your custom venv, configure as in the example
@@ -142,17 +140,23 @@ pip install git+https://github.com/johndoe/tripleo-quickstart-extras@dev
 right into the local oooq venv at the container entry point stage.
 
 
-For the rest of components, like t-h-t, puppet modules, heat-agent,
+For remaining components, like t-h-t, puppet modules, tripleo client,
 define a custom repo/branch/refspec:
 ```
 overcloud_templates_repo: https://github.com/johndoe/tripleo-heat-templates
 overcloud_templates_branch: dev
 undercloud_install_script: undercloud-deploy-dev.sh.j2
 ```
-Then create the custom ``undercloud-deploy-dev.sh.j2`` script.
+Then opionally create a custom ``undercloud-deploy-dev.sh.j2`` script.
 Inside, make sure to checkout/install required dev branches of components under
 dev/test. Then define a composable role (a heat environemnt) for the undercloud
 for the given script as well. For overcloud custom roles, see OOOQ docs.
+
+You may want as well to use default deployment script and t-h-t et al installed
+from packages. For that case you can still provide your custom t-h-t env files
+in the `tht/environments` directory. Those will be uploaded to the undercloud
+node and can be picked as extra deployment args from
+`{{working_dir}}/tht/environments`.
 
 ## Respinning a failed local libvirt env
 
