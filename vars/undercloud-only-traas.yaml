@@ -1,0 +1,63 @@
+undercloud_user: centos
+ssh_user: "{{ undercloud_user }}"
+non_root_user: "{{ undercloud_user }}"
+non_root_group: "{{ undercloud_user }}"
+local_working_dir: "{{ lookup('env', 'LWD') }}"
+working_dir: /home/{{ undercloud_user }}
+overcloud_templates_path: "{{ working_dir }}/tripleo-heat-templates"
+enable_vbmc: false
+undercloud_network_cidr: 192.168.0.0/24
+undercloud_undercloud_hostname: foo-undercloud.rdocloud
+overcloud_cloud_domain: rdocloud
+use_external_images: false
+overcloud_as_undercloud: false
+chrooted: true
+inject_instackenv: false
+undercloud_undercloud_nameservers: 208.67.222.220
+overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
+configure_repos: true
+release: master
+overcloud_release: "{{release}}"
+gating_repo_enabled: false
+dlrn_hash: current
+repos:
+  - type: generic
+    reponame: delorean
+    filename: delorean.repo
+    baseurl: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/
+    hash_url: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/delorean.repo
+    priority: 20
+  - type: file
+    filename: delorean-deps.repo
+    down_url: http://trunk.rdoproject.org/centos7-{{ release }}/delorean-deps.repo
+repo_cmd_after: ''
+undercloud_generate_service_certificate: false
+undercloud_update_packages: "'*'"
+undercloud_extra_services: >-
+  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-aodh.yaml
+  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-gnocchi.yaml
+undercloud_extra_args: >-
+  --timeout 90
+  --heat-native
+containerized_undercloud: true
+step_install_undercloud: true
+undercloud_install_script: undercloud-deploy.sh.j2
+undercloud_docker_registry_host: docker.io
+undercloud_docker_registry_namespace: tripleomaster
+undercloud_docker_image_tag: current-tripleo
+local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
+enable_pacemaker: false
+overcloud_ipv6: false
+enable_swap: false
+ssl_overcloud: false
+tempest_config: false
+run_tempest: false
+test_ping: false
+step_introspect: false
+extra_args_common: >-
+  --ntp-server pool.ntp.org
+  --deployed-server
+validation_args: --disable-validations
+deploy_composable_scenario: false
+multinode_args: ""
+use_resource_registry_nic_configs: true
