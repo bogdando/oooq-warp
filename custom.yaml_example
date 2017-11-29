@@ -58,7 +58,8 @@ repo_cmd_after: ''
 # THT, see also in-repo custom tht example
 #overcloud_templates_repo: https://github.com/openstack/tripleo-heat-templates
 #overcloud_templates_branch: master
-overcloud_templates_path: /var/tmp/openstack-tripleo-heat-templates
+#overcloud_templates_path: /var/tmp/openstack-tripleo-heat-templates
+overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
 
 ## UNDERCLOUD
 undercloud_generate_service_certificate: false

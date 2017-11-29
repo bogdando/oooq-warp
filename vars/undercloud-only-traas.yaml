@@ -4,7 +4,7 @@ non_root_user: "{{ undercloud_user }}"
 non_root_group: "{{ undercloud_user }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 working_dir: /home/{{ undercloud_user }}
-overcloud_templates_path: "{{ working_dir }}/tripleo-heat-templates"
+overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
 enable_vbmc: false
 undercloud_network_cidr: 192.168.0.0/24
 undercloud_undercloud_hostname: foo-undercloud.rdocloud
