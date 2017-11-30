@@ -10,6 +10,7 @@ parameter_defaults:
   DockerCinderConfigImage: docker.io/tripleomaster/centos-binary-cinder-api:current-tripleo
   DockerCinderSchedulerImage: docker.io/tripleomaster/centos-binary-cinder-scheduler:current-tripleo
   DockerCinderVolumeImage: docker.io/tripleomaster/centos-binary-cinder-volume:current-tripleo
+  UndercloudServicesDefault: []
   UndercloudServices:
     #- OS::TripleO::Services::IronicApi
     #- OS::TripleO::Services::IronicConductor
