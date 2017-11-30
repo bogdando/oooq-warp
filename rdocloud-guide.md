@@ -30,7 +30,7 @@ EOF_CAT
 
 $ cd ~
 $ git clone https://github.com/openstack/tripleo-quickstart.git
-$ git clone -b dev https://github.com/bogdando/oooq-warp.git
+$ git clone https://github.com/bogdando/oooq-warp.git
 $ git clone -b wip https://github.com/bogdando/traas.git
 ```
 Customize the
