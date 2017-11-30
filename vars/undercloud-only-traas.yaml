@@ -36,6 +36,7 @@ undercloud_update_packages: "'*'"
 undercloud_extra_services: >-
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-aodh.yaml
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-gnocchi.yaml
+  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
   -e {{working_dir}}/tht/environments/all-in-one.yaml
 undercloud_extra_args: >-
   --timeout 90
