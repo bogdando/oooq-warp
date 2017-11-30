@@ -20,8 +20,7 @@
         name: python-tripleoclient
 
 - name: Upload custom tht env files
-  hosts: localhost
-  connection: local
+  hosts: undercloud
   any_errors_fatal: true
   gather_facts: false
   vars_files:
@@ -29,7 +28,7 @@
   tasks:
     - copy:
         src: /tmp/scripts/tht
-        dest: "{{working_dir}}/tht"
+        dest: "{{working_dir}}"
         force: yes
         owner: "{{undercloud_user}}"
 
