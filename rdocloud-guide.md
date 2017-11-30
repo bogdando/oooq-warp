@@ -54,7 +54,10 @@ $ cp vars/undercloud-only-traas.yaml custom.yaml
 ```
 
 Edit `vars/inventory-traas.yaml` with the RDO cloud creds used above.
-Generate static inventory, SSH config and deploy:
+Update `undercloud_network_cidr` and `undercloud_external_network_cidr`
+in `vars/undercloud-only-traas.yaml` to correspond to the private networks and
+subnets you created for your RDO cloud's tenant (traas expects the networks are
+pre-created). Generate static inventory, SSH config and deploy:
 
 ```
 $ OOOQ_PATH="${HOME}/tripleo-quickstart" OOOQE_BRANCH=rdocloud ./oooq-warp.sh

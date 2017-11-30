@@ -19,18 +19,15 @@
     - package:
         name: python-tripleoclient
 
-- name: Upload custom tht env files
+- name: Upload custom tht and prepare networking configs
   hosts: undercloud
   any_errors_fatal: true
   gather_facts: false
   vars_files:
     - ../vars/undercloud-traas.yaml
-  tasks:
-    - copy:
-        src: /tmp/scripts/tht
-        dest: "{{working_dir}}"
-        force: yes
-        owner: "{{undercloud_user}}"
+  become: true
+  roles:
+    - overcloud-prep-config
 
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
