@@ -36,6 +36,7 @@ undercloud_update_packages: "'*'"
 undercloud_extra_services: >-
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-aodh.yaml
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-gnocchi.yaml
+  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-ceilometer.yaml
   -e {{working_dir}}/tht/environments/all-in-one.yaml
 # FIXME(bogdando) after https://review.openstack.org/#/c/524114/ merged, add:
 # -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
