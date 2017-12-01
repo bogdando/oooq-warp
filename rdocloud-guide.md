@@ -101,13 +101,3 @@ local host:
 ```
 $ ssh -F ${WORKSPACE}/ssh.config.ansible undercloud
 ```
-
-**Note:** you need to run this on the undercloud node:
-```
-$ sudo cp -R /etc/iscsi/* /var/lib/config-data/puppet-generated/iscsid/
-$ sudo cp /etc/iscsi/.initiator_reset \
-/var/lib/config-data/puppet-generated/iscsid/
-```
-This work-arounds
-[bug/1735425](https://bugs.launchpad.net/tripleo/+bug/1735425)
-

@@ -42,3 +42,17 @@
     - ../vars/undercloud-networking.yaml
   roles:
     - undercloud-deploy
+
+#FIXME(bogdando) remove then https://review.openstack.org/#/c/524187/ merged
+- name: Apply w/a for bug/1735425
+  hosts: undercloud
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  tasks:
+    - when: deployed_server
+      shell: >-
+        cp -fR /etc/iscsi/* /var/lib/config-data/puppet-generated/iscsid/;
+        cp -f /etc/iscsi/.initiator_reset \
+        /var/lib/config-data/puppet-generated/iscsid/
+      ignore_errors: true
