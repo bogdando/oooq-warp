@@ -20,7 +20,6 @@ parameter_defaults:
     #- OS::TripleO::Services::NovaIronic
     #- OS::TripleO::Services::Tuned
     #- OS::TripleO::Services::UndercloudCeilometerAgentIpmi
-    #- OS::TripleO::Services::UndercloudPankoApi
     - OS::TripleO::Services::Apache
     - OS::TripleO::Services::ComputeCeilometerAgent
     - OS::TripleO::Services::ContainersLogrotateCrond
@@ -69,4 +68,5 @@ parameter_defaults:
     - OS::TripleO::Services::UndercloudGnocchiApi
     - OS::TripleO::Services::UndercloudGnocchiMetricd
     - OS::TripleO::Services::UndercloudGnocchiStatsd
+    - OS::TripleO::Services::UndercloudPankoApi
     - OS::TripleO::Services::Zaqar
