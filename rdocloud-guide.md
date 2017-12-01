@@ -33,9 +33,30 @@ $ git clone https://github.com/openstack/tripleo-quickstart.git
 $ git clone https://github.com/bogdando/oooq-warp.git
 $ git clone -b wip https://github.com/bogdando/traas.git
 ```
-Customize the
-`traas/templates/example-environments/rdo-cloud-oooq-env-uc.yaml`
-file with you creds/flavors/images used. Then create a heat stack:
+Customize `traas/templates/example-environments/rdo-cloud-oooq-env-uc.yaml`
+with your creds/flavors/images used. Do not set overcloud controller/compute
+counts above zero, you will not need them for all-in-one undercloud setup.
+
+Create an additional 'private2' tenant netwrok on RDO host cloud, which is
+required for undercloud intranet-only "floating" IPs. No subnet or router
+connection is needed for that network.
+
+According to RDO cloud tenant configuration guide, you should already have
+a 'private' and a public networks created. Traas relies on these hardcoded
+names from that guide (real IP is hidden with an 'x'):
+
+```
+openstack --os-cloud rdo-cloud network list -c Name
++----------------+
+| Name           |
++----------------+
+| private2       |
+| private        |
+| 3x.xx.xx.0/22 |
++----------------+
+```
+
+Then create a heat stack:
 ```
 $ cd ~/traas
 $ openstack --os-cloud rdo-cloud stack create foo \
@@ -46,6 +67,14 @@ $ openstack --os-cloud rdo-cloud stack create foo \
 
 Wait for provisioning ends, just watch for 'foo-undercloud login:' shown in
 `openstack --os-cloud rdo-cloud console log show foo-undercloud` outputs.
+
+**Note:** you should disable Neutron ports security for provisioned undercloud
+VM:
+```
+neutron port-update --no-security-groups $PORT
+neutron port-update  $PORT --port-security-enabled=False
+```
+
 Prepare ansible inventory variables:
 
 ```
@@ -73,7 +102,7 @@ local host:
 $ ssh -F ${WORKSPACE}/ssh.config.ansible undercloud
 ```
 
-Note that you need to run this on the undercloud node:
+**Note:** you need to run this on the undercloud node:
 ```
 $ sudo cp -R /etc/iscsi/* /var/lib/config-data/puppet-generated/iscsid/
 $ sudo cp /etc/iscsi/.initiator_reset \
