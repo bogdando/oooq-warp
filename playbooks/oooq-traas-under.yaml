@@ -25,9 +25,12 @@
   gather_facts: false
   vars_files:
     - ../vars/undercloud-traas.yaml
+    - ../vars/undercloud-networking.yaml
   become: true
   roles:
-    - overcloud-prep-config
+    - role: overcloud-prep-config
+      when: deployed_server
+
 
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
@@ -36,5 +39,6 @@
   become: true
   vars_files:
     - ../vars/undercloud-traas.yaml
+    - ../vars/undercloud-networking.yaml
   roles:
     - undercloud-deploy

@@ -2,16 +2,8 @@ deployed_server: true
 overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
 extra_tht_configs: /tmp/scripts/tht
 enable_vbmc: false
-use_external_images: false
-overcloud_as_undercloud: false
-chrooted: true
-inject_instackenv: false
-undercloud_undercloud_nameservers: 208.67.222.220
-overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
 configure_repos: true
 release: master
-overcloud_release: "{{release}}"
-gating_repo_enabled: false
 dlrn_hash: current
 repos:
   - type: generic
@@ -43,40 +35,3 @@ undercloud_install_script: undercloud-deploy.sh.j2
 undercloud_docker_registry_host: docker.io
 undercloud_docker_registry_namespace: tripleomaster
 undercloud_docker_image_tag: current-tripleo
-local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
-enable_pacemaker: false
-overcloud_ipv6: false
-enable_swap: false
-ssl_overcloud: false
-tempest_config: false
-run_tempest: false
-test_ping: false
-step_introspect: false
-extra_args_common: >-
-  --ntp-server pool.ntp.org
-validation_args: --disable-validations
-deploy_composable_scenario: false
-multinode_args: ""
-use_resource_registry_nic_configs: true
-undercloud_ip: "{{ hostvars['undercloud'].undercloud_ip }}"
-network_isolation: false
-# Host cloud private tenant networks CIDR, provisioned with Traas
-undercloud_network_cidr: 192.168.0.0/24
-undercloud_external_network_cidr: 192.168.253.0/24
-external_network_cidr: "{{ undercloud_external_network_cidr }}"
-overcloud_dns_servers:
-  - "{{ undercloud_network_cidr|nthhost(2) }}"
-  - 38.145.32.66
-  - 38.145.32.79
-network_environment_args:
-  ExternalNetCidr: "{{ undercloud_external_network_cidr }}"
-  ExternalAllocationPools: >
-    [{'start': '{{ undercloud_external_network_cidr|nthhost(128) }}',
-    'end': '{{ undercloud_external_network_cidr|nthhost(250) }}'}]
-  NeutronExternalNetworkBridge: "''"
-  ControlPlaneSubnetCidr: "{{ undercloud_network_cidr|ipaddr('prefix') }}"
-  ControlPlaneDefaultRoute: "{{ undercloud_network_cidr|nthhost(1) }}"
-  EC2MetadataIp: "{{ undercloud_ip }}"
-  DnsServers: "{{ overcloud_dns_servers }}"
-  NeutronPublicInterface: eth1
-  HypervisorNeutronPublicInterface: eth1
