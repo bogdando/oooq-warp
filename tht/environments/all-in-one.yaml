@@ -6,6 +6,7 @@ resource_registry:
   OS::TripleO::Services::UndercloudCinderVolume: /usr/share/openstack-tripleo-heat-templates/docker/services/cinder-volume.yaml
 
 parameter_defaults:
+  HeatConvergenceEngine: true
   # w/a https://review.openstack.org/#/c/524133/ not merged yet
   DockerCinderApiImage: docker.io/tripleomaster/centos-binary-cinder-api:current-tripleo
   DockerCinderConfigImage: docker.io/tripleomaster/centos-binary-cinder-api:current-tripleo
@@ -37,7 +38,6 @@ parameter_defaults:
     - OS::TripleO::Services::MistralExecutor
     - OS::TripleO::Services::MySQL
     - OS::TripleO::Services::NeutronApi
-    - OS::TripleO::Services::NeutronCorePlugin
     - OS::TripleO::Services::NeutronCorePlugin
     - OS::TripleO::Services::NeutronDhcpAgent
     - OS::TripleO::Services::NeutronL3Agent
