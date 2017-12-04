@@ -31,7 +31,7 @@ EOF_CAT
 $ cd ~
 $ git clone https://github.com/openstack/tripleo-quickstart.git
 $ git clone https://github.com/bogdando/oooq-warp.git
-$ git clone -b wip https://github.com/bogdando/traas.git
+$ git clone -b dev https://github.com/bogdando/traas.git
 ```
 Customize `traas/templates/example-environments/rdo-cloud-oooq-env-uc.yaml`
 with your creds/flavors/images used. Do not set overcloud controller/compute
