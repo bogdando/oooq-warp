@@ -37,6 +37,11 @@ Customize `traas/templates/example-environments/rdo-cloud-oooq-env-uc.yaml`
 with your creds/flavors/images used. Do not set overcloud controller/compute
 counts above zero, you will not need them for all-in-one undercloud setup.
 
+**Security note** : Set `ssh_ingress_cidr` and `cluster_ingress_cidr` to your
+local host's public IP (in a '/32' CIDR notaion) in order to restrict access to
+deployed services from outside. Use ``curl https://api.ipify.org`` to get that
+public address.
+
 Create an additional 'private2' tenant netwrok on RDO host cloud, which is
 required for undercloud intranet-only "floating" IPs. No subnet or router
 connection is needed for that network.
@@ -67,13 +72,6 @@ $ openstack --os-cloud rdo-cloud stack create foo \
 
 Wait for provisioning ends, just watch for 'foo-undercloud login:' shown in
 `openstack --os-cloud rdo-cloud console log show foo-undercloud` outputs.
-
-**Note:** you should disable Neutron ports security for provisioned undercloud
-VM:
-```
-neutron port-update --no-security-groups $PORT
-neutron port-update  $PORT --port-security-enabled=False
-```
 
 Prepare ansible inventory variables:
 
