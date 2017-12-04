@@ -87,7 +87,11 @@ subnets you created for your RDO cloud's tenant (traas expects the networks are
 pre-created). Generate static inventory, SSH config and deploy:
 
 ```
-$ OOOQ_PATH="${HOME}/tripleo-quickstart" OOOQE_BRANCH=rdocloud ./oooq-warp.sh
+$ TEARDOWN=true \
+  OOOQ_PATH="${HOME}/tripleo-quickstart" \
+  OOOQE_BRANCH=rdocloud \
+  ./oooq-warp.sh
+
 # execute from container (oooq prompt):
 (oooq) PLAY=oooq-traas.yaml create_env_oooq.sh
 (oooq) PLAY=oooq-traas-under.yaml create_env_oooq.sh
