@@ -58,4 +58,5 @@
   environment:
     ControllerDeployedServer_hosts: "{{ lookup('env', 'CONTROLLER_HOSTS') }}"
     SUBNODES_SSH_KEY: "{{subnodes_ssh_key}}"
+    OVERCLOUD_SSH_KEY: "{{subnodes_ssh_key}}"
     OVERCLOUD_SSH_USER: "{{ssh_user}}"
