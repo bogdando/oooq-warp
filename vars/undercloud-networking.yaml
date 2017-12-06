@@ -22,3 +22,5 @@ network_environment_args:
   NeutronPublicInterface: eth1
   HypervisorNeutronPublicInterface: eth1
   NeutronBridgeMappings: 'floating:br-ex,ctlplane:br-ctlplane'
+  NeutronServicePlugins: 'router,qos,trunk'
+  NeutronAgentExtensions: 'qos'
