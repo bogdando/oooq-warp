@@ -7,6 +7,8 @@ resource_registry:
 
 parameter_defaults:
   HeatConvergenceEngine: true
+  DockerDebug: true
+  DockerPuppetDebug: true
   # w/a https://review.openstack.org/#/c/524133/ not merged yet
   DockerCinderApiImage: docker.io/tripleomaster/centos-binary-cinder-api:current-tripleo
   DockerCinderConfigImage: docker.io/tripleomaster/centos-binary-cinder-api:current-tripleo

@@ -25,5 +25,7 @@ resource_registry:
   OS::TripleO::Services::Zaqar: ../docker/services/zaqar.yaml
 
 parameter_defaults:
+  DockerDebug: true
+  DockerPuppetDebug: true
   ZaqarMessageStore: 'swift'
   ZaqarManagementStore: 'sqlalchemy'
