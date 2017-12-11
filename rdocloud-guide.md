@@ -37,14 +37,10 @@ Customize `traas/templates/example-environments/rdo-cloud-oooq-env-uc.yaml`
 with your creds/flavors/images used. Do not set overcloud controller/compute
 counts above zero, you will not need them for all-in-one undercloud setup.
 
-**Security note** : Set `ssh_ingress_cidr` and `cluster_ingress_cidr` to your
+**Security note** : Set `cluster_ingress_cidr` to your
 local host's public IP (in a '/32' CIDR notaion) in order to restrict access to
 deployed services from outside. Use ``curl https://api.ipify.org`` to get that
 public address.
-
-Create an additional 'private2' tenant netwrok on RDO host cloud, which is
-required for undercloud intranet-only "floating" IPs. No subnet or router
-connection is needed for that network.
 
 According to RDO cloud tenant configuration guide, you should already have
 a 'private' and a public networks created. Traas relies on these hardcoded
@@ -55,7 +51,6 @@ openstack --os-cloud rdo-cloud network list -c Name
 +----------------+
 | Name           |
 +----------------+
-| private2       |
 | private        |
 | 3x.xx.xx.0/22 |
 +----------------+
