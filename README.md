@@ -48,8 +48,8 @@ To start a scratch local dev env with libvirt and kvm:
 
 * Download overcloud/undercloud images and md5 into the ``IMAGECACHE``.
   For master dev envs, you may want to pick any of these sources:
-  * [The most recent, the less stable](http://artifacts.ci.centos.org/rdo/images/master/delorean/current-tripleo/testing/),
-    for hardcore devs (a [mirror](https://images.rdoproject.org/master/delorean/current-tripleo/testing/))
+  * [The most recent, the less stable](https://images.rdoproject.org/master/delorean/current-tripleo/),
+    for hardcore devs
   * [The consistent, the longest upgrade path](http://artifacts.ci.centos.org/rdo/images/master/delorean/consistent/),
     it is also the default OOOQ choice (a [mirror](https://images.rdoproject.org/master/delorean/consistent/)).
   * [The one from](https://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/master/delorean/) the
