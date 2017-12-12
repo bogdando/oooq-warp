@@ -22,11 +22,12 @@ sudo mkdir -p ${LWD}
 sudo chown -R ${USER}: ${LWD}
 cd $HOME
 if [ "${VENV}" = "local" ]; then
-  sudo ln -sf /root/Envs .
+  sudo rsync -a /root/Envs .
   sudo chown -R ${USER}: $HOME
   set +u
   . /usr/bin/virtualenvwrapper.sh
   . ${HOME}/Envs/oooq/bin/activate
+  export VIRTUAL_ENV=${HOME}/Envs/oooq
   [[ "$PLAY" =~ "libvirt" ]] && (. /tmp/scripts/ssh_config)
   set -u
 
