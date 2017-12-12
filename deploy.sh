@@ -36,7 +36,7 @@ if [ "${TEARDOWN}" = "true" -a "${PLAY}" = "oooq-libvirt-provision.yaml" ]; then
   # provision VMs, generate inventory, exit if INTERACTIVE mode
   # TODO traas provision to come here as well
   inventory=${SCRIPTS}/inventory.ini
-  with_ansible -u ${USER} -i ${inventory} ${SCRIPTS}/oooq-libvirt-provision.yaml
+  with_ansible -u ${USER} -i ${inventory} ${SCRIPTS}/playbooks/oooq-libvirt-provision.yaml
   [ "$INTERACTIVE" = "true" ] && exit 0
 fi
 
