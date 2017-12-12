@@ -10,7 +10,10 @@
   roles:
     - { role: environment/setup, when: teardown|bool }
     - { role: libvirt/teardown, when: teardown|bool }
-    - { role: libvirt/setup/user, when: teardown|bool, become: false }
+    - role: libvirt/setup/user
+      ssh_user: "{{ lookup('env', 'USER') }}"
+      become: false
+      when: teardown|bool
     #- libvirt/setup/overcloud
     - libvirt/setup/undercloud
 

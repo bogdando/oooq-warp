@@ -60,8 +60,10 @@ docker run -it --rm --privileged \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${IMAGECACHE}:${IMAGECACHE} \
   -v ${OOOQ_PATH}:/tmp/oooq \
+  -v ${LWD}:$LWD \
   -v $(pwd):/tmp/scripts:ro \
   -v /etc/passwd:/etc/passwd:ro \
+  -v /etc/group:/etc/group:ro \
   -u 1000 \
   --entrypoint /bin/bash \
   --name runner bogdando/oooq-runner:0.1 \
