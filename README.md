@@ -60,11 +60,11 @@ To start a scratch local dev env with libvirt and kvm:
   $ export OOOQ_PATH=${HOME}/gitrepos/tripleo-quickstart
   $ export WORKSPACE=/opt/oooq
   $ export IMAGECACHE=/opt/cache
-  $ export LWD=/home/{USER}/.quickstart
+  $ export LWD=${HOME}/.quickstart
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
-  $ export VENV=hostpath
-  $ export VPATH=${HOME}/.venvs/oooq
+  $ #export VENV=hostpath # provides an alternative to default 'local'
+  $ #export VPATH=${HOME}/.venvs/oooq
   # mkdir -p ${WORKSPACE}
   ```
 * Export a custom PLAY name to start with. The default play is
@@ -181,18 +181,11 @@ to disable apparmor for libvirt and reconfigure qemu as well:
 # echo 'group = "root"' >> /etc/libvirt/qemu.conf
 # echo 'user = "root"' >> /etc/libvirt/qemu.conf
 # echo 'security_driver = "none"' >> /etc/libvirt/qemu.conf
-# sudo systemctl restart libvirt-bin
+# sudo systemctl restart libvirt-bin || sudo systemctl restart libvirtd
 # sudo systemctl restart qemu-kvm
 ```
 
 ## Traas multinode pre-provisioned deployment with openstack provider
-
-Note that you should disable Neutron ports security for pre-provisioned VMs
-running at the host cloud as an overcloud deployment prerequisite:
-```
-neutron port-update --no-security-groups $PORT
-neutron port-update  $PORT --port-security-enabled=False
-```
 
 Follow an [all-in-one undercloud example guide](rdocloud-guide.md)
 (RDO cloud), or read below for advanced deployment scenarios.
