@@ -41,7 +41,6 @@ docker run -it --rm --privileged \
   -e HOME=/home/${USER} \
   -e TEARDOWN=${TEARDOWN} \
   -e VIRTUALENVWRAPPER_PYTHON=/usr/bin/python \
-  -e VIRTUAL_ENV=home/${USER}/Envs \
   -e OOOQE_BRANCH=${OOOQE_BRANCH} \
   -e OOOQE_FORK=${OOOQE_FORK} \
   -e INTERACTIVE=${INTERACTIVE} \

@@ -21,12 +21,11 @@ HACK=${HACK:-false}
 sudo mkdir -p ${LWD}
 sudo chown -R ${USER}: ${LWD}
 cd $HOME
-sudo rsync -avxH /root/Envs .
+sudo ln -sf /root/Envs .
 sudo chown -R ${USER}: $HOME
 set +u
-. virtualenvwrapper.sh
-. ${VPATH}/bin/activate
-export VIRTUAL_ENV=$VPATH
+. /usr/bin/virtualenvwrapper.sh
+. ${HOME}/Envs/oooq/bin/activate
 [[ "$PLAY" =~ "libvirt" ]] && (. /tmp/scripts/ssh_config)
 set -u
 
