@@ -63,8 +63,6 @@ To start a scratch local dev env with libvirt and kvm:
   $ export LWD=${HOME}/.quickstart
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
-  $ #export VENV=hostpath # provides an alternative to default 'local'
-  $ #export VPATH=${HOME}/.venvs/oooq
   # mkdir -p ${WORKSPACE}
   ```
 * Export a custom PLAY name to start with. The default play is
@@ -128,17 +126,10 @@ This mode is only works with traas playbooks yet.
 
 By default, the wrapper uses predefined python virtual env named oooq.
 Container build time, upstream dependencies are installed into it.
-If you want to mount in your custom venv, configure as in the example
-above. That env must contain at least oooq and oooq-extras dependencies.
-
-An alternative shortcut for overriding only OOOQ-extras playbooks and roles,
-is to use ``VENV=local`` and override its stock setup by the env vars
-``OOOQE_BRANCH`` and ``OOOQE_FORK``. For the given above example, it would do:
+Quickstart extras is installed from the given fork and branch params:
 ```
 pip install git+https://github.com/johndoe/tripleo-quickstart-extras@dev
 ```
-right into the local oooq venv at the container entry point stage.
-
 
 For remaining components, like t-h-t, puppet modules, tripleo client,
 define a custom repo/branch/refspec:

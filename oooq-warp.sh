@@ -19,9 +19,6 @@ OOOQE_FORK=${OOOQE_FORK:-openstack}
 WORKSPACE=${WORKSPACE:-/tmp/qs}
 LWD=${LWD:-/home/${USER}/.quickstart}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
-VENV=local
-VMOUNT=""
-[ "${VENV}" != "local" ] && VMOUNT="-v ${VPATH}:/home/${USER}/Envs"
 CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
@@ -44,8 +41,7 @@ docker run -it --rm --privileged \
   -e HOME=/home/${USER} \
   -e TEARDOWN=${TEARDOWN} \
   -e VIRTUALENVWRAPPER_PYTHON=/usr/bin/python \
-  -e VENV=${VENV} \
-  -e VIRTUAL_ENV=${VIRTUAL_ENV:-/home/${USER}/Envs} \
+  -e VIRTUAL_ENV=home/${USER}/Envs \
   -e OOOQE_BRANCH=${OOOQE_BRANCH} \
   -e OOOQE_FORK=${OOOQE_FORK} \
   -e INTERACTIVE=${INTERACTIVE} \
@@ -53,7 +49,6 @@ docker run -it --rm --privileged \
   -e COMPUTE_HOSTS=${COMPUTE_HOSTS} \
   -e SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY} \
   -e HACK=${HACK} \
-  ${VMOUNT} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run:/run \
   -v /dev:/dev:ro \

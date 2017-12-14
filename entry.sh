@@ -6,7 +6,7 @@ export WORKON_HOME=~/Envs
 USER=${USER:-bogdando}
 OOOQE_FORK=${OOOQE_FORK:-openstack}
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
-VENV=${VENV:-local}
+VPATH=${VPATH:-${HOME}/Envs/oooq}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-~/.quickstart}
@@ -21,22 +21,20 @@ HACK=${HACK:-false}
 sudo mkdir -p ${LWD}
 sudo chown -R ${USER}: ${LWD}
 cd $HOME
-if [ "${VENV}" = "local" ]; then
-  sudo rsync -a /root/Envs .
-  sudo chown -R ${USER}: $HOME
-  set +u
-  . /usr/bin/virtualenvwrapper.sh
-  . ${HOME}/Envs/oooq/bin/activate
-  export VIRTUAL_ENV=${HOME}/Envs/oooq
-  [[ "$PLAY" =~ "libvirt" ]] && (. /tmp/scripts/ssh_config)
-  set -u
+sudo rsync -avxH /root/Envs .
+sudo chown -R ${USER}: $HOME
+set +u
+. virtualenvwrapper.sh
+. ${VPATH}/bin/activate
+export VIRTUAL_ENV=$VPATH
+[[ "$PLAY" =~ "libvirt" ]] && (. /tmp/scripts/ssh_config)
+set -u
 
-  # Hack into oooq-extras dev branch
-  sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
-  sudo rsync -aLH /usr/config /root/Envs/oooq/
-  sudo rsync -aLH /usr/playbooks /root/Envs/oooq/
-  sudo rsync -aLH /usr/usr/local/share/ansible/roles /root/Envs/oooq/usr/local/share/ansible/
-fi
+# Hack into oooq-extras dev branch
+sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
+sudo rsync -aLH /usr/config /root/Envs/oooq/
+sudo rsync -aLH /usr/playbooks /root/Envs/oooq/
+sudo rsync -aLH /usr/usr/local/share/ansible/roles /root/Envs/oooq/usr/local/share/ansible/
 
 # Restore the saved state from the WORKSPACE (ssh keys/setup, inventory)
 # to allow fast respinning of the local environment omitting VM provisioning tasks
