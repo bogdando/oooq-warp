@@ -55,6 +55,7 @@ docker run -it --rm --privileged \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${IMAGECACHE}:${IMAGECACHE} \
   -v ${OOOQ_PATH}:/tmp/oooq \
+  -v $(pwd)/ansible.cfg:/tmp/oooq/ansible.cfg:ro \
   -v ${LWD}:$LWD \
   -v $(pwd):/tmp/scripts:ro \
   -v /etc/passwd:/etc/passwd:ro \
