@@ -1,19 +1,10 @@
-# w/a https://review.openstack.org/#/c/524114/ not merged yet
 resource_registry:
   OS::TripleO::Undercloud::Net::SoftwareConfig: /usr/share/openstack-tripleo-heat-templates/net-config-static-bridge.yaml
-  OS::TripleO::Services::UndercloudCinderApi: /usr/share/openstack-tripleo-heat-templates/docker/services/cinder-api.yaml
-  OS::TripleO::Services::UndercloudCinderScheduler: /usr/share/openstack-tripleo-heat-templates/docker/services/cinder-scheduler.yaml
-  OS::TripleO::Services::UndercloudCinderVolume: /usr/share/openstack-tripleo-heat-templates/docker/services/cinder-volume.yaml
 
 parameter_defaults:
   HeatConvergenceEngine: true
   DockerDebug: true
   DockerPuppetDebug: true
-  # w/a https://review.openstack.org/#/c/524133/ not merged yet
-  DockerCinderApiImage: docker.io/tripleomaster/centos-binary-cinder-api:current-tripleo
-  DockerCinderConfigImage: docker.io/tripleomaster/centos-binary-cinder-api:current-tripleo
-  DockerCinderSchedulerImage: docker.io/tripleomaster/centos-binary-cinder-scheduler:current-tripleo
-  DockerCinderVolumeImage: docker.io/tripleomaster/centos-binary-cinder-volume:current-tripleo
   UndercloudServicesDefault: []
   UndercloudServices:
     #- OS::TripleO::Services::IronicApi
