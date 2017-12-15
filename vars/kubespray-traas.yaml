@@ -78,7 +78,6 @@ overcloud_services:
       - OS::TripleO::Services::Snmp
       - OS::TripleO::Services::Timezone
       - OS::TripleO::Services::TripleoPackages
-      - OS::TripleO::Services::TripleoFirewall
       - OS::TripleO::Services::HAproxy
       - OS::TripleO::Services::Keepalived
       - OS::TripleO::Services::Sshd
