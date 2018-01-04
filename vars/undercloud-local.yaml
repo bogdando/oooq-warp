@@ -7,3 +7,12 @@ working_dir: /home/{{ undercloud_user }}
 undercloud_vcpu: 3
 undercloud_disk: 50
 undercloud_memory: 4096
+
+# TODO consider priv VMs magic from
+# https://gerrit.opnfv.org/gerrit/#/c/28675/26/config/quickstart_defaults.yaml
+# non_root_chown: true
+# non_root_user: stack
+# undercloud_user: stack
+# working_dir: "/home/{{ non_root_user }}"
+# ssh_user: root
+# libvirt_uri: qemu:///system
