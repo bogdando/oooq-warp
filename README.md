@@ -181,6 +181,9 @@ to disable apparmor for libvirt and reconfigure qemu as well:
 Follow an [all-in-one undercloud example guide](rdocloud-guide.md)
 (RDO cloud), or read below for advanced deployment scenarios.
 
+Note, the private key from the generated Nova keypair should be copied under
+``$WORKSPACE``.
+
 Update the ``vars/inventory-traas.yaml`` vars file with required info, like
 OpenStack cloud access secrets and endpoints. Now you need to generate an
 ansible inventory for the undercloud/overcloud VMs on OpenStack (see
