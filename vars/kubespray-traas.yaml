@@ -27,7 +27,7 @@ config_download_args: >-
   --overcloud-ssh-user centos
   --overcloud-ssh-key /home/centos/.ssh/id_rsa
 
-node_cound: 1
+node_count: 1
 flavor_args: ''
 # FIXME given a provisioned traas stack name was 'foo'.
 overcloud_nodes:
