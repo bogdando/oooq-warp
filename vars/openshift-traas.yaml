@@ -1,0 +1,168 @@
+# from kubespray-traas.yaml, with external_deployments and configs download
+# added from tripleo-quickstart/tree/config/general_config/featureset010.yml
+# and openshift on overcloud CI job https://review.openstack.org/#/c/494418/
+deploy_multinode: true
+step_overcloud_image: false
+step_glance_upload: false
+step_register: false
+hypervisor_wait: false
+deployed_server: true
+
+# Drop docker-network.yaml from oooq container_args to not conflict
+container_args: >-
+  -e {{ overcloud_templates_path }}/environments/openshift.yaml
+  -e {{ working_dir }}/containers-default-parameters.yaml
+
+prepare_service_env_args: >-
+  -e {{ overcloud_templates_path }}/environments/openshift.yaml
+
+# It does not that we want here, yet. Use a custom port mappings template
+# instead!
+#deploy_steps_ansible_workflow: true
+# note: --config-download doesn't work well yet, stack updates ok, yet the deploy
+# command hangs after 'Starting ssh admin enablement workflow' done.
+
+#https://review.openstack.org/#/c/522776
+config_download_args: >-
+  -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml
+  --overcloud-ssh-user centos
+  --overcloud-ssh-key /home/centos/.ssh/id_rsa
+
+node_count: 1
+flavor_args: ''
+# From a splitstack by https://github.com/bogdando/ocp-inventory (shiftonstack)
+overcloud_nodes:
+  - name: master-0.openshift.cluster.lc
+
+# Note, scale args are ignored for composable roles.
+# Add a custom t-h-t env instead
+extra_args: >
+  {{ extra_args_common }}
+  -e {{ working_dir }}/network-environment.yaml
+  -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
+  -e {{overcloud_templates_path}}/environments/openshift.yaml
+
+# Composable deployed-server roles to override defaults in
+# tht's deployed-server/deployed-server-roles-data.yaml
+composable_roles: true
+# ServicesDefault merges services from the overcloud_services
+# TODO remaining deployed server roles supported
+overcloud_roles:
+  - name: ControllerDeployedServer
+    HostnameFormatDefault: '%stackname%-controller-%index%'
+    disable_constraints: True
+    ServicesDefault: []
+    CountDefault: 1
+    tags:
+      - primary
+      - controller
+
+# requires https://bugs.launchpad.net/tripleo/+bug/1733837 resolved
+#    disable_upgrade_deployment: True
+
+#  - name: ComputeDeployedServer
+#    HostnameFormatDefault: '%stackname%-compute-%index%'
+#    disable_upgrade_deployment: True
+#    disable_constraints: True
+#    CountDefault: 0
+#    ServicesDefault: []
+
+composable_services: true
+overcloud_services:
+  - name: 'ControllerDeployedServerServices:'
+    services:
+      - OS::TripleO::Services::Kernel
+      - OS::TripleO::Services::Ntp
+      - OS::TripleO::Services::Snmp
+      - OS::TripleO::Services::Timezone
+      - OS::TripleO::Services::TripleoPackages
+      - OS::TripleO::Services::TripleoFirewall
+      - OS::TripleO::Services::Sshd
+      - OS::TripleO::Services::OpenShift::Master
+      - OS::TripleO::Services::OpenShift::Worker
+
+# FIXME Doesn't work well for oooq, produces bad indentation
+#  - name: 'ComputeDeployedServerServices:'
+#    services:
+
+controller_hosts: "{{ lookup('env', 'CONTROLLER_HOSTS') }}"
+first_controller_ip: "{{ controller_hosts.split(' ')[0] }}"
+undercloud_ip: "{{ hostvars['undercloud'].undercloud_ip }}"
+
+# Which nodes roles to ssh in and apply deployed-server magic
+# TODO remaining deployed server roles supported
+# BLOCKSTORAGE_HOSTS, OBJECTSTORAGE_HOSTS, CEPHSTORAGE_HOSTS
+deployed_server_overcloud_roles:
+  - name: ControllerDeployedServer
+    hosts: "{{ controller_hosts }}"
+
+#  - name: ComputeDeployedServer
+#    hosts: "{{ lookup('env', 'COMPUTE_HOSTS')|default('') }}"
+subnodes_ssh_key: "{{ lookup('env', 'SUBNODES_SSH_KEY') }}"
+
+# TODO figure out a networking setup from multinode CI scenarios.
+# Do not use host cloud floating IPs subnet for external-ish variables!
+# see also undercloud_networks in oooq
+network_isolation: false
+# Enable these, when network_isolation is enabled
+#step_adjust_mtu: true
+#mtu: 1350
+#mtu_interface:
+#  - eth0
+
+# Host cloud private tenant networks CIDR, provisioned with Traas
+undercloud_network_cidr: 192.168.0.0/24
+#undercloud_external_network_cidr: 192.168.253.0/24
+
+# Private VMs' networks for overcloud contol traffic routing,
+# based on the chosen network_isolation
+undercloud_external_network_cidr: "{{ undercloud_network_cidr }}"
+external_network_cidr: "{{ undercloud_external_network_cidr }}"
+
+# Private tenant net defaults and RDO cloud specific DNS servers
+overcloud_dns_servers:
+  - "{{ undercloud_network_cidr|nthhost(2) }}"
+
+# FIXME Hack: merge environments/custom.yaml parameter_defaults into a single template
+network_environment_args:
+  ControlPlaneSubnetCidr: "{{ undercloud_network_cidr|ipaddr('prefix') }}"
+  ControlPlaneDefaultRoute: "{{ undercloud_network_cidr|nthhost(1) }}"
+  EC2MetadataIp: "{{ undercloud_ip }}"
+  DnsServers: "{{ overcloud_dns_servers }}"
+  NeutronPublicInterface: eth1
+  HypervisorNeutronPublicInterface: eth1
+  HostnameMap:
+    overcloud-controller-0: master-0.openshift.cluster.lc
+  DeployedServerPortMap:
+    master-0.openshift.cluster.lc-ctlplane:
+      fixed_ips:
+        - ip_address: "{{ first_controller_ip }}"
+      subnets:
+        - cidr: 24
+  ControllerDeployedServerCount: 1
+  ControllerDeployedServerExtraConfig:
+    nova::compute::libvirt::services::libvirt_virt_type: qemu
+    nova::compute::libvirt::libvirt_virt_type: qemu
+    nova::compute::libvirt::libvirt_cpu_mode: 'none'
+  DockerPuppetDebug: true
+  DockerDebug: true
+
+#  ControllerDeployedServerFlavor: foo
+#  ExtraConfig: {}
+#  ControlVirtualIP: <pre_provisioned_configufed_ip>
+#  RedisVirtualIP: <pre_provisioned_configufed_ip2>
+
+overcloud_user: centos
+overcloud_key: /home/centos/.ssh/id_rsa
+undercloud_user: centos
+ssh_user: "{{ undercloud_user }}"
+non_root_user: "{{ undercloud_user }}"
+non_root_group: "{{ undercloud_user }}"
+local_working_dir: /home/{{ undercloud_user }}
+working_dir: /home/{{ undercloud_user }}
+overcloud_cloud_domain: rdocloud
+overcloud_cloud_name: overcloud.rdocloud
+overcloud_cloud_name_internal: overcloud.internalapi.rdocloud
+overcloud_cloud_name_storage:  overcloud.storage.rdocloud
+overcloud_cloud_name_storage_management: overcloud.storagemanagement.rdocloud
+overcloud_cloud_name_ctlplane: overcloud.ctlplane.rdocloud
