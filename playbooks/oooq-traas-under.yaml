@@ -29,7 +29,7 @@
   become: true
   roles:
     - role: overcloud-prep-config
-      when: deployed_server
+      when: deployed_server # defines all-in-one UC case
 
 
 - name: Install the undercloud (oooq-extras)

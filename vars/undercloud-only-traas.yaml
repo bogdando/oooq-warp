@@ -1,3 +1,4 @@
+# Undercloud all-in-one scenario. Replace custom.yaml with that file.
 deployed_server: true
 overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
 extra_tht_configs: /tmp/scripts/tht
@@ -18,15 +19,15 @@ repos:
 repo_cmd_after: ''
 undercloud_generate_service_certificate: false
 undercloud_update_packages: "'*'"
+# TODO contribute undercloud_extra_services into oooq extras from my dev fork
 undercloud_extra_services: >-
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-aodh.yaml
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-gnocchi.yaml
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-ceilometer.yaml
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-panko.yaml
+  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
   -e {{ working_dir }}/network-environment.yaml
   -e {{working_dir}}/tht/environments/all-in-one.yaml
-# FIXME(bogdando) after https://review.openstack.org/#/c/524114/ merged, add:
-# -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
 undercloud_extra_args: >-
   --timeout 90
   --heat-native

@@ -147,6 +147,14 @@ network_environment_args:
   DockerPuppetDebug: true
   DockerDebug: true
 
+resource_registry_args:
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-noop.yaml"
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-noop.yaml"
+  OS::TripleO::Server: "{{ overcloud_templates_path }}/deployed-server/deployed-server.yaml"
+  OS::TripleO::DeployedServer::Bootstrap: OS::Heat::None
+  # Pre-provisioned host cloud neutron ports
+  OS::TripleO::DeployedServer::ControlPlanePort: "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
+
 #  ControllerDeployedServerFlavor: foo
 #  ExtraConfig: {}
 #  ControlVirtualIP: <pre_provisioned_configufed_ip>

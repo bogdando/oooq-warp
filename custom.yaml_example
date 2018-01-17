@@ -60,6 +60,9 @@ repo_cmd_after: ''
 #overcloud_templates_branch: master
 #overcloud_templates_path: /var/tmp/openstack-tripleo-heat-templates
 overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
+# The path is specific for the oooq runner container's mounted volumes
+# Use with overcloud-prep-config to upload custom tht/role files from ./tht
+extra_tht_configs: /tmp/scripts/tht
 
 ## UNDERCLOUD
 undercloud_generate_service_certificate: false
@@ -133,16 +136,6 @@ deploy_composable_scenario: false
 # Override tht deployed-server-environment.yaml and drop it from oooq multinode_args
 # ...which one to pick??? https://bugs.launchpad.net/tripleo/+bug/1702280 :-(
 multinode_args: ""
+# Allows to specify custom resource_registry_args in vars files
+# Used by overcloud-prep-config to generate network configs
 use_resource_registry_nic_configs: true
-resource_registry_args:
-  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-static-bridge.yaml"
-  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: "{{ overcloud_templates_path }}/net-config-static.yaml"
-  OS::TripleO::Server: "{{ overcloud_templates_path }}/deployed-server/deployed-server.yaml"
-  OS::TripleO::DeployedServer::Bootstrap: OS::Heat::None
-  # Pre-provisioned host cloud neutron ports
-  OS::TripleO::DeployedServer::ControlPlanePort: "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
-  #OS::TripleO::Network::Ports::ControlPlaneVipPort: "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
-  #OS::TripleO::Network::Ports::RedisVipPort: "{{ overcloud_templates_path }}/network/ports/noop.yaml"
-  # Or provision a port undercloud, e.g.:
-  #OS::TripleO::DeployedServer::ControlPlanePort: OS::Neutron::Port
-  OS::TripleO::Network::Ports::ControlPlaneVipPort: OS::Neutron::Port
