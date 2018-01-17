@@ -5,6 +5,9 @@ resource_registry:
 
 parameter_defaults:
   HeatConvergenceEngine: true
+  # w/a https://review.openstack.org/#/c/534756/ not merged yet
+  DockerCinderSchedulerImage: docker.io/tripleomaster/centos-binary-cinder-scheduler:current-tripleo
+  DockerCinderVolumeImage: docker.io/tripleomaster/centos-binary-cinder-volume:current-tripleo
   DockerDebug: true
   DockerPuppetDebug: true
   UndercloudServicesDefault: []
