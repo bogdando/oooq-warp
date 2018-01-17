@@ -1,0 +1,37 @@
+# Undercloud all-in-one scenario with Manila and Pcmk. Replace custom.yaml with that file.
+deployed_server: true
+overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
+extra_tht_configs: /tmp/scripts/tht
+enable_vbmc: false
+configure_repos: true
+release: master
+dlrn_hash: current
+repos:
+  - type: generic
+    reponame: delorean
+    filename: delorean.repo
+    baseurl: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/
+    hash_url: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/delorean.repo
+    priority: 20
+  - type: file
+    filename: delorean-deps.repo
+    down_url: http://trunk.rdoproject.org/centos7-{{ release }}/delorean-deps.repo
+repo_cmd_after: ''
+undercloud_generate_service_certificate: false
+undercloud_update_packages: "'*'"
+# TODO contribute undercloud_extra_services into oooq extras from my dev fork
+undercloud_extra_services: >-
+  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
+  -e {{overcloud_templates_path}}/environments/manila-cephfsnative-config-docker.yaml
+  -e {{overcloud_templates_path}}/environments/docker-ha.yaml
+  -e {{ working_dir }}/network-environment.yaml
+  -e {{working_dir}}/tht/environments/all-in-one-pcmk.yaml
+undercloud_extra_args: >-
+  --timeout 90
+  --heat-native
+containerized_undercloud: true
+step_install_undercloud: true
+undercloud_install_script: undercloud-deploy.sh.j2
+undercloud_docker_registry_host: docker.io
+undercloud_docker_registry_namespace: tripleomaster
+undercloud_docker_image_tag: current-tripleo

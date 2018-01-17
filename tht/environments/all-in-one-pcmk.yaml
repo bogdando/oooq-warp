@@ -1,0 +1,72 @@
+resource_registry:
+  OS::TripleO::Undercloud::Net::SoftwareConfig: /usr/share/openstack-tripleo-heat-templates/net-config-static-bridge.yaml
+  # These are prolly not needed as docker-ha.yaml unsets it for ControllerPre/Post
+  #OS::TripleO::Tasks::UndercloudPreConfig: /usr/share/openstack-tripleo-heat-templates/extraconfig/tasks/pre_puppet_pacemaker.yaml
+  #OS::TripleO::Tasks::UndercloudPostConfig: /usr/share/openstack-tripleo-heat-templates/extraconfig/tasks/post_puppet_pacemaker.yaml
+  # Not sure if this one is needed
+  #OS::TripleO::Tasks::UndercloudPostPuppetRestart: /usr/share/openstack-tripleo-heat-templates/extraconfig/tasks/post_puppet_pacemaker_restart.yaml
+
+parameter_defaults:
+  HeatConvergenceEngine: true
+  DockerDebug: true
+  DockerPuppetDebug: true
+  UndercloudServicesDefault: []
+  UndercloudServices:
+    #- OS::TripleO::Services::IronicApi
+    #- OS::TripleO::Services::IronicConductor
+    #- OS::TripleO::Services::IronicInspector
+    #- OS::TripleO::Services::IronicPxe
+    #- OS::TripleO::Services::MistralEventEngine
+    #- OS::TripleO::Services::NovaIronic
+    #- OS::TripleO::Services::Tuned
+    #- OS::TripleO::Services::UndercloudCeilometerAgentIpmi
+    - OS::TripleO::Services::Apache
+    #- OS::TripleO::Services::ComputeCeilometerAgent
+    - OS::TripleO::Services::ContainersLogrotateCrond
+    - OS::TripleO::Services::Docker
+    - OS::TripleO::Services::GlanceApi
+    - OS::TripleO::Services::HeatApi
+    - OS::TripleO::Services::HeatApiCfn
+    - OS::TripleO::Services::HeatEngine
+    - OS::TripleO::Services::Iscsid
+    - OS::TripleO::Services::Keystone
+    - OS::TripleO::Services::Memcached
+    - OS::TripleO::Services::MistralApi
+    - OS::TripleO::Services::MistralEngine
+    - OS::TripleO::Services::MistralExecutor
+    - OS::TripleO::Services::MySQL
+    - OS::TripleO::Services::NeutronApi
+    - OS::TripleO::Services::NeutronCorePlugin
+    - OS::TripleO::Services::NeutronDhcpAgent
+    - OS::TripleO::Services::NeutronL3Agent
+    - OS::TripleO::Services::NeutronMetadataAgent
+    - OS::TripleO::Services::NeutronOvsAgent
+    - OS::TripleO::Services::NeutronServer
+    - OS::TripleO::Services::NovaApi
+    - OS::TripleO::Services::NovaCompute
+    - OS::TripleO::Services::NovaConductor
+    - OS::TripleO::Services::NovaLibvirt
+    - OS::TripleO::Services::NovaMetadata
+    - OS::TripleO::Services::NovaPlacement
+    - OS::TripleO::Services::NovaScheduler
+    - OS::TripleO::Services::Ntp
+    - OS::TripleO::Services::Pacemaker
+    - OS::TripleO::Services::RabbitMQ
+    #- OS::TripleO::Services::Redis
+    - OS::TripleO::Services::SwiftProxy
+    - OS::TripleO::Services::SwiftRingBuilder
+    - OS::TripleO::Services::SwiftStorage
+    #- OS::TripleO::Services::UndercloudAodhApi
+    #- OS::TripleO::Services::UndercloudAodhEvaluator
+    #- OS::TripleO::Services::UndercloudAodhListener
+    #- OS::TripleO::Services::UndercloudAodhNotifier
+    #- OS::TripleO::Services::UndercloudCeilometerAgentCentral
+    #- OS::TripleO::Services::UndercloudCeilometerAgentNotification
+    - OS::TripleO::Services::UndercloudCinderApi
+    - OS::TripleO::Services::UndercloudCinderScheduler
+    - OS::TripleO::Services::UndercloudCinderVolume
+    #- OS::TripleO::Services::UndercloudGnocchiApi
+    #- OS::TripleO::Services::UndercloudGnocchiMetricd
+    #- OS::TripleO::Services::UndercloudGnocchiStatsd
+    #- OS::TripleO::Services::UndercloudPankoApi
+    - OS::TripleO::Services::Zaqar
