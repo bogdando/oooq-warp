@@ -65,8 +65,9 @@ To start a scratch local dev env with libvirt and kvm:
   $ export OOOQE_FORK=johndoe
   # mkdir -p ${WORKSPACE}
   ```
-* Export a custom PLAY name to start with. The default play is
-  is ``oooq-libvirt-provision.yaml`` (see the `playbooks` dir):
+* Export a custom PLAY and/or CUSTOMVARS names to start with. The default play is
+  is ``oooq-libvirt-provision.yaml`` (see the `playbooks` dir) and the default
+  overrides file is invoked as `-e@custom.yaml`:
   ```
   $ export PLAY=oooq-libvirt-under.yaml
   ```
@@ -87,9 +88,10 @@ To start a scratch local dev env with libvirt and kvm:
   ```
   The latter step is optional, ignore if the command fails.
 
-* Copy data vars ``custom.yaml_example`` as ``custom.yaml`` and check for
+* Copy example data vars ``custom.yaml_example`` as ``custom.yaml`` and check for
   needed data overrides. Note, it contains only common vars. Use var files
-  from the ``vars`` dir for advanced configuration overrides.
+  from the ``vars`` dir for advanced configuration overrides. You can either
+  copy it as ``custom.yaml`` or ``export CUSTOMVARS=vars/something.yaml``.
 * Git checkout the wanted branch of the local OOQ repo. It will be mounted
   into the wrapper container by the given ``OOOQ_PATH``.
 

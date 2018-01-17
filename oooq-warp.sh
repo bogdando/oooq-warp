@@ -23,6 +23,7 @@ CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 HACK=${HACK:-false}
+CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 
 docker run -it --rm --privileged \
   --device-read-bps=${DEV}:${IOR} \
@@ -48,6 +49,7 @@ docker run -it --rm --privileged \
   -e COMPUTE_HOSTS=${COMPUTE_HOSTS} \
   -e SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY} \
   -e HACK=${HACK} \
+  -e CUSTOMVARS=${CUSTOMVARS} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run:/run \
   -v /dev:/dev:ro \

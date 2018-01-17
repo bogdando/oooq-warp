@@ -17,6 +17,7 @@ CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 HACK=${HACK:-false}
+CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 
 sudo mkdir -p ${LWD}
 sudo chown -R ${USER}: ${LWD}
@@ -60,6 +61,7 @@ if [ "$INTERACTIVE" = "true" ]; then
   echo export PLAY=oooq-traas-over.yaml to deploy an overcloud on on openstack
   echo export PLAY=oooq-traas-kubespray.yaml to prepare overcloud for k8s on openstack
   echo export HACK=true for an experimental interleaved uc/oc deployment mode
+  echo export CUSTOMVARS=path/file.yaml to override default '-e @custom.yaml' with it
   echo Run create_env_oooq.sh to deploy
   /bin/bash
 else

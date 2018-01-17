@@ -16,13 +16,14 @@ WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-${HOME}/.quickstart}
 INTERACTIVE=${INTERACTIVE:-true}
 HACK=${HACK:-false}
+CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 
 function with_ansible {
   ansible-playbook \
     --become-user=root \
     --forks=$ANSIBLE_FORKS --timeout $ANSIBLE_TIMEOUT \
     -e teardown=$TEARDOWN \
-    -e @${SCRIPTS}/custom.yaml \
+    -e @${SCRIPTS}/${CUSTOMVARS} \
     ${ARGS} \
     $LOG_LEVEL $@
 }

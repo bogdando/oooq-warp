@@ -73,6 +73,8 @@ Prepare ansible inventory variables:
 ```
 $ cd ~/oooq-warp
 $ cp vars/undercloud-only-traas.yaml custom.yaml
+$ #Or alternatively
+$ export CUSTOMVARS=vars/undercloud-only-traas.yaml
 ```
 
 Edit `vars/inventory-traas.yaml` with the RDO cloud creds used above.
