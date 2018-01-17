@@ -1,10 +1,7 @@
 resource_registry:
   OS::TripleO::Undercloud::Net::SoftwareConfig: /usr/share/openstack-tripleo-heat-templates/net-config-static-bridge.yaml
-  # These are prolly not needed as docker-ha.yaml unsets it for ControllerPre/Post
-  #OS::TripleO::Tasks::UndercloudPreConfig: /usr/share/openstack-tripleo-heat-templates/extraconfig/tasks/pre_puppet_pacemaker.yaml
-  #OS::TripleO::Tasks::UndercloudPostConfig: /usr/share/openstack-tripleo-heat-templates/extraconfig/tasks/post_puppet_pacemaker.yaml
-  # Not sure if this one is needed
-  #OS::TripleO::Tasks::UndercloudPostPuppetRestart: /usr/share/openstack-tripleo-heat-templates/extraconfig/tasks/post_puppet_pacemaker_restart.yaml
+  # Unmanage manila-share from pcmk and put it back under docker control plane
+  OS::TripleO::Services::ManilaShare: /usr/share/openstack-tripleo-heat-templates/docker/services/manila-share.yaml
 
 parameter_defaults:
   HeatConvergenceEngine: true
@@ -50,7 +47,6 @@ parameter_defaults:
     - OS::TripleO::Services::NovaPlacement
     - OS::TripleO::Services::NovaScheduler
     - OS::TripleO::Services::Ntp
-    - OS::TripleO::Services::Pacemaker
     - OS::TripleO::Services::RabbitMQ
     #- OS::TripleO::Services::Redis
     - OS::TripleO::Services::SwiftProxy

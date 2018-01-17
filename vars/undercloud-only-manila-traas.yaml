@@ -1,4 +1,4 @@
-# Undercloud all-in-one scenario with Manila and Pcmk. Replace custom.yaml with that file.
+# Undercloud all-in-one scenario with Manila. Replace custom.yaml with that file.
 deployed_server: true
 overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
 extra_tht_configs: /tmp/scripts/tht
@@ -23,9 +23,8 @@ undercloud_update_packages: "'*'"
 undercloud_extra_services: >-
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
   -e {{overcloud_templates_path}}/environments/manila-cephfsnative-config-docker.yaml
-  -e {{overcloud_templates_path}}/environments/docker-ha.yaml
   -e {{ working_dir }}/network-environment.yaml
-  -e {{working_dir}}/tht/environments/all-in-one-pcmk.yaml
+  -e {{working_dir}}/tht/environments/all-in-one-manila.yaml
 undercloud_extra_args: >-
   --timeout 90
   --heat-native
