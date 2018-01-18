@@ -29,6 +29,8 @@ undercloud_extra_services_args: >-
   -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
   -e {{ working_dir }}/network-environment.yaml
   -e {{working_dir}}/tht/environments/all-in-one.yaml
+# A lightweight undercloud, use with tht/roles/UndercloudLight.yaml
+# -e {{working_dir}}/tht/environments/docker-uc-light.yaml
 undercloud_extra_args: >-
   --timeout 90
   --heat-native
