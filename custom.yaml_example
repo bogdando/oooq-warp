@@ -76,12 +76,15 @@ undercloud_update_packages: "'*'"
 #  python-paunch
 #  python-heat-agent*
 #  os-*
-undercloud_extra_services: >-
+
+# https://review.openstack.org/#/c/534708/
+undercloud_cloud_domain: rdocloud
+undercloud_extra_services_args: >-
   -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
   -e {{overcloud_templates_path}}/environments/debug.yaml
   -e {{overcloud_templates_path}}/environments/config-debug.yaml
+
 undercloud_extra_args: >-
-  {{ undercloud_extra_services }}
   --timeout 60
   --heat-native
 # See https://bugs.launchpad.net/tripleo/+bug/1733381 , fails w/o heat-native :/
