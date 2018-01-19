@@ -46,6 +46,8 @@ if [ "${TEARDOWN}" = "false" ]; then
     sudo cp -f "${WORKSPACE}/${state}" ${LWD}/
   done
   set -e
+else
+  rm -f /opt/oooq/{id_rsa,hosts,ssh.config}*
 fi
 
 sudo chown -R ${USER}: ${HOME}
