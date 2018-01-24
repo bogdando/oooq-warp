@@ -19,7 +19,6 @@ repos:
 repo_cmd_after: ''
 undercloud_generate_service_certificate: false
 undercloud_update_packages: "'*'"
-# https://review.openstack.org/#/c/534708/
 undercloud_cloud_domain: rdocloud
 undercloud_extra_services_args: >-
   -e {{overcloud_templates_path}}/environments/services-docker/mistral.yaml

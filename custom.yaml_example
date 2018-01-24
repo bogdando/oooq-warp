@@ -77,7 +77,6 @@ undercloud_update_packages: "'*'"
 #  python-heat-agent*
 #  os-*
 
-# https://review.openstack.org/#/c/534708/
 undercloud_cloud_domain: rdocloud
 undercloud_extra_services_args: >-
   -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
