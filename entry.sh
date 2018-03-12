@@ -4,9 +4,13 @@
 set -eu
 export WORKON_HOME=~/Envs
 USER=${USER:-bogdando}
+OOOQ_PATH=${OOOQ_PATH:-}
+OOOQ_FORK=${OOOQ_FORK:-openstack}
+OOOQ_BRANCH=${OOOQ_BRANCH:-master}
+OOOQE_PATH=${OOOQE_PATH:-}
 OOOQE_FORK=${OOOQE_FORK:-openstack}
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
-VPATH=${VPATH:-${HOME}/Envs/oooq}
+VPATH=${VPATH:-/root/Envs}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-~/.quickstart}
@@ -19,22 +23,39 @@ SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 HACK=${HACK:-false}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 
+sudo mkdir -p /tmp/oooq
 sudo mkdir -p ${LWD}
 sudo chown -R ${USER}: ${LWD}
 cd $HOME
-sudo ln -sf /root/Envs .
+sudo ln -sf ${VPATH} .
 sudo chown -R ${USER}: $HOME
 set +u
 . /usr/bin/virtualenvwrapper.sh
-. ${HOME}/Envs/oooq/bin/activate
+. ${VPATH}/oooq/bin/activate
 [[ "$PLAY" =~ "libvirt" ]] && (. /tmp/scripts/ssh_config)
 set -u
 
-# Hack into oooq-extras dev branch
-sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
-sudo rsync -aLH /usr/config /root/Envs/oooq/
-sudo rsync -aLH /usr/playbooks /root/Envs/oooq/
-sudo rsync -aLH /usr/usr/local/share/ansible/roles /root/Envs/oooq/usr/local/share/ansible/
+if [ -z ${OOOQ_PATH} ]; then
+  # Hack into oooq dev branch
+  sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart@${OOOQE_BRANCH}
+  sudo rsync -aLH /usr/config /tmp/oooq/
+  sudo rsync -aLH /usr/playbooks /tmp/oooq/
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/roles /tmp/oooq/
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/library /tmp/oooq/
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/test_plugins /tmp/oooq/
+fi
+
+if [ -z ${OOOQE_PATH} ]; then
+  # Hack into oooq-extras dev branch
+  sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
+  sudo rsync -aLH /usr/config /tmp/oooq/
+  sudo rsync -aLH /usr/playbooks /tmp/oooq/
+  sudo rsync -aLH /usr/local/share/ansible/roles /tmp/oooq/
+else
+  sudo rsync -aLH /tmp/oooq-extras/config /tmp/oooq/
+  sudo rsync -aLH /tmp/oooq-extras/playbooks /tmp/oooq/
+  sudo rsync -aLH /tmp/oooq-extras/roles /tmp/oooq/
+fi
 
 # Restore the saved state from the WORKSPACE (ssh keys/setup, inventory)
 # to allow fast respinning of the local environment omitting VM provisioning tasks

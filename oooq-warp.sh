@@ -16,6 +16,11 @@ TEARDOWN=${TEARDOWN:-true}
 USER=${USER:-bogdando}
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
 OOOQE_FORK=${OOOQE_FORK:-openstack}
+OOOQE_PATH=${OOOQE_PATH:-}
+OOOQ_BRANCH=${OOOQ_BRANCH:-master}
+OOOQ_FORK=${OOOQ_FORK:-openstack}
+OOOQ_PATH=${OOOQ_PATH:-}
+VPATH=${VPATH:-/root/Envs}
 WORKSPACE=${WORKSPACE:-/tmp/qs}
 LWD=${LWD:-/home/${USER}/.quickstart}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
@@ -24,6 +29,15 @@ COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 HACK=${HACK:-false}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
+
+if [ "${OOOQE_PATH}" ]; then
+  MOUNT_EXTRAS="-v ${OOOQE_PATH}:/tmp/oooq-extras"
+  OOOQE_PATH=/tmp/oooq-extras
+fi
+if [ "${OOOQ_PATH}" ]; then
+  MOUNT_QUICKSTART="-v ${OOOQ_PATH}:/tmp/oooq"
+  OOOQ_PATH=/tmp/oooq
+fi
 
 docker run -it --rm --privileged \
   --device-read-bps=${DEV}:${IOR} \
@@ -38,7 +52,9 @@ docker run -it --rm --privileged \
   -e WORKSPACE=${WORKSPACE} \
   -e LWD=${LWD} \
   -e IMAGECACHE=${IMAGECACHE} \
-  -e OOOQ_PATH=${OOOQ_PATH} \
+  -e OOOQ_PATH=${OOOQ_PATH:-} \
+  -e OOOQE_PATH=${OOOQE_PATH:-} \
+  -e VPATH=${VPATH} \
   -e HOME=/home/${USER} \
   -e TEARDOWN=${TEARDOWN} \
   -e VIRTUALENVWRAPPER_PYTHON=/usr/bin/python \
@@ -56,7 +72,8 @@ docker run -it --rm --privileged \
   -v /lib/modules:/lib/modules:ro \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${IMAGECACHE}:${IMAGECACHE} \
-  -v ${OOOQ_PATH}:/tmp/oooq \
+  ${MOUNT_QUICKSTART:-} \
+  ${MOUNT_EXTRAS:-} \
   -v $(pwd)/ansible.cfg:/tmp/oooq/ansible.cfg:ro \
   -v ${LWD}:$LWD \
   -v $(pwd):/tmp/scripts:ro \

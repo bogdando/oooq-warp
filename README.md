@@ -65,8 +65,12 @@ To start a scratch local dev env with libvirt and kvm:
   $ export LWD=${HOME}/.quickstart
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
+  $ export OOOQ_BRANCH=dev
+  $ export OOOQ_FORK=johbdoe
   # mkdir -p ${WORKSPACE}
   ```
+  Or use ``OOOQE_PATH`` and/or ``OOOQ_PATH``, if you want omit clonning either of
+  the quickstart or extras repo and use local copies instead.
 * Export a custom PLAY and/or CUSTOMVARS names to start with. The default play is
   is ``oooq-libvirt-provision.yaml`` (see the `playbooks` dir) and the default
   overrides file is invoked as `-e@custom.yaml`:
