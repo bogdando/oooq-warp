@@ -7,6 +7,7 @@ working_dir: /home/{{ undercloud_user }}
 undercloud_vcpu: 3
 undercloud_disk: 50
 undercloud_memory: 4096
+enable_opstools_repo: true
 
 # TODO consider priv VMs magic from
 # https://gerrit.opnfv.org/gerrit/#/c/28675/26/config/quickstart_defaults.yaml
@@ -16,3 +17,25 @@ undercloud_memory: 4096
 # working_dir: "/home/{{ non_root_user }}"
 # ssh_user: root
 # libvirt_uri: qemu:///system
+
+# TODO adjust the repo commands to not update *all* packages for containerized UC prolly
+repo_cmd_after: |
+  sudo yum install -y yum-plugin-priorities;
+  {% if not enable_opstools_repo|default(false)|bool %}sudo yum-config-manager --save --setopt centos-opstools.enable=0;
+  {%endif %}
+  sudo yum-config-manager --disable rdo-qemu-ev;
+  sudo rpm -e epel-release || true;
+  sudo yum remove -y rdo-release centos-release-ceph-* centos-release-openstack-* || true;
+  sudo rm -rf /etc/yum.repos.d/CentOS-OpenStack-*.repo /etc/yum.repos.d/CentOS-Ceph-*.repo /etc/yum.repos.d/CentOS-QEMU-EV.repo;
+  sudo rm -rf /etc/yum.repos.d/*.rpmsave;
+  sudo yum repolist;
+  sudo yum clean metadata
+  sudo yum update -y
+repo_cmd_before: |
+  sudo truncate --size 0 /home/{{ undercloud_user }}/repo_setup.log ||:;
+  sudo rm -rf /etc/yum.repos.d/delorean*;
+  sudo rm -rf /etc/yum.repos.d/*.rpmsave;
+  sudo yum clean all || :;
+  sudo yum-config-manager --disable "C7*"
+  #sudo yum-config-manager --disable "*"
+  sudo yum -y install deltarpm
