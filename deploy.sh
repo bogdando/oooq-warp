@@ -36,29 +36,34 @@ function finalize {
 }
 trap finalize EXIT
 
+sudo mkdir -p /etc/ansible
 if [ "${TEARDOWN}" = "true" -a "${PLAY}" = "oooq-libvirt-provision.yaml" ]; then
   # provision VMs, generate inventory, exit if INTERACTIVE mode
   # TODO traas provision to come here as well
   inventory=${SCRIPTS}/inventory.ini
   with_ansible -u ${USER} -i ${inventory} ${SCRIPTS}/playbooks/oooq-libvirt-provision.yaml
+  sudo cp -f ${LWD}/hosts /etc/ansible/
+  sudo cp -f ${LWD}/hosts /tmp/oooq/
   [ "$INTERACTIVE" = "true" ] && exit 0
 fi
 
 # switch to the generated inventory
 inventory=${LWD}/hosts
 [ -f "${inventory}" ] || cp ${SCRIPTS}/inventory.ini ${LWD}/hosts
+sudo cp -f ${inventory} /etc/ansible/
+sudo cp -f ${inventory} /tmp/oooq/
 
 echo "Check nodes connectivity"
-ansible -i ${inventory} -m ping all
+ansible -m ping all
 
 if [ "$HACK" = "false" ]; then
   echo "Deploy with quickstart, use playbook ${PLAY}"
-  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/${PLAY}
+  with_ansible ${SCRIPTS}/playbooks/${PLAY}
 else
   # hacking/racy mode for scripted ansible-playbook calls interleaved by tags:
   echo "Deploy with quickstart, interleaved hacking (experimental)"
-  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_repos.yml
-  (while true; do with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_prep.yml; [ $? -eq 0 ] && break; sleep 20; done)&
-  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_uc.yml --skip-tags overcloud-prep-containers
-  with_ansible -i ${inventory} ${SCRIPTS}/playbooks/hack_step_oc.yml
+  with_ansible ${SCRIPTS}/playbooks/hack_step_repos.yml
+  (while true; do with_ansible ${SCRIPTS}/playbooks/hack_step_prep.yml; [ $? -eq 0 ] && break; sleep 20; done)&
+  with_ansible ${SCRIPTS}/playbooks/hack_step_uc.yml --skip-tags overcloud-prep-containers
+  with_ansible ${SCRIPTS}/playbooks/hack_step_oc.yml
 fi

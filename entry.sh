@@ -60,6 +60,9 @@ if [ "${TEARDOWN}" = "false" ]; then
       'ssh.config.ansible' 'ssh.config.local.ansible'; do
     sudo cp -f "${WORKSPACE}/${state}" ${LWD}/
   done
+  sudo mkdir -p /etc/ansible
+  sudo cp -f "${WORKSPACE}/hosts" ${LWD}/hosts
+  sudo cp -f "${WORKSPACE}/hosts" /etc/ansible/
   set -e
 else
   rm -f /opt/oooq/{id_rsa,hosts,ssh.config}*
