@@ -47,6 +47,13 @@ if [ "${TEARDOWN}" = "true" -a "${PLAY}" = "oooq-libvirt-provision.yaml" ]; then
   [ "$INTERACTIVE" = "true" ] && exit 0
 fi
 
+# autodetect plays
+if [ -f ${SCRIPTS}/playbooks/${PLAY} ]; then
+  PLAY="${SCRIPTS}/playbooks/${PLAY}"
+else
+  PLAY="playbooks/${PLAY}"
+fi
+
 # switch to the generated inventory
 inventory=${LWD}/hosts
 [ -f "${inventory}" ] || cp ${SCRIPTS}/inventory.ini ${LWD}/hosts
@@ -58,7 +65,7 @@ ansible -m ping all
 
 if [ "$HACK" = "false" ]; then
   echo "Deploy with quickstart, use playbook ${PLAY}"
-  with_ansible ${SCRIPTS}/playbooks/${PLAY}
+  with_ansible ${PLAY}
 else
   # hacking/racy mode for scripted ansible-playbook calls interleaved by tags:
   echo "Deploy with quickstart, interleaved hacking (experimental)"
