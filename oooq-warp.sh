@@ -72,7 +72,8 @@ docker run -it --rm --privileged \
   -e SUPERMIN_MODULES=${SUPERMIN_MODULES:-} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
-  -v /dev:/dev:ro \
+  -v /dev:/dev \
+  -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /lib/modules:/lib/modules:ro \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${IMAGECACHE}:${IMAGECACHE} \
