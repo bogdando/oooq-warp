@@ -1,6 +1,6 @@
 ### THIS CONTAINS ONLY COMMON VARS, UNLIKE TO 'FEATURESETS'
 ## VIRTHOST
-default_disk: 25
+default_disk: 50
 default_memory: 4096
 default_vcpu: 1
 #compute_memory: 12288
