@@ -191,6 +191,9 @@ to disable apparmor for libvirt and reconfigure qemu as well:
 # sudo systemctl restart qemu-kvm
 ```
 
+If ``libguestfs-test-tool`` fails, try to adjust ``SUPERMIN_KERNEL``,
+``SUPERMIN_MODULES`` and ``LIBGUESTFS_BACKEND``.
+
 ## Traas multinode pre-provisioned deployment with openstack provider
 
 Follow an [all-in-one undercloud example guide](rdocloud-guide.md)
