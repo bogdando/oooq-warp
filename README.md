@@ -98,11 +98,18 @@ To start a scratch local dev env with libvirt and kvm:
   needed data overrides. Note, it contains only common vars. Use var files
   from the ``vars`` dir for advanced configuration overrides. You can either
   copy it as ``custom.yaml`` or ``export CUSTOMVARS=vars/something.yaml``.
-* Git checkout the wanted branch of the local OOQ repo. It will be mounted
-  into the wrapper container by the given ``OOOQ_PATH``.
+* (optional) Git checkout the wanted branches of the local OOQ(E) repos. Controlled
+  by the given ``OOOQ_PATH`` and ``OOQE_PATH``. If not set, then those are git
+  clonned from OOOQ(E) FORK/BRANCH.
 
 For traas, provision servers with the openstack CLI and proceed with custom
 playbooks as it's described below.
+
+For libvirt, provision VMs with the command like:
+```
+(oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh \
+-e@config/nodes/1ctlr_1comp.yml
+```
 
 ## Example playbooks for a local libvirt env
 
