@@ -29,6 +29,7 @@ COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 HACK=${HACK:-false}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
+LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
 
 if [ "${OOOQE_PATH}" ]; then
   MOUNT_EXTRAS="-v ${OOOQE_PATH}:/tmp/oooq-extras"
@@ -66,6 +67,9 @@ docker run -it --rm --privileged \
   -e SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY} \
   -e HACK=${HACK} \
   -e CUSTOMVARS=${CUSTOMVARS} \
+  -e LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND} \
+  -e SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-} \
+  -e SUPERMIN_MODULES=${SUPERMIN_MODULES:-} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /dev:/dev:ro \
@@ -79,6 +83,7 @@ docker run -it --rm --privileged \
   -v $(pwd):/tmp/scripts:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
+  -v /boot:/boot:ro \
   -u 1000 \
   --entrypoint /bin/bash \
   --name runner bogdando/oooq-runner:0.1 \

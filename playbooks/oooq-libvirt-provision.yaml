@@ -15,7 +15,11 @@
       become: false
       when: teardown|bool
     #- libvirt/setup/overcloud
-    - libvirt/setup/undercloud
+    - role: libvirt/setup/undercloud
+      environment:
+        SUPERMIN_KERNEL: "{{ lookup('env', 'SUPERMIN_KERNEL') }}"
+        SUPERMIN_MODULES:  "{{ lookup('env', 'SUPERMIN_MODULES') }}"
+        LIBGUESTFS_BACKEND: "{{ lookup('env', 'LIBGUESTFS_BACKEND') }}"
 
 - name: Generate new inventory
   hosts: localhost

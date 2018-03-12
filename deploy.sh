@@ -17,6 +17,9 @@ LWD=${LWD:-${HOME}/.quickstart}
 INTERACTIVE=${INTERACTIVE:-true}
 HACK=${HACK:-false}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
+LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
+SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-}
+SUPERMIN_MODULES=${SUPERMIN_MODULES:-}
 
 function with_ansible {
   ansible-playbook \
