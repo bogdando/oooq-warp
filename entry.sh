@@ -14,14 +14,8 @@ VPATH=${VPATH:-/root/Envs}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-~/.quickstart}
-IMAGECACHE=${IMAGECACHE:-/opt/cache}
 TEARDOWN=${TEARDOWN:-true}
 INTERACTIVE=${INTERACTIVE:-true}
-CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
-COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
-SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
-HACK=${HACK:-false}
-CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 
 sudo mkdir -p /tmp/oooq
 sudo mkdir -p ${LWD}
