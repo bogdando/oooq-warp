@@ -51,9 +51,9 @@ docker run -it --rm --privileged \
   -e HACK=${HACK} \
   -e CUSTOMVARS=${CUSTOMVARS} \
   -v /var/lib/libvirt:/var/lib/libvirt \
-  -v /run:/run \
+  -v /run/libvirt:/run/libvirt \
   -v /dev:/dev:ro \
-  -v /lib/modules:/lib/modules \
+  -v /lib/modules:/lib/modules:ro \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${IMAGECACHE}:${IMAGECACHE} \
   -v ${OOOQ_PATH}:/tmp/oooq \
