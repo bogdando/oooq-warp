@@ -46,7 +46,9 @@ Note, adapt those for your case or jut use existing images. It also requires
 
 To start a scratch local dev env with libvirt and kvm:
 
-* Download overcloud/undercloud images and md5 into the ``IMAGECACHE``.
+* Download overcloud/undercloud images and md5 into the ``IMAGECACHE``. Backup
+  those for future re-provision runs! Quickstart will mutate qcow2 files in-place, so
+  for a clean retry you will need those restored from a backup.
   For master dev envs, you may want to pick any of these sources:
   * [The most recent, the less stable](https://images.rdoproject.org/master/delorean/current-tripleo/),
     for hardcore devs
