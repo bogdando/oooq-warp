@@ -1,7 +1,15 @@
 ### THIS CONTAINS ONLY COMMON VARS, UNLIKE TO 'FEATURESETS'
 ## VIRTHOST
-default_disk: 50
+default_disk: 25
 default_memory: 4096
+default_vcpu: 1
+#compute_memory: 12288
+#compute_vcpu: 3
+#control_memory: 4096
+#compute_vcpu: 1
+#undercloud_disk: 25
+#undercloud_vcpu: 1
+#undercloud_memory: 4096
 libvirt_cpu_mode: host-passthrough
 
 # A hack for oooq to use the default pool instead of the oooq_pool

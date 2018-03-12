@@ -14,7 +14,8 @@
       ssh_user: "{{ lookup('env', 'USER') }}"
       become: false
       when: teardown|bool
-    #- libvirt/setup/overcloud
+    - role: libvirt/setup/overcloud
+      when: overcloud_nodes is defined
     - role: libvirt/setup/undercloud
       environment:
         SUPERMIN_KERNEL: "{{ lookup('env', 'SUPERMIN_KERNEL') }}"
