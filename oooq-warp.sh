@@ -3,12 +3,12 @@
 set -uxe
 
 DEV=${DEV:-/dev/sda}
-IOPSW=${IOPSW:-60}
-IOPSR=${IOPSR:-60}
-IOW=${IOW:-35mb}
-IOR=${IOR:-60mb}
-CPU=${CPU:-800}
-MEM=${MEM:-7G}
+IOPSW=${IOPSW:-0}
+IOPSR=${IOPSR:-0}
+IOW=${IOW:-0}
+IOR=${IOR:-0}
+CPU=${CPU:-0}
+MEM=${MEM:-0}
 
 # defaults
 INTERACTIVE=${INTERACTIVE:-true}
