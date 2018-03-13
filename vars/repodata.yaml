@@ -1,0 +1,32 @@
+# Custom DLRN repos, WARN: do not collide it with config/releases!
+# May be disabled if user data script handles it for pre-provisioned nodes
+configure_repos: true
+release: master
+overcloud_release: "{{release}}"
+gating_repo_enabled: false
+# https://review.openstack.org/#/c/465043/
+#repos:
+#  - type: tripleo-repos
+#    bundle: current
+#    release: master
+# TODO: rework with dlrn_hash_tag: current-tripleo / dlrn_hash_tag_newest: current ?
+dlrn_hash: current-tripleo
+repos:
+  - type: generic
+    reponame: delorean
+    filename: delorean.repo
+    baseurl: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/
+    hash_url: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/delorean.repo
+    priority: 20
+
+  - type: file
+    filename: delorean-deps.repo
+    down_url: http://trunk.rdoproject.org/centos7-{{ release }}/delorean-deps.repo
+
+#  - type: package
+#    pkg_name: centos-release-ceph-jewel
+#    custom_cmd: 'sudo yum install -y --enablerepo=extras'
+
+#repo_cmd_after: |
+#  sudo yum-config-manager --save --setopt centos-ceph-jewel.gpgcheck=0
+

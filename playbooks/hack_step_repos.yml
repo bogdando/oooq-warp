@@ -9,6 +9,7 @@
   vars_files:
     - ../vars/undercloud-traas.yaml
     - ../vars/overcloud-traas.yaml
+    - ../vars/repodata.yaml
   pre_tasks:
     - setup:
         gather_subset: '!all'

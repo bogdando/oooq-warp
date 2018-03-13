@@ -1,5 +1,5 @@
 ---
-# Libvirt local deployments by quickstart
+# Libvirt local deployments by quickstart (no overclouds expected)
 - name: Install delorian repos (oooq-extras)
   any_errors_fatal: true
   gather_facts: true
@@ -7,6 +7,7 @@
   hosts: undercloud
   vars_files:
     - ../vars/undercloud-local.yaml
+    - ../vars/repodata.yaml
   roles:
     - {role: repo-setup,  when: configure_repos|bool}
 

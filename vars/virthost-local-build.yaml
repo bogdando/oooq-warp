@@ -4,17 +4,16 @@ image_cache_dir: "{{ lookup('env', 'IMAGECACHE') }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 image_fetch_dir: "{{ working_dir }}"
 
-undercloud_use_custom_boot_images: true
-undercloud_custom_initrd: "{{ image_cache_dir }}/overcloud-full.initrd"
+undercloud_use_custom_boot_images: false
+build_undercloud: true
+overcloud_as_undercloud: true
+update_images: true
 undercloud_image_url: file://{{ image_cache_dir }}/undercloud.qcow2
 overcloud_image_url: file:///{{ image_cache_dir }}/overcloud-full.tar
-undercloud_custom_vmlinuz: "{{ image_cache_dir }}/overcloud-full.vmlinuz"
 enable_vnc_console: true
-enable_vbmc: false
-use_external_images: false
-overcloud_as_undercloud: false
+enable_vbmc: true
 chrooted: true
-inject_instackenv: false
+inject_instackenv: true
 
 undercloud_user: stack
 ssh_user: "{{ undercloud_user }}"

@@ -105,10 +105,9 @@ To start a scratch local dev env with libvirt and kvm:
 For traas, provision servers with the openstack CLI and proceed with custom
 playbooks as it's described below.
 
-For libvirt, provision VMs with the command like:
+For libvirt deployments w/o overclouds, provision VMs with the command like:
 ```
-(oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh \
--e@config/nodes/1ctlr_1comp.yml
+(oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh
 ```
 
 ## Example playbooks for a local libvirt env ready for OVB setup
@@ -122,14 +121,15 @@ Use ``INTERACTIVE=false`` to start the chosen ``PLAY`` automatically after the
 provisioning steps done. Otherwise, it returns to the shell prompt of the
 wrapper container. The interactive mode may help debugging.
 
-An example commands (additional to the example libvirt provision command
-given above):
+An example commands:
 ```
+(oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
+-e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml
 (oooq) export OOOQ_DIR=$PWD
 (oooq) export OPT_WORKDIR=$PWD
 (oooq) ./quickstart.sh --install-deps
 ```
-(install undercloud keeping in mind an arbitrary CI featureset)
+(install undercloud keeping in mind an arbitrary CI featureset for overcloud)
 ```
 (oooq) ./quickstart.sh -R master -n -I -T none -t all \
 -N config/nodes/1ctlr_1comp.yml \
@@ -137,8 +137,8 @@ given above):
 -p quickstart-extras-undercloud.yml \
 -e transport=local -e inventory=hosts localhost
 ```
-TODO: the latter command might not pick the generated inventory, then use the
-ansible-playbook command it produces, yet added ``-i hosts``.
+TODO: the latter command might not always pick the generated inventory. If so,
+then use the ansible-playbook command it produces, yet added ``-i hosts``.
 
 (deploy that CI featureset as overcloud)
 ```
@@ -215,7 +215,7 @@ to disable apparmor for libvirt and reconfigure qemu as well:
 ```
 
 If ``libguestfs-test-tool`` fails, try to adjust ``SUPERMIN_KERNEL``,
-``SUPERMIN_MODULES`` and ``LIBGUESTFS_BACKEND``.
+``SUPERMIN_KERNEL_VERSION``, ``SUPERMIN_MODULES`` and ``LIBGUESTFS_BACKEND``.
 
 ## Traas multinode pre-provisioned deployment with openstack provider
 

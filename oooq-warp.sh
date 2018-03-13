@@ -70,6 +70,7 @@ docker run -it --rm --privileged \
   -e LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND} \
   -e SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-} \
   -e SUPERMIN_MODULES=${SUPERMIN_MODULES:-} \
+  -e SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /dev:/dev \

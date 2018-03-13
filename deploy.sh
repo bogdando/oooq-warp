@@ -20,6 +20,7 @@ CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
 SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-}
 SUPERMIN_MODULES=${SUPERMIN_MODULES:-}
+SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-}
 
 function with_ansible {
   ansible-playbook \
@@ -37,7 +38,7 @@ function finalize {
 trap finalize EXIT
 
 sudo mkdir -p /etc/ansible
-if [ "${TEARDOWN}" = "true" -a "${PLAY}" = "oooq-libvirt-provision.yaml" ]; then
+if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
   # provision VMs, generate inventory, exit if INTERACTIVE mode
   # TODO traas provision to come here as well
   inventory=${SCRIPTS}/inventory.ini

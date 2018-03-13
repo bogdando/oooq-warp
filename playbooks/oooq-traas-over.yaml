@@ -17,6 +17,7 @@
   become: true
   vars_files:
     - ../vars/overcloud-traas.yaml
+      ../vars/repodata.yaml
   roles:
     - {role: repo-setup,  when: configure_repos|bool}
 
