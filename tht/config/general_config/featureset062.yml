@@ -1,0 +1,61 @@
+# Composed of fs026/27/17 mutated to host OVB jobs
+composable_scenario: scenario062-multinode-containers.yaml
+overcloud_templates_path: /home/{{ undercloud_user }}/tht
+deployed_server: false
+# Enable, if deployed from vanila Centos images
+undercloud_setup: false
+
+enable_swap: true
+swap_type: file
+network_isolation: false
+enable_pacemaker: false
+overcloud_ipv6: false
+containerized_overcloud: false
+containerized_undercloud: false
+deploy_steps_ansible_workflow: false
+
+# turn off image prep
+step_overcloud_image: false
+step_glance_upload: false
+step_register: false
+step_root_device_size: false
+step_root_device_hints: false
+step_introspect: false
+
+# This enables TLS for the undercloud which will also make haproxy bind to the
+# configured public-vip and admin-vip.
+undercloud_generate_service_certificate: false
+
+# This enables the deployment of the overcloud with SSL.
+ssl_overcloud: false
+
+extra_args: >-
+  --ntp-server pool.ntp.org
+
+# If `run_tempest` is `true`, run tempests tests, otherwise do not
+# run them.
+test_ping: false
+run_tempest: false
+composable_roles: true
+overcloud_roles:
+  - name: Controller
+    CountDefault: 1
+    tags:
+      - primary
+      - controller
+    networks:
+      - External
+      - InternalApi
+      - Storage
+      - StorageMgmt
+      - Tenant
+  - name: Compute
+    CountDefault: 1
+    tags:
+      - compute
+    networks:
+      - External
+      - InternalApi
+      - Storage
+      - StorageMgmt
+      - Tenant

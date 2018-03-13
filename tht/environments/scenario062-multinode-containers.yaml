@@ -1,0 +1,64 @@
+# A scenario based on 002 and 006 mutated and simplified to host OVB envs
+resource_registry:
+  OS::TripleO::Controller::Net::SoftwareConfig: ../common/net-config-multinode.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: ../common/net-config-multinode.yaml
+  OS::TripleO::Services::NovaIronic: ../puppet/services/nova-ironic.yaml
+  OS::TripleO::Services::IronicApi: ../puppet/services/ironic-api.yaml
+  OS::TripleO::Services::IronicConductor: ../puppet/services/ironic-conductor.yaml
+  OS::TripleO::Services::IronicInspector: ../puppet/services/ironic-inspector.yaml
+  OS::TripleO::Services::IronicPxe: ../puppet/services/ironic-pxe.yaml
+  OS::TripleO::Services::Zaqar: ../puppet/services/zaqar-api.yaml
+  OS::TripleO::AllNodes::Validation: ../common/all-nodes-validation-disabled.yaml
+
+parameter_defaults:
+  ControllerServices:
+    - OS::TripleO::Services::Kernel
+    - OS::TripleO::Services::Keystone
+    - OS::TripleO::Services::GlanceApi
+    - OS::TripleO::Services::HeatApi
+    - OS::TripleO::Services::HeatApiCfn
+    - OS::TripleO::Services::HeatEngine
+    - OS::TripleO::Services::IronicApi
+    - OS::TripleO::Services::IronicConductor
+    - OS::TripleO::Services::IronicInspector
+    - OS::TripleO::Services::IronicPxe
+    - OS::TripleO::Services::CinderApi
+    - OS::TripleO::Services::CinderScheduler
+    - OS::TripleO::Services::CinderVolume
+    - OS::TripleO::Services::SwiftProxy
+    - OS::TripleO::Services::SwiftStorage
+    - OS::TripleO::Services::SwiftRingBuilder
+    - OS::TripleO::Services::MySQL
+    - OS::TripleO::Services::MySQLClient
+    - OS::TripleO::Services::NeutronDhcpAgent
+    - OS::TripleO::Services::NeutronL3Agent
+    - OS::TripleO::Services::NeutronMetadataAgent
+    - OS::TripleO::Services::NeutronServer
+    - OS::TripleO::Services::NeutronCorePlugin
+    - OS::TripleO::Services::NeutronOvsAgent
+    - OS::TripleO::Services::RabbitMQ
+    - OS::TripleO::Services::Memcached
+    - OS::TripleO::Services::NovaConductor
+    - OS::TripleO::Services::NovaApi
+    - OS::TripleO::Services::NovaIronic
+    - OS::TripleO::Services::NovaPlacement
+    - OS::TripleO::Services::NovaMetadata
+    - OS::TripleO::Services::NovaScheduler
+    - OS::TripleO::Services::Ntp
+    - OS::TripleO::Services::Sshd
+    - OS::TripleO::Services::Iscsid
+    - OS::TripleO::Services::Timezone
+    - OS::TripleO::Services::Redis
+    - OS::TripleO::Services::Zaqar
+    - OS::TripleO::Services::TripleoPackages
+    - OS::TripleO::Services::TripleoFirewall
+
+  Debug: false
+  DockerDebug: false
+  DockerPuppetDebug: false
+  GlanceBackend: 'swift'
+  IronicCleaningDiskErase: 'metadata'
+  NotificationDriver: 'noop'
+  ZaqarMessageStore: 'swift'
+  ZaqarManagementStore: 'sqlalchemy'
+  SwiftCeilometerPipelineEnabled: false
