@@ -122,17 +122,27 @@ Use ``INTERACTIVE=false`` to start the chosen ``PLAY`` automatically after the
 provisioning steps done. Otherwise, it returns to the shell prompt of the
 wrapper container. The interactive mode may help debugging.
 
-An example commands:
+An example commands (additional to the example libvirt provision command
+given above):
 ```
-(oooq) PLAY=repo-setup.yml create_env_oooq.sh \
-  -e@/tmp/scripts/vars/undercloud-local.yaml
 (oooq) export OOOQ_DIR=$PWD
 (oooq) export OPT_WORKDIR=$PWD
 (oooq) ./quickstart.sh --install-deps
-(oooq) ./quickstart.sh -R master --no-clone --tags all \
-  --nodes config/nodes/1ctlr_1comp.yml \
-  -I --teardown none -p quickstart-extras-undercloud.yml \
-  -e chrooted=true -e transport=local localhost
+```
+(install undercloud keeping in mind an arbitrary CI featureset)
+```
+(oooq) ./quickstart.sh -R master -n -I -T none -t all \
+-N config/nodes/1ctlr_1comp.yml \
+-E /tmp/scripts/tht/config/general_config/featureset062.yml \
+-p quickstart-extras-undercloud.yml \
+-e transport=local -e inventory=hosts localhost
+```
+TODO: the latter command might not pick the generated inventory, then use the
+ansible-playbook command it produces, yet added ``-i hosts``.
+
+(deploy that CI featureset as overcloud)
+```
+(oooq) #TBD
 ```
 
 ## Hacking mode with interleaving undercloud/overcloud tasks (experimental)
