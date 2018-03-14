@@ -14,8 +14,6 @@ TEARDOWN=${TEARDOWN:-true}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-${HOME}/.quickstart}
-INTERACTIVE=${INTERACTIVE:-true}
-HACK=${HACK:-false}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
 SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-}
@@ -29,7 +27,7 @@ function with_ansible {
     -e teardown=$TEARDOWN \
     -e @${SCRIPTS}/${CUSTOMVARS} \
     ${ARGS} \
-    $LOG_LEVEL $@
+    $LOG_LEVEL $@ 2>&1 | tee -a _deploy.log
 }
 
 function finalize {
@@ -38,15 +36,6 @@ function finalize {
 trap finalize EXIT
 
 sudo mkdir -p /etc/ansible
-if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
-  # provision VMs, generate inventory, exit if INTERACTIVE mode
-  # TODO traas provision to come here as well
-  inventory=${SCRIPTS}/inventory.ini
-  with_ansible -u ${USER} -i ${inventory} ${SCRIPTS}/playbooks/oooq-libvirt-provision.yaml
-  sudo cp -f ${LWD}/hosts /etc/ansible/
-  sudo cp -f ${LWD}/hosts /tmp/oooq/
-  [ "$INTERACTIVE" = "true" ] && exit 0
-fi
 
 # autodetect plays
 if [ -f ${SCRIPTS}/playbooks/${PLAY} ]; then
@@ -55,23 +44,23 @@ else
   PLAY="playbooks/${PLAY}"
 fi
 
-# switch to the generated inventory
-inventory=${LWD}/hosts
-[ -f "${inventory}" ] || cp ${SCRIPTS}/inventory.ini ${LWD}/hosts
-sudo cp -f ${inventory} /etc/ansible/
-sudo cp -f ${inventory} /tmp/oooq/
+if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
+  # provision VMs, generate inventory and exit
+  # TODO traas provision to come here as well maybe
+  inventory=${SCRIPTS}/inventory.ini
+  with_ansible -u ${USER} -i ${inventory} ${PLAY}
+  sudo cp -f ${LWD}/hosts /etc/ansible/
+  sudo cp -f ${LWD}/hosts /tmp/oooq/
+else
+  # switch to the generated inventory and deploy a PLAY, if already provisioned VMs
+  inventory=${LWD}/hosts
+  [ -f "${inventory}" ] || cp ${SCRIPTS}/inventory.ini ${LWD}/hosts
+  sudo cp -f ${inventory} /etc/ansible/
+  sudo cp -f ${inventory} /tmp/oooq/
 
-echo "Check nodes connectivity"
-ansible -m ping all
+  echo "Check nodes connectivity"
+  ansible -m ping all
 
-if [ "$HACK" = "false" ]; then
   echo "Deploy with quickstart, use playbook ${PLAY}"
   with_ansible ${PLAY}
-else
-  # hacking/racy mode for scripted ansible-playbook calls interleaved by tags:
-  echo "Deploy with quickstart, interleaved hacking (experimental)"
-  with_ansible ${SCRIPTS}/playbooks/hack_step_repos.yml
-  (while true; do with_ansible ${SCRIPTS}/playbooks/hack_step_prep.yml; [ $? -eq 0 ] && break; sleep 20; done)&
-  with_ansible ${SCRIPTS}/playbooks/hack_step_uc.yml --skip-tags overcloud-prep-containers
-  with_ansible ${SCRIPTS}/playbooks/hack_step_oc.yml
 fi

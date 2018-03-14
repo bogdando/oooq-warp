@@ -6,7 +6,7 @@ default_vcpu: 1
 #compute_memory: 12288
 #compute_vcpu: 3
 #control_memory: 4096
-#compute_vcpu: 1
+#control_vcpu: 1
 #undercloud_disk: 25
 #undercloud_vcpu: 1
 #undercloud_memory: 4096

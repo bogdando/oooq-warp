@@ -71,7 +71,7 @@ To start a scratch local dev env with libvirt and kvm:
   ```
   Or use ``OOOQE_PATH`` and/or ``OOOQ_PATH``, if you want omit clonning either of
   the quickstart or extras repo and use local copies instead.
-* Export a custom PLAY and/or CUSTOMVARS names to start with. The default play is
+* Export a custom ``PLAY`` and/or ``CUSTOMVARS`` names to start with. The default play is
   is ``oooq-libvirt-provision.yaml`` (see the `playbooks` dir) and the default
   overrides file is invoked as `-e@custom.yaml`:
   ```
@@ -98,30 +98,39 @@ To start a scratch local dev env with libvirt and kvm:
   needed data overrides. Note, it contains only common vars. Use var files
   from the ``vars`` dir for advanced configuration overrides. You can either
   copy it as ``custom.yaml`` or ``export CUSTOMVARS=vars/something.yaml``.
-* (optional) Git checkout the wanted branches of the local OOQ(E) repos. Controlled
-  by the given ``OOOQ_PATH`` and ``OOQE_PATH``. If not set, then those are git
-  clonned from OOOQ(E) FORK/BRANCH.
+
+  Note, ``custom.yaml``/``CUSTOMVARS`` is applied with each ``create_env_oooq.sh``
+  command with the top overriding precedence. Do not put there any vars you want
+  to override elsewhere, like from the vars files shipped with plays!
+
+* (optional) Git checkout the wanted branches of the local quickstart/extras repos.
+  Controlled by the given ``OOOQ_PATH`` and ``OOQE_PATH``. If not set, then those
+  are git clonned from ``OOOQ(E)_FORK/BRANCH``.
 
 For traas, provision servers with the openstack CLI and proceed with custom
 playbooks as it's described below.
 
-For libvirt deployments w/o overclouds, provision VMs with the command like:
+For libvirt deployments w/o overclouds, provision your only undercloud VM with
+the command like:
 ```
 (oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh
 ```
 
+Note, that reuses the extracted initrd/vmlinuz and omits the repo-setup and some
+of the qcow2 image building steps are normally executed with quickstart CI.
+
 ## Example playbooks for a local libvirt env ready for OVB setup
 
-An example list of the executed plays:
-* the default ``oooq-libvirt-provision.yaml``, that provisions servers and
-  updates inventory. Use ``TEARDOWN=false`` to omit it.
-* the ``oooq-libvirt-under.yaml`` or an arbitrary custom ``PLAY``.
+The expected workflow is:
 
-Use ``INTERACTIVE=false`` to start the chosen ``PLAY`` automatically after the
-provisioning steps done. Otherwise, it returns to the shell prompt of the
-wrapper container. The interactive mode may help debugging.
+* provision a libvirt env, it creates a running undercloud VM and shut-off VMs
+  from the ``overcloud_nodes`` passed.
+* Install undercloud as a separate step (optional, depends on the next step)
+* Deploy a particular quickstart's CI featureset, given a nodes-file and/or a
+  config release file, added your custom ansible CLI args and ``CUSTOMVARS``.
+* Proceed with OVB, f.e. executred from the provided ``reproduce-quickstart.sh``.
 
-An example commands:
+Example commands:
 ```
 (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
 -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml
@@ -144,21 +153,6 @@ then use the ansible-playbook command it produces, yet added ``-i hosts``.
 ```
 (oooq) #TBD
 ```
-
-## Hacking mode with interleaving undercloud/overcloud tasks (experimental)
-
-Use ``HACK=true`` to overlap undercloud and overcloud install playbooks for some
-point. While hacky and racy and will likely fail, it can still be a shortcut for
-the total deploy time. The long running steps, like populating container images
-to prepare the overcloud deployment, save *a lot* of time when overlapped with
-the undercloud deployment tasks. And failed playbooks may be just re-applied,
-after all!
-
-It should only be used with the ``INTERACTIVE=true`` as it requires manual
-steps to finish deployments, like turning off the hack mode and retrying of the
-failed playbooks.
-
-This mode is only works with traas playbooks yet.
 
 ## Dev branches and venvs (undercloud)
 
