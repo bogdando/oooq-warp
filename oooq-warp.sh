@@ -67,6 +67,8 @@ docker run -it --rm --privileged \
   -e SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-} \
   -e SUPERMIN_MODULES=${SUPERMIN_MODULES:-} \
   -e SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-} \
+  -e OOOQ_DIR=/tmp/oooq \
+  -e OPT_WORKDIR=/tmp/oooq \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /dev:/dev \
