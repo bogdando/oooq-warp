@@ -30,8 +30,18 @@ function with_ansible {
     $LOG_LEVEL $@ 2>&1 | tee -a _deploy.log
 }
 
+# A tricky sync for the state spread across LWD/WORKSPACE
 function finalize {
-  sudo cp -af ${LWD}/* ${WORKSPACE}/
+  set +xe
+  for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
+      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' ; do
+    cp -f "${LWD}/${state}" ${WORKSPACE}/
+  done
+  for state in 'hosts' 'ssh.config.ansible' \
+      'ssh.config.local.ansible' ; do
+    cp -f "${WORKSPACE}/${state}" ${LWD}/
+  done
+  set -xe
 }
 trap finalize EXIT
 
@@ -50,13 +60,18 @@ if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
   inventory=${SCRIPTS}/inventory.ini
   with_ansible -u ${USER} -i ${inventory} ${PLAY}
   sudo cp -f ${LWD}/hosts /etc/ansible/
-  sudo cp -f ${LWD}/hosts /tmp/oooq/
+  cp -f ${LWD}/hosts /tmp/oooq/
+  cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/
+  finalize
+  echo "# Generated for quickstart VMs IPMI/VBMC, purge this later manually" >> \
+  ${HOME}/.ssh/authorized_keys
+  cat ${LWD}/id_rsa_virt_power.pub  >> ${HOME}/.ssh/authorized_keys
 else
   # switch to the generated inventory and deploy a PLAY, if already provisioned VMs
   inventory=${LWD}/hosts
   [ -f "${inventory}" ] || cp ${SCRIPTS}/inventory.ini ${LWD}/hosts
   sudo cp -f ${inventory} /etc/ansible/
-  sudo cp -f ${inventory} /tmp/oooq/
+  cp -f ${inventory} /tmp/oooq/
 
   echo "Check nodes connectivity"
   ansible -m ping all

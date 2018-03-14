@@ -74,12 +74,13 @@ docker run -it --rm --privileged \
   -v /dev:/dev \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /lib/modules:/lib/modules:ro \
-  -v ${WORKSPACE}:${WORKSPACE} \
   -v ${IMAGECACHE}:${IMAGECACHE} \
   ${MOUNT_QUICKSTART:-} \
   ${MOUNT_EXTRAS:-} \
   -v $(pwd)/ansible.cfg:/tmp/oooq/ansible.cfg:ro \
+  -v ${WORKSPACE}:${WORKSPACE} \
   -v ${LWD}:$LWD \
+  -v /home/${USER}/.ssh/authorized_keys:/home/${USER}/.ssh/authorized_keys \
   -v $(pwd):/tmp/scripts:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \

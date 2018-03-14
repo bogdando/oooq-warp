@@ -19,6 +19,8 @@ TEARDOWN=${TEARDOWN:-true}
 sudo mkdir -p /tmp/oooq
 sudo mkdir -p ${LWD}
 sudo chown -R ${USER}: ${LWD}
+sudo mkdir -p ${WORKSPACE}
+sudo chown -R ${USER}: ${WORKSPACE}
 cd $HOME
 sudo ln -sf ${VPATH} .
 sudo chown -R ${USER}: $HOME
@@ -50,21 +52,25 @@ else
   sudo rsync -aLH /tmp/oooq-extras/roles /tmp/oooq/
 fi
 
-# Restore the saved state from the WORKSPACE (ssh keys/setup, inventory)
-# to allow fast respinning of the local environment omitting VM provisioning tasks
+# Restore the saved state spread across LWD/WORKSPACE dirs
+# (ssh keys/setup, inventory, kernel images)
 if [ "${TEARDOWN}" = "false" ]; then
-  set +e
-  for state in 'hosts' 'id_rsa_undercloud' 'id_rsa_virt_power' \
-      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
-      'ssh.config.ansible' 'ssh.config.local.ansible'; do
-    sudo cp -f "${WORKSPACE}/${state}" ${LWD}/
+  set +ex
+  for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
+      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' ; do
+    cp -f "${WORKSPACE}/${state}" ${LWD}/
+  done
+  for state in 'hosts' 'ssh.config.ansible' \
+      'ssh.config.local.ansible' ; do
+    cp -f "${LWD}/${state}" ${WORKSPACE}/
   done
   sudo mkdir -p /etc/ansible
-  sudo cp -f "${WORKSPACE}/hosts" ${LWD}/hosts
-  sudo cp -f "${WORKSPACE}/hosts" /etc/ansible/
-  set -e
+  sudo cp -f "${LWD}/hosts" /etc/ansible/
+  cp -f "${LWD}/hosts" /tmp/oooq/
+  set -ex
 else
-  rm -f /opt/oooq/{id_rsa,hosts,ssh.config}*
+  rm -f "${WORKSPACE}/{id_rsa,hosts,ssh.config}*"
+  rm -f "${LWD}/{id_rsa,hosts,ssh.config}*"
 fi
 
 sudo chown -R ${USER}: ${HOME}

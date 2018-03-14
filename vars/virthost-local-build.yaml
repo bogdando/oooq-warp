@@ -1,3 +1,4 @@
+# May be used  to deploy undercloud with overcloud to host OVB stack
 inventory: undercloud
 working_dir: "{{ lookup('env', 'WORKSPACE') }}"
 image_cache_dir: "{{ lookup('env', 'IMAGECACHE') }}"
@@ -21,3 +22,14 @@ ssh_user: "{{ undercloud_user }}"
 non_root_user: "{{ lookup('env', 'USER') }}"
 non_root_group: "{{ non_root_user }}"
 ansible_user_id: "{{ non_root_user }}"
+
+# Recommended for OVB stack comprised of 1 controller and 1 compute
+#default_disk: 50
+#default_memory: 4096
+#default_vcpu: 1
+#compute_memory: 16384
+#compute_vcpu: 4
+#control_memory: 4096
+#control_vcpu: 1
+#undercloud_vcpu: 1
+#undercloud_memory: 4096

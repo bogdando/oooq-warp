@@ -62,9 +62,9 @@ To start a scratch local dev env with libvirt and kvm:
 * Export env vars as you want them, for example:
   ```
   $ export USER=bogdando
-  $ export WORKSPACE=/tmp/qs #ephemeral for a container life-time!
-  $ export IMAGECACHE=/opt/cache #persistent and bind-mounted
-  $ export LWD=${HOME}/.quickstart #persistent and bind-mounted
+  $ export WORKSPACE=/tmp/qs #persisted on host, libvirt revers to it
+  $ export IMAGECACHE=/opt/cache #persistent on host
+  $ export LWD=${HOME}/.quickstart #persistent on host
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
   $ export OOOQ_BRANCH=dev
@@ -144,38 +144,44 @@ Example commands (``(oooq)`` represents the shell prompt in the oooq container):
 
 * Provision with building images
 ```
-(oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
--e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml
 (oooq) ./quickstart.sh --install-deps
+(oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
+           -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml
 ```
-* Add the generated ``id_rsa_virt_power.pub`` to the libvirt host ``$USER``'s
-authorized_keys:
+* Install undercloud (keeping in mind the fs062 featureset for overcloud)
 ```
-$ cat $LWD/id_rsa_virt_power.pub  >> $HOME/.ssh/authorized_keys
+(oooq) export HOST_BREXT_IP=192.168.23.1
+(oooq) ./quickstart.sh -R master -n -I -T none -t all \
+           -N config/nodes/1ctlr_1comp.yml \
+           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /tmp/scripts/vars/undercloud-local.yaml \
+           -p quickstart-extras-undercloud.yml \
+           -e transport=local \
+           -e vbmc_libvirt_uri="qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=${LWD}/id_rsa_virt_power&no_verify=1&no_tty=1" \
+           localhost
 ```
-* Install undercloud keeping in mind the fs062 featureset for overcloud
-```
-(oooq) HOST_BREXT_IP=192.168.23.1 ./quickstart.sh -R master -n -I -T none -t all \
--N config/nodes/1ctlr_1comp.yml \
--E /tmp/scripts/tht/config/general_config/featureset062.yml \
--p quickstart-extras-undercloud.yml \
--e vbmc_libvirt_uri="qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=${LWD}/id_rsa_virt_power&no_verify=1&no_tty=1" \
--e transport=local localhost
-```
-> **NOTE** the command might not always pick the generated inventory. If so,
-> use the ansible-playbook command it produces, yet added ``-i hosts``.
-
 **FIXME**: the socket path is hardcoded in quickstart for RHEL OS family,
 so we have to override the ``vbmc_libvirt_uri`` and manually evaluate ``HOST_BREXT_IP``.
 
+* Deploy overcloud from the given featureset and nodes config
 ```
-(oooq)
-```
+(oooq) ./quickstart.sh -R master -n -I -T none -t all \
+           -S tripleo-validations \
+           -p quickstart-extras-overcloud-prep.yml \
+           -N config/nodes/1ctlr_1comp.yml \
+           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /tmp/scripts/vars/undercloud-local.yaml \
+           -e transport=local localhost
 
-(deploy that CI featureset as overcloud)
+(oooq) ./quickstart.sh -R master -n -I -T none -t all \
+           -S tripleo-validations \
+           -p quickstart-extras-overcloud.yml \
+           -N config/nodes/1ctlr_1comp.yml \
+           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /tmp/scripts/vars/undercloud-local.yaml \
+           -e transport=local localhost
 ```
-(oooq) #TBD
-```
+* Deploy your OVB setup on top
 
 ## Dev branches and venvs (undercloud)
 
@@ -208,15 +214,15 @@ node and can be picked as extra deployment args from
 
 If you want to reuse existing customized by oooq images and omit
 all of the long playing oooq provisioning steps:
-* Make sure your ``local_working_dir`` is a persistent host path
-  Otherwise, when the container exited, you loose the updated
-  inventory and ssh keys and may only start from the scratch.
 * Export ``TEARDOWN=false`` then rerun the deploy inside of the
   container.
 
-To start from the scratch, remove existing VMs' snapshots, export or
-unset``TEARDOWN=true``, unset ``PLAY``, exit container and re-run
-``./oooq-warp.sh`` and grap some cofee, it won't be ready soon.
+To start a new libvirt env from the scratch:
+
+* remove existing VMs' snapshots,
+* restore the downloaded images from backups to the ``IMAGECACHE`` dir,
+* exit the wrapper container,
+* start a new container with ``TEARDOWN=true ./oooq-warp.sh`` or the like.
 
 ## Troubleshooting local envs
 
