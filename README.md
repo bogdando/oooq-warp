@@ -26,8 +26,8 @@ For non local (traas) deployments:
 * OpenStack client installed locally
 * OpenStack creds file and pem/pub key files to access the hosting cloud
 
-Note, public cloud providers may not allow HW enabled kvm. OOOQ
-will not work on QEMU, sorry!
+> **NOTE** public cloud providers may not allow HW enabled kvm. OOOQ
+> will not work on QEMU, sorry!
 
 Note, the wrapper docker image wants Ansible >= 2.3, Shade >= 1.21.0
 and Jinja >= 2.9.6, plus those oooq/extras requirements and packages
@@ -40,15 +40,18 @@ $ packer build packer-docker-centos7.json
 $ packer build packer-docker-oooq-runner.json
 ```
 Note, adapt those for your case or jut use existing images. It also requires
-``OOOQ_PATH`` set, see below.
+``OOOQ_PATH`` set and pointing to the quickstart clonned locally.
 
 ## Pre-flight checks for a warp jump
 
 To start a scratch local dev env with libvirt and kvm:
 
-* Download overcloud/undercloud images and md5 into the ``IMAGECACHE``. Backup
-  those for future re-provision runs! Quickstart will mutate qcow2 files in-place, so
-  for a clean retry you will need those restored from a backup.
+* Download overcloud/undercloud images and md5 into the ``IMAGECACHE``.
+
+  > **WARN**: Backup those for future re-provision runs!
+  > Quickstart will mutate qcow2 files in-place, so
+  > for a clean retry you will need those restored from a backup manually.
+
   For master dev envs, you may want to pick any of these sources:
   * [The most recent, the less stable](https://images.rdoproject.org/master/delorean/current-tripleo/),
     for hardcore devs
@@ -59,31 +62,31 @@ To start a scratch local dev env with libvirt and kvm:
 * Export env vars as you want them, for example:
   ```
   $ export USER=bogdando
-  $ export OOOQ_PATH=${HOME}/gitrepos/tripleo-quickstart
-  $ export WORKSPACE=/opt/oooq
-  $ export IMAGECACHE=/opt/cache
-  $ export LWD=${HOME}/.quickstart
+  $ export WORKSPACE=/tmp/qs #ephemeral for a container life-time!
+  $ export IMAGECACHE=/opt/cache #persistent and bind-mounted
+  $ export LWD=${HOME}/.quickstart #persistent and bind-mounted
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
   $ export OOOQ_BRANCH=dev
   $ export OOOQ_FORK=johbdoe
-  # mkdir -p ${WORKSPACE}
   ```
   Or use ``OOOQE_PATH`` and/or ``OOOQ_PATH``, if you want omit clonning either of
-  the quickstart or extras repo and use local copies instead.
+  the quickstart or extras repo and use the local copies instead.
 * Export a custom ``PLAY`` and/or ``CUSTOMVARS`` names to start with. The default play is
   is ``oooq-libvirt-provision.yaml`` (see the `playbooks` dir) and the default
   overrides file is invoked as `-e@custom.yaml`:
   ```
   $ export PLAY=oooq-libvirt-under.yaml
   ```
-* Extract initrd and vmlinuz (does not work from the
+* Extract initrd and vmlinuz (from the host, does not work from the
   wrapping oooq-runner container):
   ```
   # virt-copy-out -a ${IMAGECACHE}/undercloud.qcow2 \
     /home/stack/overcloud-full.vmlinuz \
     /home/stack/overcloud-full.initrd ${WORKSPACE}
   ```
+  This step may be omitted if building images with quickstart.
+
 * Prepare host for nested kvm and do some sysctl magic:
   ```
   # echo "options kvm_intel nested=1" > /etc/modprobe.d/kvm-nested.conf
@@ -95,13 +98,13 @@ To start a scratch local dev env with libvirt and kvm:
   The latter step is optional, ignore if the command fails.
 
 * Copy example data vars ``custom.yaml_example`` as ``custom.yaml`` and check for
-  needed data overrides. Note, it contains only common vars. Use var files
-  from the ``vars`` dir for advanced configuration overrides. You can either
-  copy it as ``custom.yaml`` or ``export CUSTOMVARS=vars/something.yaml``.
+  needed data overrides. Note, it contains only common vars for all plays. Use var files
+  from the ``vars`` dir (or quickstart's releases configs) for advanced configuration
+  overrides. Arbitrary overrides are also supported with ``CUSTOMVARS=something.yaml``.
 
-  Note, ``custom.yaml``/``CUSTOMVARS`` is applied with each ``create_env_oooq.sh``
-  command with the top overriding precedence. Do not put there any vars you want
-  to override elsewhere, like from the vars files shipped with plays!
+  > **NOTE** ``custom.yaml``/``CUSTOMVARS`` applies with each ``create_env_oooq.sh``
+  command with the top level vars precedence. Do not put there any vars you want
+  to override elsewhere, like from the vars files shipped with plays or releases configs!
 
 * (optional) Git checkout the wanted branches of the local quickstart/extras repos.
   Controlled by the given ``OOOQ_PATH`` and ``OOQE_PATH``. If not set, then those
@@ -116,8 +119,15 @@ the command like:
 (oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh
 ```
 
-Note, that reuses the extracted initrd/vmlinuz and omits the repo-setup and some
-of the qcow2 image building steps are normally executed with quickstart CI.
+You can access the undercloud VMs with the command:
+```
+ssh -F /opt/.quickstart/ssh.config.local.ansible undercloud
+```
+
+> **NOTE** That command reuses the extracted initrd/vmlinuz kernel images and
+> omits the repo-setup and some of the qcow2 image building steps are normally
+> executed with quickstart CI. If the extracted kernel images do not fit your
+> case, use ``oooq-libvirt-provision-build.yaml`` instead.
 
 ## Example playbooks for a local libvirt env ready for OVB setup
 
@@ -216,8 +226,8 @@ If ``libguestfs-test-tool`` fails, try to adjust ``SUPERMIN_KERNEL``,
 Follow an [all-in-one undercloud example guide](rdocloud-guide.md)
 (RDO cloud), or read below for advanced deployment scenarios.
 
-Note, the private key from the generated Nova keypair should be copied under
-``$WORKSPACE``.
+> **NOTE** the private key from the generated Nova keypair should be
+> copied under the ``$LWD`` path.
 
 Update the ``vars/inventory-traas.yaml`` vars file with required info, like
 OpenStack cloud access secrets and endpoints. Now you need to generate an
@@ -234,8 +244,7 @@ $ ./oooq-warp.sh
 ```
 Note, it places the given openstack cloud provider access secrets under the
 ``$LWD/clouds.yaml`` or ``$LWD/stackrc``. The ``$LWD`` dir is bind-mounted
-into the wrapper container and may be not ephemeral, so take care of your
-secrets to not be spreading around permanently!
+into the wrapper container and is persisted across different containers runs.
 
 Then deploy with custom tripleo-extras roles, like:
 ```
@@ -255,7 +264,3 @@ Use the ``openstack --os-cloud my-cool-cloud server list`` outputs to get
 a list of controllers/computes/etc private IPs for export.
 SSH keys placement is up to cloud init scripts for the pre-provisioned hosts.
 Traas creates them under the centos user home by default.
-
-The `custom.yaml_defaults` also provides some top level overrides
-for oooq roles' vars. Those are needed to reify multinode/deployed-server
-networking.
