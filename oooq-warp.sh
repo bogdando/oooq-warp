@@ -84,7 +84,7 @@ docker run -it --rm --privileged \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
   -v /boot:/boot:ro \
-  -u 1000 \
+  -u $(id -u $USER) \
   --entrypoint /bin/bash \
   --name runner bogdando/oooq-runner:0.1 \
   -c "sudo cp /tmp/scripts/*.sh /usr/local/sbin/ && \

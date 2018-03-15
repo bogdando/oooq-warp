@@ -13,7 +13,6 @@
     - { role: environment/setup, when: teardown|bool }
     - { role: libvirt/teardown, when: teardown|bool }
     - role: libvirt/setup/user
-      ssh_user: "{{ lookup('env', 'USER') }}"
       when: teardown|bool
     - role: libvirt/setup/overcloud
       when: overcloud_nodes is defined

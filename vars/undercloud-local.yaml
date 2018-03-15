@@ -1,4 +1,5 @@
-undercloud_user: stack
+undercloud_user: "{{ lookup('env', 'USER') }}"
+overcloud_user: "{{ undercloud_user }}"
 ssh_user: "{{ undercloud_user }}"
 non_root_user: "{{ undercloud_user }}"
 non_root_group: "{{ undercloud_user }}"

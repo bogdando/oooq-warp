@@ -140,24 +140,37 @@ The expected workflow is:
   config release file, added your custom ansible CLI args and ``CUSTOMVARS``.
 * Proceed with OVB, f.e. executred from the provided ``reproduce-quickstart.sh``.
 
-Example commands:
+Example commands (``(oooq)`` represents the shell prompt in the oooq container):
+
+* Provision with building images
 ```
 (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
 -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml
-(oooq) export OOOQ_DIR=$PWD
-(oooq) export OPT_WORKDIR=$PWD
 (oooq) ./quickstart.sh --install-deps
 ```
-(install undercloud keeping in mind an arbitrary CI featureset for overcloud)
+* Add the generated ``id_rsa_virt_power.pub`` to the libvirt host ``$USER``'s
+authorized_keys:
 ```
-(oooq) ./quickstart.sh -R master -n -I -T none -t all \
+$ cat $LWD/id_rsa_virt_power.pub  >> $HOME/.ssh/authorized_keys
+```
+* Install undercloud keeping in mind the fs062 featureset for overcloud
+```
+(oooq) HOST_BREXT_IP=192.168.23.1 ./quickstart.sh -R master -n -I -T none -t all \
 -N config/nodes/1ctlr_1comp.yml \
 -E /tmp/scripts/tht/config/general_config/featureset062.yml \
 -p quickstart-extras-undercloud.yml \
--e transport=local -e inventory=hosts localhost
+-e vbmc_libvirt_uri="qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=${LWD}/id_rsa_virt_power&no_verify=1&no_tty=1" \
+-e transport=local localhost
 ```
-TODO: the latter command might not always pick the generated inventory. If so,
-then use the ansible-playbook command it produces, yet added ``-i hosts``.
+> **NOTE** the command might not always pick the generated inventory. If so,
+> use the ansible-playbook command it produces, yet added ``-i hosts``.
+
+**FIXME**: the socket path is hardcoded in quickstart for RHEL OS family,
+so we have to override the ``vbmc_libvirt_uri`` and manually evaluate ``HOST_BREXT_IP``.
+
+```
+(oooq)
+```
 
 (deploy that CI featureset as overcloud)
 ```

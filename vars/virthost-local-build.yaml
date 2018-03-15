@@ -15,7 +15,8 @@ enable_vbmc: true
 chrooted: true
 inject_instackenv: true
 
-undercloud_user: stack
+undercloud_user: "{{ lookup('env', 'USER') }}"
+overcloud_user: "{{ undercloud_user }}"
 ssh_user: "{{ undercloud_user }}"
 non_root_user: "{{ lookup('env', 'USER') }}"
 non_root_group: "{{ non_root_user }}"
