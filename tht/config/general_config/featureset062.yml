@@ -14,13 +14,13 @@ containerized_overcloud: false
 containerized_undercloud: false
 deploy_steps_ansible_workflow: false
 
-# turn off image prep
-step_overcloud_image: false
-step_glance_upload: false
-step_register: false
-step_root_device_size: false
-step_root_device_hints: false
-step_introspect: false
+# turn on image prep
+step_overcloud_image: true
+step_glance_upload: true
+step_register: true
+step_root_device_size: true
+step_root_device_hints: true
+step_introspect: true
 
 # This enables TLS for the undercloud which will also make haproxy bind to the
 # configured public-vip and admin-vip.
