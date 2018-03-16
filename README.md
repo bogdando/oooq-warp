@@ -1,38 +1,33 @@
-# A warper for TripleO-QuickStart
+# A wrapper/warper for TripleO Quickstart
 
-An OOOQ wrapper (centos7 container) that makes oooq
-thinking it's running at centos, not ubuntu or the like.
-While in fact it operates the host's libvirt and nested
-kvm, if configured. Just like containerized nova-compute
-would do.
+A wrapper centos7 container that makes
+[Quickstart](https://git.openstack.org/cgit/openstack/tripleo-quickstart)
+thinking it's running at centos box.
 
-It omits shell scripts/featuresets/devmode from OOOQ/tripleo-ci
-and only uses an inventory vars and playbooks. As these are
-still glued by a shell script, you can as well invoke wanted
-``ansible-playbook`` commands directly, if you wish so.
+Some of the included example playbooks omit build/provision steps
+executed by default, when operated via ``quickstart.sh``.
 
-WIP: It may be used to deploy with traas and openstack provider
-and pre-provisioned VMs (see tripleo's deployed-server).
+It also helps to use the quickstart/extras playbooks off-road, via direct
+ansible-playbook commands. And sometimes it works like a warp jump!
+
+It may as well be used to deploy with [traas](https://github.com/slagle/traas)
+on openstack clouds and
+[pre-provisioned/deployed servers](https://docs.openstack.org/tripleo-docs/latest/install/advanced_deployment/deployed_server.html).
 
 ## Requirements for the host OS
 
-* Packer >= 0.12
+* Packer >= 0.12 (omit it, if not going to rebuild the wrapper container)
 * Docker >= 1.13
-* Libvirt and kvm (latest perhaps) with HW access/nested
-  virtualization enabled, for local deployments
+* Libvirt, qemu-kvm, libguestfs (latest perhaps?) with HW access/nested
+  virtualization enabled, for local deployments only.
 
 For non local (traas) deployments:
-* OpenStack cloud >= Ocata with Heat
-* OpenStack client installed locally
-* OpenStack creds file and pem/pub key files to access the hosting cloud
+* OpenStack cloud >= Ocata with Heat.
+* OpenStack client installed locally.
+* OpenStack creds file and pem/pub key files to access the hosting cloud.
 
-> **NOTE** public cloud providers may not allow HW enabled kvm. OOOQ
-> will not work on QEMU, sorry!
-
-Note, the wrapper docker image wants Ansible >= 2.3, Shade >= 1.21.0
-and Jinja >= 2.9.6, plus those oooq/extras requirements and packages
-that come from the oooq repo's master branch. Feel free to rebuild it
-to update installed versions.
+> **NOTE** public cloud providers may not allow HW enabled kvm for guest
+> VMs. Quickstart will not work on QEMU!
 
 ## Build the wrapper container
 ```
@@ -52,40 +47,43 @@ To start a scratch local dev env with libvirt and kvm:
   > Quickstart will mutate qcow2 files in-place, so
   > for a clean retry you will need those restored from a backup manually.
 
-  For master dev envs, you may want to pick any of these sources:
+  For libvirt dev envs, pick any of these sources:
   * [The most recent, the less stable](https://images.rdoproject.org/master/delorean/current-tripleo/),
     for hardcore devs
-  * [The consistent, the longest upgrade path](http://artifacts.ci.centos.org/rdo/images/master/delorean/consistent/),
-    it is also the default OOOQ choice (a [mirror](https://images.rdoproject.org/master/delorean/consistent/)).
-  * [The one from](https://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/master/delorean/) the
-    [docs](http://tripleo.org/basic_deployment/basic_deployment_cli.html), for RTFM ppl.
-* Export env vars as you want them, for example:
+  * [(Non HTTPS link!) more stable and older images](http://artifacts.ci.centos.org/rdo/images/master/delorean/consistent/),
+    it is also the default OOOQ choice ([HTTPS mirror](https://images.rdoproject.org/master/delorean/consistent/)).
+  * [The one](https://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/master/delorean/) from the
+    [Docs](https://tripleo.org/basic_deployment/basic_deployment_cli.html).
+
+* Customize and export some env vars, for example:
   ```
   $ export USER=bogdando
-  $ export WORKSPACE=/tmp/qs #persisted on host, libvirt revers to it
-  $ export IMAGECACHE=/opt/cache #persistent on host
+  $ export WORKSPACE=/tmp/qs       #persisted on host, libvirt revers to it
+  $ export IMAGECACHE=/opt/cache   #persistent on host
   $ export LWD=${HOME}/.quickstart #persistent on host
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
   $ export OOOQ_BRANCH=dev
   $ export OOOQ_FORK=johbdoe
   ```
-  Or use ``OOOQE_PATH`` and/or ``OOOQ_PATH``, if you want omit clonning either of
-  the quickstart or extras repo and use the local copies instead.
-* Export a custom ``PLAY`` and/or ``CUSTOMVARS`` names to start with. The default play is
-  is ``oooq-libvirt-provision.yaml`` (see the `playbooks` dir) and the default
+  Or use ``OOOQE_PATH`` and/or ``OOOQ_PATH``, if you already have then clonned
+  somewhere locally.
+
+* Export a custom ``PLAY`` and/or ``CUSTOMVARS``. The default play is
+  is ``oooq-libvirt-provision-build.yaml`` (see the `playbooks` dir) and the default
   overrides file is invoked as `-e@custom.yaml`:
-  ```
-  $ export PLAY=oooq-libvirt-under.yaml
-  ```
-* Extract initrd and vmlinuz (from the host, does not work from the
-  wrapping oooq-runner container):
+
+* If picked ``PLAY=oooq-libvirt-provision.yaml``, which may be the case for
+  undercloud-only deployments (w/o overclouds expected on top), extract kernel images
+  with the command executed from the host machine:
   ```
   # virt-copy-out -a ${IMAGECACHE}/undercloud.qcow2 \
     /home/stack/overcloud-full.vmlinuz \
     /home/stack/overcloud-full.initrd ${WORKSPACE}
   ```
-  This step may be omitted if building images with quickstart.
+
+  > **NOTE** this might leave you with an oudated kernel, fall back to the
+  > default ``PLAY`` option then!
 
 * Prepare host for nested kvm and do some sysctl magic:
   ```
@@ -100,34 +98,22 @@ To start a scratch local dev env with libvirt and kvm:
 * Copy example data vars ``custom.yaml_example`` as ``custom.yaml`` and check for
   needed data overrides. Note, it contains only common vars for all plays. Use var files
   from the ``vars`` dir (or quickstart's releases configs) for advanced configuration
-  overrides. Arbitrary overrides are also supported with ``CUSTOMVARS=something.yaml``.
+  overrides. Additional overriding is also possible with ``CUSTOMVARS=something.yaml``
+  and ``-e/-e@`` args.
 
   > **NOTE** ``custom.yaml``/``CUSTOMVARS`` applies with each ``create_env_oooq.sh``
-  command with the top level vars precedence. Do not put there any vars you want
+  command with the **top level** vars precedence. Do not put there any vars you want
   to override elsewhere, like from the vars files shipped with plays or releases configs!
 
-* (optional) Git checkout the wanted branches of the local quickstart/extras repos.
-  Controlled by the given ``OOOQ_PATH`` and ``OOQE_PATH``. If not set, then those
-  are git clonned from ``OOOQ(E)_FORK/BRANCH``.
-
-For traas, provision servers with the openstack CLI and proceed with custom
-playbooks as it's described below.
-
-For libvirt deployments w/o overclouds, provision your only undercloud VM with
-the command like:
+* Execute the wanted ``PLAY`` with the command like:
 ```
-(oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh
+(oooq) PLAY=something.yaml create_env_oooq.sh -e foo=bar -e@baz.yml -vvvv
 ```
 
-You can access the undercloud VMs with the command:
-```
-ssh -F /opt/.quickstart/ssh.config.local.ansible undercloud
-```
-
-> **NOTE** That command reuses the extracted initrd/vmlinuz kernel images and
-> omits the repo-setup and some of the qcow2 image building steps are normally
-> executed with quickstart CI. If the extracted kernel images do not fit your
-> case, use ``oooq-libvirt-provision-build.yaml`` instead.
+> **NOTE** You can access the undercloud VMs with the command:
+> ```
+> $ ssh -F ${LWD}/ssh.config.local.ansible undercloud
+> ```
 
 ## Example playbooks for a local libvirt env ready for OVB setup
 
@@ -140,9 +126,9 @@ The expected workflow is:
   config release file, added your custom ansible CLI args and ``CUSTOMVARS``.
 * Proceed with OVB, f.e. executred from the provided ``reproduce-quickstart.sh``.
 
-Example commands (``(oooq)`` represents the shell prompt in the oooq container):
+Example commands (``(oooq)`` represents the shell prompt in the wrapper container):
 
-* Provision with building images
+* Provision the long path with building images et al
 ```
 (oooq) ./quickstart.sh --install-deps
 (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
@@ -157,11 +143,15 @@ Example commands (``(oooq)`` represents the shell prompt in the oooq container):
            -E /tmp/scripts/vars/undercloud-local.yaml \
            -p quickstart-extras-undercloud.yml \
            -e transport=local \
-           -e vbmc_libvirt_uri="qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=${LWD}/id_rsa_virt_power&no_verify=1&no_tty=1" \
+           -e vbmc_libvirt_uri="qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1" \
            localhost
 ```
-**FIXME**: the socket path is hardcoded in quickstart for RHEL OS family,
-so we have to override the ``vbmc_libvirt_uri`` and manually evaluate ``HOST_BREXT_IP``.
+> **FIXME**: the socket path is hardcoded in quickstart for RHEL OS family,
+> so we have to override the ``vbmc_libvirt_uri`` and manually evaluate ``HOST_BREXT_IP``.
+> To verify the connection, run from the undercloud node deployed (substitued with real values):
+> ```
+> # virsh connect "qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1"
+> ```
 
 * Deploy overcloud from the given featureset and nodes config
 ```
