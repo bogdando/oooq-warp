@@ -24,12 +24,9 @@ non_root_group: "{{ non_root_user }}"
 ansible_user_id: "{{ non_root_user }}"
 
 # Recommended for OVB stack comprised of 1 controller and 1 compute
-#default_disk: 50
-#default_memory: 4096
-#default_vcpu: 1
 #compute_memory: 16384
 #compute_vcpu: 4
-#control_memory: 4096
+#control_memory: 5120
 #control_vcpu: 1
 #undercloud_vcpu: 1
-#undercloud_memory: 4096
+#undercloud_memory: 7168

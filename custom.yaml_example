@@ -3,13 +3,12 @@
 default_disk: 50
 default_memory: 4096
 default_vcpu: 1
-#compute_memory: 12288
-#compute_vcpu: 3
-#control_memory: 4096
+#compute_memory: 16384
+#compute_vcpu: 4
+#control_memory: 5120
 #control_vcpu: 1
-#undercloud_disk: 25
 #undercloud_vcpu: 1
-#undercloud_memory: 4096
+#undercloud_memory: 7168
 libvirt_cpu_mode: host-passthrough
 libguestfs_kernel_override: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"
 
