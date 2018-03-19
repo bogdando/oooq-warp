@@ -37,6 +37,9 @@ if [ "${OOOQ_PATH}" ]; then
   MOUNT_QUICKSTART="-v ${OOOQ_PATH}:/tmp/oooq"
   OOOQ_PATH=/tmp/oooq
 fi
+if [ "${IMAGECACHEBACKUP:-}" ]; then
+  MOUNT_IMAGECACHEBACKUP="-v ${IMAGECACHEBACKUP}:${IMAGECACHEBACKUP}:ro"
+fi
 
 docker run -it --rm --privileged \
   --device-read-bps=${DEV}:${IOR} \
@@ -51,6 +54,7 @@ docker run -it --rm --privileged \
   -e WORKSPACE=${WORKSPACE} \
   -e LWD=${LWD} \
   -e IMAGECACHE=${IMAGECACHE} \
+  -e IMAGECACHEBACKUP=${IMAGECACHEBACKUP:-} \
   -e OOOQ_PATH=${OOOQ_PATH:-} \
   -e OOOQE_PATH=${OOOQE_PATH:-} \
   -e VPATH=${VPATH} \
@@ -77,6 +81,7 @@ docker run -it --rm --privileged \
   -v ${IMAGECACHE}:${IMAGECACHE} \
   ${MOUNT_QUICKSTART:-} \
   ${MOUNT_EXTRAS:-} \
+  ${MOUNT_IMAGECACHEBACKUP:-} \
   -v $(pwd)/ansible.cfg:/tmp/oooq/ansible.cfg:ro \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${LWD}:$LWD \

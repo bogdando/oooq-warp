@@ -71,7 +71,12 @@ if [ "${TEARDOWN}" = "false" ]; then
 else
   rm -f "${WORKSPACE}/{id_rsa,hosts,ssh.config}*"
   rm -f "${LWD}/{id_rsa,hosts,ssh.config}*"
+  if [ "${IMAGECACHEBACKUP:-}" ]; then
+   echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
+   cp -a ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
+  fi
 fi
+
 
 sudo chown -R ${USER}: ${HOME}
 cd /tmp/oooq

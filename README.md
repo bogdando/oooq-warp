@@ -43,9 +43,9 @@ To start a scratch local dev env with libvirt and kvm:
 
 * Download overcloud/undercloud images and md5 into the ``IMAGECACHE``.
 
-  > **WARN**: Backup those for future re-provision runs!
-  > Quickstart will mutate qcow2 files in-place, so
-  > for a clean retry you will need those restored from a backup manually.
+  > **NOTE**: Backup those for future re-provision runs in ``${IMAGECACHEBACKUP}``!
+  > Quickstart mutates qcow2 files in-place. You may want to preserve the
+  > original images for future deployments.
 
   For libvirt dev envs, pick any of these sources:
   * [The most recent, the less stable](https://images.rdoproject.org/master/delorean/current-tripleo/),
@@ -210,7 +210,6 @@ all of the long playing oooq provisioning steps:
 To start a new libvirt env from the scratch:
 
 * remove existing VMs' snapshots,
-* restore the downloaded images from backups to the ``IMAGECACHE`` dir,
 * exit the wrapper container,
 * start a new container with ``TEARDOWN=true ./oooq-warp.sh`` or the like.
 
