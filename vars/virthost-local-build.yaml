@@ -35,3 +35,5 @@ libguestfs_kernel_override: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"
 libvirt_volume_pool: default
 libvirt_volume_path: /var/lib/libvirt/images
 libvirt_domain_type: kvm
+
+modify_image_vc_root_password: r00tme
