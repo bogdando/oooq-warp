@@ -134,14 +134,15 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
 ```
 (oooq) ./quickstart.sh --install-deps
 (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
-           -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml
+           -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml \
+           -e@/tmp/scripts/tht/config/general_config/featureset062.yml
 ```
 * Install undercloud (keeping in mind the fs062 featureset for overcloud)
 ```
 (oooq) export HOST_BREXT_IP=192.168.23.1
 (oooq) ./quickstart.sh -R master -n -I -T none -t all \
            -N config/nodes/1ctlr_1comp.yml \
-           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -c /tmp/scripts/tht/config/general_config/featureset062.yml \
            -E /tmp/scripts/vars/undercloud-local.yaml \
            -p quickstart-extras-undercloud.yml \
            -e transport=local \
@@ -161,7 +162,7 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -S tripleo-validations \
            -p quickstart-extras-overcloud-prep.yml \
            -N config/nodes/1ctlr_1comp.yml \
-           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -c /tmp/scripts/tht/config/general_config/featureset062.yml \
            -E /tmp/scripts/vars/undercloud-local.yaml \
            -e transport=local localhost
 
@@ -169,7 +170,7 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -S tripleo-validations \
            -p quickstart-extras-overcloud.yml \
            -N config/nodes/1ctlr_1comp.yml \
-           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -c /tmp/scripts/tht/config/general_config/featureset062.yml \
            -E /tmp/scripts/vars/undercloud-local.yaml \
            -e transport=local localhost
 ```
