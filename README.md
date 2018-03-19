@@ -61,7 +61,7 @@ To start a scratch local dev env with libvirt and kvm:
   $ export DLRN_HASH=current-tripleo
   $ export WORKSPACE=/tmp/qs       #persisted on host, libvirt revers to it
   $ export IMAGECACHE=/opt/cache   #persistent on host
-  $ export LWD=${HOME}/.quickstart #persistent on host
+  $ export LWD=${HOME}/.quickstart #persistent on host, may be equal to WORKSPACE
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
   $ export OOOQ_BRANCH=dev
@@ -136,6 +136,9 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml \
            -e@/tmp/scripts/tht/config/general_config/featureset062.yml
 ```
+**TODO**: requires commits contributed upstream:
+https://github.com/bogdando/tripleo-quickstart/commit/2fbc0f8ebd21d50ecbae3e40300019e3e3a204f9
+https://github.com/bogdando/tripleo-quickstart/commit/b96a2bc4099ef344ddda66dbd517cde3b9a81f31 (https://review.openstack.org/554473)
 
 > **NOTE** The ``dlrn_hash_tag`` value is configured from ``DLRN_HASH`` and
 > must be matching the version in the source URL of the downloaded images. Do
@@ -148,6 +151,7 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
 (oooq) ./quickstart.sh -R master -n -I -T none -t all \
            -N config/nodes/1ctlr_1comp.yml \
            -c /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /tmp/scripts/custom.yaml \
            -E /tmp/scripts/vars/undercloud-local.yaml \
            -p quickstart-extras-undercloud.yml \
            -e transport=local \
@@ -168,6 +172,7 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -p quickstart-extras-overcloud-prep.yml \
            -N config/nodes/1ctlr_1comp.yml \
            -c /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /tmp/scripts/custom.yaml \
            -E /tmp/scripts/vars/undercloud-local.yaml \
            -e transport=local localhost
 
@@ -176,6 +181,7 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -p quickstart-extras-overcloud.yml \
            -N config/nodes/1ctlr_1comp.yml \
            -c /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /tmp/scripts/custom.yaml \
            -E /tmp/scripts/vars/undercloud-local.yaml \
            -e transport=local localhost
 ```

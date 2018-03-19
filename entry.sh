@@ -55,24 +55,29 @@ fi
 # Restore the saved state spread across LWD/WORKSPACE dirs
 # (ssh keys/setup, inventory, kernel images)
 if [ "${TEARDOWN}" = "false" ]; then
-  set +ex
+  set +e
   for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
       'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
       'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
-      'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
-    cp -u "${WORKSPACE}/${state}" ${LWD}/ ||
-    cp -u "${LWD}/${state}" ${WORKSPACE}/
+      'overcloud-full.vmlinuz' 'overcloud-full.initrd' \
+      'latest-overcloud-full.tar' 'latest-ipa_images.tar'; do
+    cp -uL "${WORKSPACE}/${state}" ${LWD}/ 2>/dev/null ||
+    cp -uL "${LWD}/${state}" ${WORKSPACE}/ 2>/dev/null
   done
   sudo mkdir -p /etc/ansible
   sudo cp -f "${LWD}/hosts" /etc/ansible/
   cp -f "${LWD}/hosts" /tmp/oooq/
-  set -ex
+  set -e
 else
-  rm -f "${WORKSPACE}/{id_rsa,hosts,ssh.config}*"
-  rm -f "${LWD}/{id_rsa,hosts,ssh.config}*"
-  if [ "${IMAGECACHEBACKUP:-}" ]; then
-   echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
-   cp -a ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
+  for s in "$WORKSPACE" "$IMAGECACHE" "$LWD"; do
+    rm -f ${s}/{id_rsa,hosts,ssh.config}*
+    rm -f ${s}/*.qcow2*
+    rm -f ${s}/*.tar*
+  done
+  rm -f /tmp/oooq/_deploy.log
+  if [ "${IMAGECACHEBACKUP:-}" -a "${TEARDOWN}" != "false" ]; then
+    echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
+    cp -a ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
   fi
 fi
 

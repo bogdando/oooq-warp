@@ -32,15 +32,24 @@ function with_ansible {
 
 # A tricky sync for the state spread across LWD/WORKSPACE
 function finalize {
-  set +xe
+  set +e
   for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
       'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
       'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
-      'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
-    cp -u "${WORKSPACE}/${state}" ${LWD}/ ||
-    cp -u "${LWD}/${state}" ${WORKSPACE}/
+      'overcloud-full.vmlinuz' 'overcloud-full.initrd' \
+      'latest-overcloud-full.tar' 'latest-ipa_images.tar'; do
+    cp -uL "${WORKSPACE}/${state}" ${LWD}/ 2>/dev/null ||
+    cp -uL "${LWD}/${state}" ${WORKSPACE}/ 2>/dev/null
   done
-  set -xe
+  chmod 600 ${LWD}/id_*
+  chmod 600 ${WORKSPACE}/id_*
+  cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/ 2>/dev/null
+  # Those should survive teardown, if updated
+  if [ "${IMAGECACHEBACKUP:-}" ]; then
+    cp -uL ${IMAGECACHE}/latest-overcloud-full.tar ${IMAGECACHEBACKUP}/
+    cp -uL ${IMAGECACHE}/latest-ipa_images.tar ${IMAGECACHEBACKUP}/
+  fi
+  set -e
 }
 trap finalize EXIT
 
@@ -58,13 +67,13 @@ if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
   # TODO traas provision to come here as well maybe
   inventory=${SCRIPTS}/inventory.ini
   with_ansible -u ${USER} -i ${inventory} ${PLAY}
+  finalize
   sudo cp -f ${LWD}/hosts /etc/ansible/
   cp -f ${LWD}/hosts /tmp/oooq/
-  cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/
-  finalize
   echo "# Generated for quickstart VMs IPMI/VBMC, purge this later manually" >> \
-  ${HOME}/.ssh/authorized_keys
-  cat ${LWD}/id_rsa_virt_power.pub  >> ${HOME}/.ssh/authorized_keys
+  /tmp/authorized_keys
+  cat ${LWD}/id_rsa_virt_power.pub  >> /tmp/authorized_keys
+  cp -f /tmp/authorized_keys ${HOME}/.ssh/authorized_keys
 else
   # switch to the generated inventory and deploy a PLAY, if already provisioned VMs
   inventory=${LWD}/hosts
