@@ -57,12 +57,11 @@ fi
 if [ "${TEARDOWN}" = "false" ]; then
   set +ex
   for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
-      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' ; do
-    cp -f "${WORKSPACE}/${state}" ${LWD}/
-  done
-  for state in 'hosts' 'ssh.config.ansible' \
-      'ssh.config.local.ansible' ; do
-    cp -f "${LWD}/${state}" ${WORKSPACE}/
+      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
+      'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
+      'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
+    cp -u "${WORKSPACE}/${state}" ${LWD}/ ||
+    cp -u "${LWD}/${state}" ${WORKSPACE}/
   done
   sudo mkdir -p /etc/ansible
   sudo cp -f "${LWD}/hosts" /etc/ansible/

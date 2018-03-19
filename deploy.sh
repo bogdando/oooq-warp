@@ -34,12 +34,11 @@ function with_ansible {
 function finalize {
   set +xe
   for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
-      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' ; do
-    cp -f "${LWD}/${state}" ${WORKSPACE}/
-  done
-  for state in 'hosts' 'ssh.config.ansible' \
-      'ssh.config.local.ansible' ; do
-    cp -f "${WORKSPACE}/${state}" ${LWD}/
+      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
+      'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
+      'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
+    cp -u "${WORKSPACE}/${state}" ${LWD}/ ||
+    cp -u "${LWD}/${state}" ${WORKSPACE}/
   done
   set -xe
 }
