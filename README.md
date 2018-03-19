@@ -91,9 +91,7 @@ To start a scratch local dev env with libvirt and kvm:
   # modprobe -r kvm_intel
   # modprobe kvm_intel
   # cat /sys/module/kvm_intel/parameters/nested
-  # echo 0 > /proc/sys/net/bridge/bridge-nf-call-iptables
   ```
-  The latter step is optional, ignore if the command fails.
 
 * Copy example data vars ``custom.yaml_example`` as ``custom.yaml`` and check for
   needed data overrides. Note, it contains only common vars for all plays. Use var files
@@ -231,6 +229,14 @@ to disable apparmor for libvirt and reconfigure qemu as well:
 
 If ``libguestfs-test-tool`` fails, try to adjust ``SUPERMIN_KERNEL``,
 ``SUPERMIN_KERNEL_VERSION``, ``SUPERMIN_MODULES`` and ``LIBGUESTFS_BACKEND``.
+
+More sysctl adjustments may be required to fix inter-VMs connectivity:
+```
+# sysctl net.bridge.bridge-nf-call-ip6tables=0
+# sysctl net.bridge.bridge-nf-call-iptables=0
+# sysctl net.bridge.bridge-nf-call-arptables=0
+# sysctl net.ipv4.ip_forward=1
+```
 
 ## Traas multinode pre-provisioned deployment with openstack provider
 
