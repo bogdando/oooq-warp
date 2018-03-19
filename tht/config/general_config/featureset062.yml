@@ -10,9 +10,10 @@ swap_type: file
 network_isolation: false
 enable_pacemaker: false
 overcloud_ipv6: false
-containerized_overcloud: false
+containerized_overcloud: true
 containerized_undercloud: false
-deploy_steps_ansible_workflow: false
+deploy_steps_ansible_workflow: true
+undercloud_rpm_dependencies: "python-tripleoclient*"
 
 # turn on image prep
 step_overcloud_image: true

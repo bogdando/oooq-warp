@@ -2,16 +2,17 @@
 resource_registry:
   OS::TripleO::Controller::Net::SoftwareConfig: ../common/net-config-multinode.yaml
   OS::TripleO::Compute::Net::SoftwareConfig: ../common/net-config-multinode.yaml
-  OS::TripleO::Services::NovaIronic: ../puppet/services/nova-ironic.yaml
-  OS::TripleO::Services::IronicApi: ../puppet/services/ironic-api.yaml
-  OS::TripleO::Services::IronicConductor: ../puppet/services/ironic-conductor.yaml
-  OS::TripleO::Services::IronicInspector: ../puppet/services/ironic-inspector.yaml
-  OS::TripleO::Services::IronicPxe: ../puppet/services/ironic-pxe.yaml
-  OS::TripleO::Services::Zaqar: ../puppet/services/zaqar-api.yaml
+  OS::TripleO::Services::NovaIronic: ../docker/services/nova-ironic.yaml
+  OS::TripleO::Services::IronicApi: ../docker/services/ironic-api.yaml
+  OS::TripleO::Services::IronicConductor: ../docker/services/ironic-conductor.yaml
+  OS::TripleO::Services::IronicInspector: ../docker/services/ironic-inspector.yaml
+  OS::TripleO::Services::IronicPxe: ../docker/services/ironic-pxe.yaml
+  OS::TripleO::Services::Zaqar: ../docker/services/zaqar-api.yaml
   OS::TripleO::AllNodes::Validation: ../common/all-nodes-validation-disabled.yaml
 
 parameter_defaults:
   ControllerServices:
+    - OS::TripleO::Services::Docker
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::Keystone
     - OS::TripleO::Services::GlanceApi
