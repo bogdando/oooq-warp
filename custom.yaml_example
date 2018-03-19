@@ -1,76 +1,29 @@
-### THIS CONTAINS ONLY COMMON VARS, UNLIKE TO 'FEATURESETS'
-## VIRTHOST
-default_disk: 50
-default_memory: 4096
-default_vcpu: 1
-#compute_memory: 16384
-#compute_vcpu: 4
-#control_memory: 5120
-#control_vcpu: 1
-#undercloud_vcpu: 1
-#undercloud_memory: 7168
-libvirt_cpu_mode: host-passthrough
-libguestfs_kernel_override: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"
-
-# A hack for oooq to use the default pool instead of the oooq_pool
-# (w/a issue with invisible custom pools unless libvirt restarted)
-# Note, it recreates the pool with the libvirt_volume_path storage
-libvirt_volume_pool: default
-libvirt_volume_path: /var/lib/libvirt/images
-libvirt_domain_type: kvm
-
+# THOSE ARE COMMON VARS WITH TOP LEVEL PRECEDENCE
+# Override with either -e/-e@ args or altering CUSTOMVARS
 # DNS
 undercloud_undercloud_nameservers: 208.67.222.220
 overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
 
 ## DEV
+release: master
+dlrn_hash: current
 # THT, see also in-repo custom tht example
 #overcloud_templates_repo: https://github.com/openstack/tripleo-heat-templates
 #overcloud_templates_branch: master
 #overcloud_templates_path: /var/tmp/openstack-tripleo-heat-templates
-overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
+
 # The path is specific for the oooq runner container's mounted volumes
 # Use with overcloud-prep-config to upload custom tht/role files from ./tht
 extra_tht_configs: /tmp/scripts/tht
 
 ## UNDERCLOUD
-undercloud_generate_service_certificate: false
-# You should better off using '*'
-undercloud_update_packages: "'*'"
-#undercloud_update_packages: >-
-#  openstack-tripleo*
-#  openstack-puppet-modules
-#  puppet-*
-#  python-tripleoclient
-#  python-paunch
-#  python-heat-agent*
-#  os-*
-
-undercloud_cloud_domain: rdocloud
-undercloud_extra_services_args: >-
-  -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
-  -e {{overcloud_templates_path}}/environments/debug.yaml
-  -e {{overcloud_templates_path}}/environments/config-debug.yaml
-
-undercloud_extra_args: >-
-  --timeout 60
-  --heat-native
-# See https://bugs.launchpad.net/tripleo/+bug/1733381 , fails w/o heat-native :/
-
-#undercloud_docker_registry_mirror: http://some-registry.lc:5000/registry-1.docker
-containerized_undercloud: true
-step_install_undercloud: true
 undercloud_install_script: undercloud-deploy.sh.j2
-composable_undercloud_roles: true
 undercloud_docker_registry_host: docker.io
 #undercloud_docker_registry_port: a port
 undercloud_docker_registry_namespace: tripleomaster
-undercloud_docker_image_tag: current-tripleo
+undercloud_docker_image_tag: "{{ dlrn_hash }}"
 
 ## OVERCLOUD
-#overcloud_nodes: false
-step_deploy_overcloud: true
-containerized_overcloud: true
 # push overcloud images to UC serving a local registry
 # NOTE: overcloud prep containers hardcodes a 8787 port
 local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
@@ -79,34 +32,4 @@ additional_insecure_registry: true
 docker_registry_host: "{{ local_docker_registry_host }}"
 docker_image_tag: "{{ undercloud_docker_image_tag }}"
 docker_registry_namespace: "{{ undercloud_docker_registry_namespace }}"
-enable_pacemaker: false
-overcloud_ipv6: false
-enable_swap: false
-ssl_overcloud: false
-tempest_config: false
-run_tempest: false
-test_ping: false
-step_validate_overcloud: false
-step_introspect: false
-extra_args_common: >-
-  --ntp-server pool.ntp.org
-  --deployed-server
-
-#  --verbose
-#  -e {{overcloud_templates_path}}/environments/debug.yaml
-#  -e {{overcloud_templates_path}}/environments/config-debug.yaml
-#  -e {{overcloud_templates_path}}/environments/puppet-pacemaker.yaml
 validation_args: --disable-validations
-
-# COMPOSABLE
-deploy_composable_scenario: false
-#composable_scenario: scenario005-multinode.yaml
-
-# OTHER TOP SCOPE OVERRIDES
-# traas-overcloud
-# Override tht deployed-server-environment.yaml and drop it from oooq multinode_args
-# ...which one to pick??? https://bugs.launchpad.net/tripleo/+bug/1702280 :-(
-multinode_args: ""
-# Allows to specify custom resource_registry_args in vars files
-# Used by overcloud-prep-config to generate network configs
-use_resource_registry_nic_configs: true

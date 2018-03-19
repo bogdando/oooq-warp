@@ -6,6 +6,17 @@ step_glance_upload: false
 step_register: false
 hypervisor_wait: false
 deployed_server: true
+enable_pacemaker: false
+overcloud_ipv6: false
+enable_swap: false
+ssl_overcloud: false
+tempest_config: false
+run_tempest: false
+test_ping: false
+step_validate_overcloud: false
+step_introspect: false
+multinode_args: ""
+use_resource_registry_nic_configs: true
 
 # Drop docker-network.yaml from oooq container_args to not conflict
 container_args: >-
@@ -38,7 +49,8 @@ overcloud_nodes:
 # Note, scale args are ignored for composable roles.
 # Add a custom t-h-t env instead
 extra_args: >
-  {{ extra_args_common }}
+  --ntp-server pool.ntp.org
+  --deployed-server
   -e {{ working_dir }}/network-environment.yaml
   -e {{ overcloud_templates_path }}/environments/deployed-server-bootstrap-environment-centos.yaml
   -e {{overcloud_templates_path}}/environments/kubernetes.yaml

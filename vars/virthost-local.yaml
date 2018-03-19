@@ -22,3 +22,9 @@ ssh_user: "{{ undercloud_user }}"
 non_root_user: "{{ lookup('env', 'USER') }}"
 non_root_group: "{{ non_root_user }}"
 ansible_user_id: "{{ non_root_user }}"
+
+libvirt_cpu_mode: host-passthrough
+libguestfs_kernel_override: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"
+libvirt_volume_pool: default
+libvirt_volume_path: /var/lib/libvirt/images
+libvirt_domain_type: kvm

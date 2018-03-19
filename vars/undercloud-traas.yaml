@@ -7,3 +7,18 @@ working_dir: /home/{{ undercloud_user }}
 undercloud_network_cidr: 192.168.0.0/24
 undercloud_undercloud_hostname: foo-undercloud.rdocloud
 overcloud_cloud_domain: rdocloud
+
+undercloud_generate_service_certificate: false
+undercloud_cloud_domain: rdocloud
+undercloud_extra_services_args: >-
+  -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
+  -e {{overcloud_templates_path}}/environments/debug.yaml
+  -e {{overcloud_templates_path}}/environments/config-debug.yaml
+
+undercloud_extra_args: >-
+  --timeout 60
+  --heat-native
+# See https://bugs.launchpad.net/tripleo/+bug/1733381 , fails w/o heat-native :/
+
+#undercloud_docker_registry_mirror: http://some-registry.lc:5000/registry-1.docker
+containerized_undercloud: true

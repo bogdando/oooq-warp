@@ -1,4 +1,5 @@
-# Undercloud all-in-one scenario. Replace custom.yaml with that file.
+# Undercloud all-in-one scenario. Replace custom.yaml with that file
+# or specify it via CUSTOMVARS.
 deployed_server: true
 overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
 extra_tht_configs: /tmp/scripts/tht
