@@ -103,7 +103,9 @@ To start a scratch local dev env with libvirt and kvm:
 
   > **NOTE** ``custom.yaml``/``CUSTOMVARS`` applies with each ``create_env_oooq.sh``
   command with the **top level** vars precedence. Do not put there any vars you want
-  to override elsewhere, like from the vars files shipped with plays or releases configs!
+  to override elsewhere, like from the vars files shipped with plays or quickstart's
+  releases config files! You can also override ``custom.yaml``/``CUSTOMVARS`` from
+  extra files or parameters passed with ``create_env_oooq.sh -e foo=bar -e@baz.yml``.
 
 * Execute the wanted ``PLAY`` with the command like:
 ```
