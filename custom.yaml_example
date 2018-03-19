@@ -5,8 +5,9 @@ undercloud_undercloud_nameservers: 208.67.222.220
 overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
 
 ## DEV
+# Do not override dlrn_hash top-scope as it breaks facts evaluation
 release: master
-dlrn_hash: current
+
 # THT, see also in-repo custom tht example
 #overcloud_templates_repo: https://github.com/openstack/tripleo-heat-templates
 #overcloud_templates_branch: master
@@ -21,7 +22,7 @@ undercloud_install_script: undercloud-deploy.sh.j2
 undercloud_docker_registry_host: docker.io
 #undercloud_docker_registry_port: a port
 undercloud_docker_registry_namespace: tripleomaster
-undercloud_docker_image_tag: "{{ dlrn_hash }}"
+undercloud_docker_image_tag: "{{ lookup('env', 'DLRN_HASH') }}"
 
 ## OVERCLOUD
 # push overcloud images to UC serving a local registry

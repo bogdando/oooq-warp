@@ -12,6 +12,8 @@ undercloud_undercloud_debug: false
 undercloud_enable_ui: false
 undercloud_enable_tempest: false
 
+# overrides the hash in releases configs
+dlrn_hash_tag: "{{ lookup('env', 'DLRN_HASH') }}"
 enable_swap: true
 swap_type: file
 network_isolation: false

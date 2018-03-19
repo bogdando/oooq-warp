@@ -58,6 +58,7 @@ To start a scratch local dev env with libvirt and kvm:
 * Customize and export some env vars, for example:
   ```
   $ export USER=bogdando
+  $ export DLRN_HASH=current-tripleo
   $ export WORKSPACE=/tmp/qs       #persisted on host, libvirt revers to it
   $ export IMAGECACHE=/opt/cache   #persistent on host
   $ export LWD=${HOME}/.quickstart #persistent on host
@@ -135,6 +136,12 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml \
            -e@/tmp/scripts/tht/config/general_config/featureset062.yml
 ```
+
+> **NOTE** The ``dlrn_hash_tag`` value is configured from ``DLRN_HASH`` and
+> must be matching the version in the source URL of the downloaded images. Do
+> not attempt to override ``dlrn_hash`` top-scope as it breaks the fact
+> auto-eval in quickstart repo-setup!
+
 * Install undercloud (keeping in mind the fs062 featureset for overcloud)
 ```
 (oooq) export HOST_BREXT_IP=192.168.23.1
