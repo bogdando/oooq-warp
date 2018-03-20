@@ -53,12 +53,12 @@ fi
 # Restore the saved state spread across LWD/WORKSPACE dirs
 # (ssh keys/setup, inventory, kernel images)
 if [ "${TEARDOWN}" = "false" ]; then
-  set +e
+  set +ex
+  echo "Restoring state"
   for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
       'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
       'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
-      'overcloud-full.vmlinuz' 'overcloud-full.initrd' \
-      'latest-overcloud-full.tar' 'latest-ipa_images.tar'; do
+      'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
     cp -uL "${WORKSPACE}/${state}" ${LWD}/ 2>/dev/null ||
     cp -uL "${LWD}/${state}" ${WORKSPACE}/ 2>/dev/null
   done
@@ -67,6 +67,7 @@ if [ "${TEARDOWN}" = "false" ]; then
   cp -f "${LWD}/hosts" /tmp/oooq/
   set -e
 else
+  echo "Cleaning up state as TEARDOWN was requested"
   for s in "$WORKSPACE" "$IMAGECACHE" "$LWD"; do
     rm -f ${s}/{id_rsa,hosts,ssh.config}*
     rm -f ${s}/*.qcow2*
@@ -76,6 +77,18 @@ else
   if [ "${IMAGECACHEBACKUP:-}" -a "${TEARDOWN}" != "false" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
     cp -a ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
+    if [ -f ${IMAGECACHE}/overcloud-full.tar -a -f ${IMAGECACHE}/overcloud-full.tar.md5 ]; then
+      echo "Symlinking the latest overcloud images from restored md5 hashes"
+      iname=$(cat ${IMAGECACHE}/overcloud-full.tar.md5 | awk '{print $1}')
+      ln -f ${IMAGECACHE}/overcloud-full.tar ${IMAGECACHE}/${iname}.tar
+      ln -sf ${IMAGECACHE}/${iname}.tar ${IMAGECACHE}/latest-overcloud-full.tar
+    fi
+    if [ -f ${IMAGECACHE}/ironic-python-agent.tar -a -f ${IMAGECACHE}/ironic-python-agent.tar.md5 ]; then
+      echo "Symlinking the latest ipa images from restored md5 hashes"
+      iname=$(cat ${IMAGECACHE}/ironic-python-agent.tar.md5 | awk '{print $1}')
+      ln -f ${IMAGECACHE}/ironic-python-agent.tar ${IMAGECACHE}/${iname}.tar
+      ln -sf ${IMAGECACHE}/${iname}.tar ${IMAGECACHE}/latest-ipa_images.tar
+    fi
   fi
 fi
 

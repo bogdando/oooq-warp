@@ -32,23 +32,17 @@ function with_ansible {
 
 # A tricky sync for the state spread across LWD/WORKSPACE
 function finalize {
-  set +e
+  set +ex
+  echo "Saving state"
   for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
       'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
       'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
-      'overcloud-full.vmlinuz' 'overcloud-full.initrd' \
-      'latest-overcloud-full.tar' 'latest-ipa_images.tar'; do
+      'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
     cp -uL "${WORKSPACE}/${state}" ${LWD}/ 2>/dev/null ||
     cp -uL "${LWD}/${state}" ${WORKSPACE}/ 2>/dev/null
   done
-  chmod 600 ${LWD}/id_*
-  chmod 600 ${WORKSPACE}/id_*
+  chmod 600 ${LWD}/id_* 2>/dev/null
   cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/ 2>/dev/null
-  # Those should survive teardown, if updated
-  if [ "${IMAGECACHEBACKUP:-}" ]; then
-    cp -uL ${IMAGECACHE}/latest-overcloud-full.tar ${IMAGECACHEBACKUP}/
-    cp -uL ${IMAGECACHE}/latest-ipa_images.tar ${IMAGECACHEBACKUP}/
-  fi
   set -e
 }
 trap finalize EXIT
@@ -68,8 +62,9 @@ if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
   inventory=${SCRIPTS}/inventory.ini
   with_ansible -u ${USER} -i ${inventory} ${PLAY}
   finalize
-  sudo cp -f ${LWD}/hosts /etc/ansible/
-  cp -f ${LWD}/hosts /tmp/oooq/
+  sudo cp -f ${LWD}/hosts /etc/ansible/ 2>/dev/null
+  cp -f ${LWD}/hosts /tmp/oooq/ 2>/dev/null
+  cp -f ${HOME}/.ssh/authorized_keys /tmp/authorized_keys
   echo "# Generated for quickstart VMs IPMI/VBMC, purge this later manually" >> \
   /tmp/authorized_keys
   cat ${LWD}/id_rsa_virt_power.pub  >> /tmp/authorized_keys
@@ -78,8 +73,8 @@ else
   # switch to the generated inventory and deploy a PLAY, if already provisioned VMs
   inventory=${LWD}/hosts
   [ -f "${inventory}" ] || cp ${SCRIPTS}/inventory.ini ${LWD}/hosts
-  sudo cp -f ${inventory} /etc/ansible/
-  cp -f ${inventory} /tmp/oooq/
+  sudo cp -f ${inventory} /etc/ansible/ 2>/dev/null
+  cp -f ${inventory} /tmp/oooq/ 2>/dev/null
 
   echo "Check nodes connectivity"
   ansible -m ping all
