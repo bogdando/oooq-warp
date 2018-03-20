@@ -11,6 +11,10 @@
     "run_command": [
       "-ti",
       "-v",
+      "/etc/passwd:/etc/passwd:ro",
+      "-v",
+      "/etc/group:/etc/group:ro",
+      "-v",
       "{{user `oooq_path`}}:/tmp/oooq:ro",
       "-d",
       "{{.Image}}",

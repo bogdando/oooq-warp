@@ -19,7 +19,7 @@ OOOQE_PATH=${OOOQE_PATH:-}
 OOOQ_BRANCH=${OOOQ_BRANCH:-master}
 OOOQ_FORK=${OOOQ_FORK:-openstack}
 OOOQ_PATH=${OOOQ_PATH:-}
-VPATH=${VPATH:-/root/Envs}
+VPATH=${VPATH:-/home/${USER}/Envs}
 WORKSPACE=${WORKSPACE:-/tmp/qs}
 LWD=${LWD:-/home/${USER}/.quickstart}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
@@ -92,7 +92,7 @@ docker run -it --rm --privileged \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
   -v /boot:/boot:ro \
-  -u $(id -u $USER) \
+  -u $(id -u $USER):$(id -g $USER) \
   --entrypoint /bin/bash \
   --name runner bogdando/oooq-runner:0.1 \
   -c "sudo cp /tmp/scripts/*.sh /usr/local/sbin/ && \

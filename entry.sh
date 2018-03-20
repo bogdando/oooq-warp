@@ -10,7 +10,7 @@ OOOQ_BRANCH=${OOOQ_BRANCH:-master}
 OOOQE_PATH=${OOOQE_PATH:-}
 OOOQE_FORK=${OOOQE_FORK:-openstack}
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
-VPATH=${VPATH:-/root/Envs}
+VPATH=${VPATH:-/Envs}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-~/.quickstart}
@@ -18,12 +18,10 @@ TEARDOWN=${TEARDOWN:-true}
 
 sudo mkdir -p /tmp/oooq
 sudo mkdir -p ${LWD}
-sudo chown -R ${USER}: ${LWD}
+sudo chown -R ${USER}:${USER} ${LWD}
 sudo mkdir -p ${WORKSPACE}
-sudo chown -R ${USER}: ${WORKSPACE}
+sudo chown -R ${USER}:${USER} ${WORKSPACE}
 cd $HOME
-sudo ln -sf ${VPATH} .
-sudo chown -R ${USER}: $HOME
 set +u
 . /usr/bin/virtualenvwrapper.sh
 . ${VPATH}/oooq/bin/activate
@@ -82,7 +80,6 @@ else
 fi
 
 
-sudo chown -R ${USER}: ${HOME}
 cd /tmp/oooq
 echo Note: ansible virthost is now localhost
 echo export PLAY=oooq-libvirt-provision.yaml to bootstrap undercloud and generate inventory - default

@@ -139,9 +139,6 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -e@/tmp/scripts/custom.yaml \
            -e@/tmp/scripts/tht/config/general_config/featureset062.yml
 ```
-**TODO**: requires commits contributed upstream:
-https://github.com/bogdando/tripleo-quickstart/commit/2fbc0f8ebd21d50ecbae3e40300019e3e3a204f9
-https://github.com/bogdando/tripleo-quickstart/commit/b96a2bc4099ef344ddda66dbd517cde3b9a81f31 (https://review.openstack.org/554473)
 
 > **NOTE** The ``dlrn_hash_tag`` value is configured from ``DLRN_HASH`` and
 > must be matching the version in the source URL of the downloaded images. Do
