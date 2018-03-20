@@ -29,6 +29,9 @@ undercloud_resource_registry_args:
 undercloud_extra_services_args: "-e {{overcloud_templates_path}}/environments/docker.yaml"
 undercloud_extra_args: ""
 deploy_steps_ansible_workflow: true
+config_download_args: >-
+  -e {{ overcloud_templates_path }}/environments/config-download-environment.yaml
+  --config-download
 undercloud_rpm_dependencies: "python-tripleoclient*"
 
 # turn on image prep
