@@ -57,7 +57,7 @@ To start a scratch local dev env with libvirt and kvm:
 
 * Customize and export some env vars, for example:
   ```
-  $ export USER=bogdando
+  $ export USER=bogdando # used as undercloud/overcloud SSH user as well
   $ export DLRN_HASH=current-tripleo
   $ export WORKSPACE=/tmp/qs       #persisted on host, libvirt revers to it
   $ export IMAGECACHE=/opt/cache   #persistent on host
@@ -164,6 +164,12 @@ https://github.com/bogdando/tripleo-quickstart/commit/b96a2bc4099ef344ddda66dbd5
 > ```
 > # virsh connect "qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1"
 > ```
+
+* On undercloud VM, allow ``USER`` to access the docker CLI w/o sudo (substitued with real values).
+```
+# usermod -aG root $USER
+# usermod -aG dockerroot $USER
+```
 
 * Deploy overcloud from the given featureset and nodes config
 ```
