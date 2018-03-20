@@ -1,4 +1,4 @@
-# Composed of fs026/27/17 mutated to host OVB jobs
+# Composed of fs026/27/17/01 mutated to host OVB jobs
 # scenario062-multinode-containers.yaml
 # is invoked with scenario_args instead of composable_scenario!
 composable_scenario: ""
@@ -10,17 +10,23 @@ undercloud_enable_validations: false
 undercloud_undercloud_debug: false
 undercloud_enable_ui: false
 undercloud_enable_tempest: false
+undercloud_type: virtual
 
 # overrides the hash in releases configs
 dlrn_hash_tag: "{{ lookup('env', 'DLRN_HASH') }}"
 enable_swap: true
 swap_type: file
-network_isolation: false
-enable_pacemaker: false
+enable_pacemaker: true
+network_isolation: true
+network_isolation_type: "multiple-nics"
+network_isolation_args: >-
+  -e {{ overcloud_templates_path }}/ci/environments/network/multiple-nics/network-isolation-absolute.yaml
+  -e {{ overcloud_templates_path }}/ci/environments/network/multiple-nics/network-environment.yaml
 overcloud_ipv6: false
 containerized_overcloud: true
 containerized_undercloud: true
 undercloud_install_cli_options: " --use-heat"
+undercloud_install_script: undercloud-install.sh.j2
 undercloud_custom_env_files: "{{ working_dir }}/undercloud-parameter-defaults.yaml"
 undercloud_cloud_domain: "localdomain"
 undercloud_undercloud_hostname: "undercloud.{{ undercloud_cloud_domain }}"
@@ -33,6 +39,7 @@ config_download_args: >-
   -e {{ overcloud_templates_path }}/environments/config-download-environment.yaml
   --config-download
 undercloud_rpm_dependencies: "python-tripleoclient*"
+delete_docker_cache: true
 
 # turn on image prep
 step_overcloud_image: true
@@ -44,18 +51,20 @@ step_introspect: true
 
 # This enables TLS for the undercloud which will also make haproxy bind to the
 # configured public-vip and admin-vip.
-undercloud_generate_service_certificate: false
+undercloud_generate_service_certificate: true
 
 # This enables the deployment of the overcloud with SSL.
-ssl_overcloud: false
+ssl_overcloud: true
 
 extra_args: >-
   --ntp-server pool.ntp.org
-
+telemetry_args: "-e {{ overcloud_templates_path }}/environments/disable-telemetry.yaml"
 # If `run_tempest` is `true`, run tempests tests, otherwise do not
 # run them.
 test_ping: false
 run_tempest: false
+run_tripleo_validations: false
+run_tripleo_validations_negative_tests: false
 composable_roles: true
 overcloud_roles:
   - name: Controller
