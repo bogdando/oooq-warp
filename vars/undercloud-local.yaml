@@ -21,3 +21,5 @@ undercloud_extra_args: >-
 
 #undercloud_docker_registry_mirror: http://some-registry.lc:5000/registry-1.docker
 containerized_undercloud: true
+# Switch to undercloud-install.sh.j2 to deploy with --use-heat instead
+undercloud_install_script: undercloud-deploy.sh.j2

@@ -22,6 +22,12 @@ container_args: >-
   -e {{ overcloud_templates_path }}/environments/docker.yaml
   -e {{ working_dir }}/containers-default-parameters.yaml
 
+# pull overcloud images from the undercloud registry
+additional_insecure_registry: true
+docker_registry_host: "{{ local_docker_registry_host }}"
+docker_image_tag: "{{ undercloud_docker_image_tag }}"
+docker_registry_namespace: "{{ undercloud_docker_registry_namespace }}"
+
 prepare_service_env_args: >-
   -e {{ overcloud_templates_path }}/environments/docker.yaml
 

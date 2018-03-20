@@ -18,7 +18,6 @@ release: master
 extra_tht_configs: /tmp/scripts/tht
 
 ## UNDERCLOUD
-undercloud_install_script: undercloud-deploy.sh.j2
 undercloud_docker_registry_host: docker.io
 #undercloud_docker_registry_port: a port
 undercloud_docker_registry_namespace: tripleomaster
@@ -28,9 +27,4 @@ undercloud_docker_image_tag: "{{ lookup('env', 'DLRN_HASH') }}"
 # push overcloud images to UC serving a local registry
 # NOTE: overcloud prep containers hardcodes a 8787 port
 local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
-additional_insecure_registry: true
-# pull overcloud images from
-docker_registry_host: "{{ local_docker_registry_host }}"
-docker_image_tag: "{{ undercloud_docker_image_tag }}"
-docker_registry_namespace: "{{ undercloud_docker_registry_namespace }}"
 validation_args: --disable-validations
