@@ -41,7 +41,8 @@ Note, adapt those for your case or jut use existing images. It also requires
 
 To start a scratch local dev env with libvirt and kvm:
 
-* Download overcloud/undercloud images and md5 into the ``IMAGECACHE``.
+* Download the overcloud-full, undercloud and ironic-python-agent images and md5
+  files into ``IMAGECACHE``.
 
   > **NOTE**: Backup those for future re-provision runs in ``${IMAGECACHEBACKUP}``!
   > Quickstart mutates qcow2 files in-place. You may want to preserve the
@@ -116,7 +117,7 @@ To start a scratch local dev env with libvirt and kvm:
 > $ ssh -F ${LWD}/ssh.config.local.ansible undercloud
 > ```
 
-## Example playbooks for a local libvirt env ready for OVB setup
+### Example playbooks for a local libvirt env ready for OVB setup
 
 The expected workflow is:
 
@@ -133,7 +134,9 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
 ```
 (oooq) ./quickstart.sh --install-deps
 (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
-           -e@config/nodes/1ctlr_1comp.yml -e@config/release/master.yml \
+           -e@config/nodes/1ctlr_1comp.yml \
+           -e@config/release/master.yml \
+           -e@/tmp/scripts/custom.yaml \
            -e@/tmp/scripts/tht/config/general_config/featureset062.yml
 ```
 **TODO**: requires commits contributed upstream:
@@ -160,15 +163,16 @@ https://github.com/bogdando/tripleo-quickstart/commit/b96a2bc4099ef344ddda66dbd5
 ```
 > **FIXME**: the socket path is hardcoded in quickstart for RHEL OS family,
 > so we have to override the ``vbmc_libvirt_uri`` and manually evaluate ``HOST_BREXT_IP``.
-> To verify the connection, run from the undercloud node deployed (substitued with real values):
+> To verify the connection, run from the undercloud node deployed (substitute with real values):
 > ```
-> # virsh connect "qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1"
+> $ sudo virsh connect "qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1"
 > ```
 
-* On undercloud VM, allow ``USER`` to access the docker CLI w/o sudo (substitued with real values).
+* On undercloud VM, configure ``USER`` to
+  access the docker CLI w/o sudo (substitute with the real value):
 ```
-# usermod -aG root $USER
-# usermod -aG dockerroot $USER
+$ sudo usermod -aG root $USER
+$ sudo usermod -aG dockerroot $USER
 ```
 
 * Deploy overcloud from the given featureset and nodes config
@@ -193,47 +197,40 @@ https://github.com/bogdando/tripleo-quickstart/commit/b96a2bc4099ef344ddda66dbd5
 ```
 * Deploy your OVB setup on top
 
-## Dev branches and venvs (undercloud)
+### Respinning a failed local libvirt env
 
-By default, the wrapper uses predefined python virtual env named oooq.
-Container build time, upstream dependencies are installed into it.
-Quickstart extras is installed from the given fork and branch params:
-```
-pip install git+https://github.com/johndoe/tripleo-quickstart-extras@dev
-```
-
-For remaining components, like t-h-t, puppet modules, tripleo client,
-define a custom repo/branch/refspec:
-```
-overcloud_templates_repo: https://github.com/johndoe/tripleo-heat-templates
-overcloud_templates_branch: dev
-undercloud_install_script: undercloud-deploy-dev.sh.j2
-```
-Then opionally create a custom ``undercloud-deploy-dev.sh.j2`` script.
-Inside, make sure to checkout/install required dev branches of components under
-dev/test. Then define a composable role (a heat environemnt) for the undercloud
-for the given script as well. For overcloud custom roles, see OOOQ docs.
-
-You may want as well to use default deployment script and t-h-t et al installed
-from packages. For that case you can still provide your custom t-h-t env files
-in the `tht/environments` directory. Those will be uploaded to the undercloud
-node and can be picked as extra deployment args from
-`{{working_dir}}/tht/environments`.
-
-## Respinning a failed local libvirt env
-
-If you want to reuse existing customized by oooq images and omit
-all of the long playing oooq provisioning steps:
+If you want to reuse the existing (already customized by oooq) images and omit
+all of the long playing build/provisioning steps:
 * Export ``TEARDOWN=false`` then rerun the deploy inside of the
-  container.
+  container or start a new container.
 
 To start a new libvirt env from the scratch:
 
 * remove existing VMs' snapshots,
 * exit the wrapper container,
-* start a new container with ``TEARDOWN=true ./oooq-warp.sh`` or the like.
+* start a new container with ``TEARDOWN=true ./oooq-warp.sh``, or the like.
 
-## Troubleshooting local envs
+> **NOTE** When rebuilding from the scratch, you can still configure quickstart
+> to re-use the kernel/latest fetched overcloud/ironic-python-agent images from
+> the ``IMAGECACHEBACKUP`` dir, for example:
+> ```
+> (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
+>            -e@config/nodes/1ctlr_1comp.yml \
+>            -e@config/release/master.yml \
+>            -e@/tmp/scripts/custom.yaml \
+>            -e@/tmp/scripts/tht/config/general_config/featureset062.yml \
+>            -e undercloud_use_custom_boot_images=true \
+>            -e undercloud_custom_initrd=${IMAGECACHE}/overcloud-full.initrd \
+>            -e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
+>            -e force_cached_images=true -e image_cache_expire_days=30
+> ```
+> **TODO**: needs https://review.openstack.org/#/c/554627 !
+
+If you want to include steps like re-fetching remote images and re-building
+the kernel images et al, just remove the corresponding images from the
+backup dir.
+
+### Troubleshooting local libvirt envs
 
 If the undercloud VM refuses to start (permission deinied) on Ubuntu, try
 to disable apparmor for libvirt and reconfigure qemu as well:
@@ -257,7 +254,7 @@ More sysctl adjustments may be required to fix inter-VMs connectivity:
 # sysctl net.ipv4.ip_forward=1
 ```
 
-## Traas multinode pre-provisioned deployment with openstack provider
+## Non-local (traas) multinode pre-provisioned deployment on openstack
 
 Follow an [all-in-one undercloud example guide](rdocloud-guide.md)
 (RDO cloud), or read below for advanced deployment scenarios.
