@@ -45,8 +45,9 @@ delete_docker_cache: true
 step_overcloud_image: true
 step_glance_upload: true
 step_register: true
-step_root_device_size: true
-step_root_device_hints: true
+# root_device steps aren't ready for containerized UC (Mistral)
+step_root_device_size: false
+step_root_device_hints: false
 step_introspect: true
 
 # This enables TLS for the undercloud which will also make haproxy bind to the
