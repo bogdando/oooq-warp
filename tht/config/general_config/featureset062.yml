@@ -16,7 +16,7 @@ undercloud_type: virtual
 dlrn_hash_tag: "{{ lookup('env', 'DLRN_HASH') }}"
 enable_swap: true
 swap_type: file
-enable_pacemaker: true
+enable_pacemaker: false
 network_isolation: true
 network_isolation_type: "multiple-nics"
 network_isolation_args: >-
@@ -31,7 +31,7 @@ undercloud_custom_env_files: "{{ working_dir }}/undercloud-parameter-defaults.ya
 undercloud_cloud_domain: "localdomain"
 undercloud_undercloud_hostname: "undercloud.{{ undercloud_cloud_domain }}"
 undercloud_resource_registry_args:
-  "OS::TripleO::Undercloud::Net::SoftwareConfig": "{{ overcloud_templates_path }}/ci/common/net-config-simple-bridge.yaml"
+  "OS::TripleO::Undercloud::Net::SoftwareConfig": "{{ overcloud_templates_path }}/net-config-undercloud.yaml"
 undercloud_extra_services_args: "-e {{overcloud_templates_path}}/environments/docker.yaml"
 undercloud_extra_args: ""
 deploy_steps_ansible_workflow: true
