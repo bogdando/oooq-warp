@@ -18,10 +18,12 @@ enable_swap: true
 swap_type: file
 enable_pacemaker: false
 network_isolation: true
-network_isolation_type: "multiple-nics"
-network_isolation_args: >-
-  -e {{ overcloud_templates_path }}/ci/environments/network/multiple-nics/network-isolation-absolute.yaml
-  -e {{ overcloud_templates_path }}/ci/environments/network/multiple-nics/network-environment.yaml
+network_isolation_type: "single-nic-vlans"
+# Not sure if those work on libvirt for host cloud and ovb on top?
+#network_isolation_type: "multiple-nics"
+#network_isolation_args: >-
+#  -e {{ overcloud_templates_path }}/ci/environments/network/multiple-nics/network-isolation-absolute.yaml
+#  -e {{ overcloud_templates_path }}/ci/environments/network/multiple-nics/network-environment.yaml
 overcloud_ipv6: false
 containerized_overcloud: true
 containerized_undercloud: true
