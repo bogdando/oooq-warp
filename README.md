@@ -251,6 +251,14 @@ More sysctl adjustments may be required to fix inter-VMs connectivity:
 # sysctl net.bridge.bridge-nf-call-arptables=0
 # sysctl net.ipv4.ip_forward=1
 ```
+And some more optional magic for PXE boot issue on libvirt
+```
+# sysctl net.ipv4.conf.default.proxy_arp=1
+# sysctl net.ipv4.conf.brovc.proxy_arp=1
+# brctl stp brovc off #default on
+# brctl setfd brovc 0.1 #default 15
+# iptables -I FORWARD -m physdev --physdev-is-bridged -j ACCEPT
+```
 
 ## Non-local (traas) multinode pre-provisioned deployment on openstack
 
