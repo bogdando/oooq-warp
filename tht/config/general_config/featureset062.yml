@@ -2,7 +2,7 @@
 # scenario062-multinode-containers.yaml
 # is invoked with scenario_args instead of composable_scenario!
 composable_scenario: ""
-scenario_args: "-e tht/config/general_config/featureset062.yml"
+scenario_args: "-e tht/environments/scenario062-multinode-containers.yaml"
 deployed_server: false
 undercloud_setup: true
 step_install_undercloud: true
