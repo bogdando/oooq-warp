@@ -1,7 +1,9 @@
 # THOSE ARE COMMON VARS WITH TOP LEVEL PRECEDENCE
 # Override with either -e/-e@ args or altering CUSTOMVARS
 # DNS
-undercloud_undercloud_nameservers: 208.67.222.220
+undercloud_undercloud_nameservers:
+  - 208.67.222.220
+custom_nameserver: "{{undercloud_undercloud_nameservers}}"
 overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
 
 ## DEV
