@@ -75,6 +75,7 @@ docker run -it --rm --privileged \
   -e OOOQ_DIR=/tmp/oooq \
   -e OPT_WORKDIR=/tmp/oooq \
   -e DLRN_HASH=${DLRN_HASH} \
+  -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /dev:/dev \
