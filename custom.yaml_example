@@ -26,7 +26,7 @@ undercloud_docker_registry_namespace: tripleomaster
 undercloud_docker_image_tag: "{{ lookup('env', 'DLRN_HASH') }}"
 
 ## OVERCLOUD
-# push overcloud images to UC serving a local registry
-# NOTE: overcloud prep containers hardcodes a 8787 port
-local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
+#docker_registry_host: docker.io
+#docker_registry_namespace: tripleomaster
+#docker_image_tag: "{{ lookup('env', 'DLRN_HASH') }}"
 validation_args: --disable-validations

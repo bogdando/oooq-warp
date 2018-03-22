@@ -22,6 +22,9 @@ container_args: >-
   -e {{ overcloud_templates_path }}/environments/docker.yaml
   -e {{ working_dir }}/containers-default-parameters.yaml
 
+# push overcloud images to UC serving a local registry
+# NOTE: overcloud prep containers hardcodes a 8787 port
+local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
 # pull overcloud images from the undercloud registry
 additional_insecure_registry: true
 docker_registry_host: "{{ local_docker_registry_host }}"
