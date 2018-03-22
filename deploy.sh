@@ -64,11 +64,8 @@ if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
   finalize
   sudo cp -f ${LWD}/hosts /etc/ansible/ 2>/dev/null
   cp -f ${LWD}/hosts /tmp/oooq/ 2>/dev/null
-  cp -f ${HOME}/.ssh/authorized_keys /tmp/authorized_keys
-  echo "# Generated for quickstart VMs IPMI/VBMC, purge this later manually" >> \
-  /tmp/authorized_keys
-  cat ${LWD}/id_rsa_virt_power.pub  >> /tmp/authorized_keys
-  cp -f /tmp/authorized_keys ${HOME}/.ssh/authorized_keys
+  echo "!!! ADD THIS TO THE HOST'S /home/$USER/.ssh/authorized_keys !!!"
+  cat ${LWD}/id_rsa_virt_power.pub
 else
   # switch to the generated inventory and deploy a PLAY, if already provisioned VMs
   inventory=${LWD}/hosts

@@ -139,6 +139,7 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
            -e@/tmp/scripts/custom.yaml \
            -e@/tmp/scripts/tht/config/general_config/featureset062.yml
 ```
+Add the generated public key into the host's ``USER`` ``authorized_keys`` file.
 
 > **NOTE** The ``dlrn_hash_tag`` value is configured from ``DLRN_HASH`` and
 > must be matching the version in the source URL of the downloaded images. Do

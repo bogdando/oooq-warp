@@ -87,7 +87,7 @@ docker run -it --rm --privileged \
   -v $(pwd)/ansible.cfg:/tmp/oooq/ansible.cfg:ro \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${LWD}:$LWD \
-  -v /home/${USER}/.ssh/authorized_keys:/home/${USER}/.ssh/authorized_keys \
+  -v /home/${USER}/.ssh/authorized_keys:/tmp/.ssh/authorized_keys \
   -v $(pwd):/tmp/scripts:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
