@@ -66,26 +66,4 @@ test_ping: false
 run_tempest: false
 run_tripleo_validations: false
 run_tripleo_validations_negative_tests: false
-composable_roles: true
-overcloud_roles:
-  - name: Controller
-    CountDefault: 1
-    tags:
-      - primary
-      - controller
-    networks:
-      - External
-      - InternalApi
-      - Storage
-      - StorageMgmt
-      - Tenant
-  - name: Compute
-    CountDefault: 1
-    tags:
-      - compute
-    networks:
-      - External
-      - InternalApi
-      - Storage
-      - StorageMgmt
-      - Tenant
+composable_roles: false
