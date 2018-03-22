@@ -38,11 +38,11 @@ function finalize {
       'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
       'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
       'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
-    cp -uL "${WORKSPACE}/${state}" ${LWD}/ 2>/dev/null ||
-    cp -uL "${LWD}/${state}" ${WORKSPACE}/ 2>/dev/null
+    cp -uL "${WORKSPACE}/${state}" ${LWD}/ 2>/dev/null ||:
+    cp -uL "${LWD}/${state}" ${WORKSPACE}/ 2>/dev/null ||:
   done
   chmod 600 ${LWD}/id_* 2>/dev/null
-  cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/ 2>/dev/null
+  cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/ 2>/dev/null ||:
   set -e
 }
 trap finalize EXIT
