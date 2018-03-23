@@ -174,6 +174,16 @@ $ sudo usermod -aG dockerroot $USER
 ```
 
 * Deploy overcloud from the given featureset and nodes config
+
+> **NOTE** A known issue is that sometimes the docker registry distribution
+> dies silently on the undercloud node. You can fix that with starting a custom
+> container for the registry like:
+> ```
+> $ docker run --restart=always -dit -p 8787:5000 \
+>       -v /var/lib/docker-registry:/var/lib/registry \
+>       --name registry docker.io/library/registry
+> ```
+
 ```
 (oooq) ./quickstart.sh -R master -n -I -T none -t all \
            -S tripleo-validations \
@@ -193,6 +203,10 @@ $ sudo usermod -aG dockerroot $USER
            -E /tmp/scripts/tht/config/general_config/featureset062.yml \
            -e transport=local localhost
 ```
+> **NOTE** A known issue is that sometimes undercloud node cannot be connected
+> because of the missing/bad ``id_rsa_undercloud`` key. Exit and re-enter a new
+> wrapper container to fix that.
+
 * Deploy your OVB setup on top
 
 ### Respinning a failed local libvirt env
