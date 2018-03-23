@@ -1,7 +1,5 @@
 # A scenario based on 002 and 006 mutated and simplified to host OVB envs
 resource_registry:
-  OS::TripleO::Controller::Net::SoftwareConfig: /usr/share/openstack-tripleo-heat-templates/ci/common/net-config-multinode.yaml
-  OS::TripleO::Compute::Net::SoftwareConfig: /usr/share/openstack-tripleo-heat-templates/ci/common/net-config-multinode.yaml
   OS::TripleO::Services::NovaIronic: /usr/share/openstack-tripleo-heat-templates/docker/services/nova-ironic.yaml
   OS::TripleO::Services::IronicApi: /usr/share/openstack-tripleo-heat-templates/docker/services/ironic-api.yaml
   OS::TripleO::Services::IronicConductor: /usr/share/openstack-tripleo-heat-templates/docker/services/ironic-conductor.yaml
@@ -11,49 +9,6 @@ resource_registry:
   OS::TripleO::AllNodes::Validation: /usr/share/openstack-tripleo-heat-templates/ci/common/all-nodes-validation-disabled.yaml
 
 parameter_defaults:
-  ControllerServices:
-    - OS::TripleO::Services::Docker
-    - OS::TripleO::Services::Kernel
-    - OS::TripleO::Services::Keystone
-    - OS::TripleO::Services::GlanceApi
-    - OS::TripleO::Services::HeatApi
-    - OS::TripleO::Services::HeatApiCfn
-    - OS::TripleO::Services::HeatEngine
-    - OS::TripleO::Services::IronicApi
-    - OS::TripleO::Services::IronicConductor
-    - OS::TripleO::Services::IronicInspector
-    - OS::TripleO::Services::IronicPxe
-    - OS::TripleO::Services::CinderApi
-    - OS::TripleO::Services::CinderScheduler
-    - OS::TripleO::Services::CinderVolume
-    - OS::TripleO::Services::SwiftProxy
-    - OS::TripleO::Services::SwiftStorage
-    - OS::TripleO::Services::SwiftRingBuilder
-    - OS::TripleO::Services::MySQL
-    - OS::TripleO::Services::MySQLClient
-    - OS::TripleO::Services::NeutronDhcpAgent
-    - OS::TripleO::Services::NeutronL3Agent
-    - OS::TripleO::Services::NeutronMetadataAgent
-    - OS::TripleO::Services::NeutronServer
-    - OS::TripleO::Services::NeutronCorePlugin
-    - OS::TripleO::Services::NeutronOvsAgent
-    - OS::TripleO::Services::RabbitMQ
-    - OS::TripleO::Services::Memcached
-    - OS::TripleO::Services::NovaConductor
-    - OS::TripleO::Services::NovaApi
-    - OS::TripleO::Services::NovaIronic
-    - OS::TripleO::Services::NovaPlacement
-    - OS::TripleO::Services::NovaMetadata
-    - OS::TripleO::Services::NovaScheduler
-    - OS::TripleO::Services::Ntp
-    - OS::TripleO::Services::Sshd
-    - OS::TripleO::Services::Iscsid
-    - OS::TripleO::Services::Timezone
-    - OS::TripleO::Services::Redis
-    - OS::TripleO::Services::Zaqar
-    - OS::TripleO::Services::TripleoPackages
-    - OS::TripleO::Services::TripleoFirewall
-
   Debug: false
   DockerDebug: false
   DockerPuppetDebug: false
