@@ -1,14 +1,14 @@
 # A scenario based on 002 and 006 mutated and simplified to host OVB envs
 resource_registry:
-  OS::TripleO::Controller::Net::SoftwareConfig: ../common/net-config-multinode.yaml
-  OS::TripleO::Compute::Net::SoftwareConfig: ../common/net-config-multinode.yaml
-  OS::TripleO::Services::NovaIronic: ../docker/services/nova-ironic.yaml
-  OS::TripleO::Services::IronicApi: ../docker/services/ironic-api.yaml
-  OS::TripleO::Services::IronicConductor: ../docker/services/ironic-conductor.yaml
-  OS::TripleO::Services::IronicInspector: ../docker/services/ironic-inspector.yaml
-  OS::TripleO::Services::IronicPxe: ../docker/services/ironic-pxe.yaml
-  OS::TripleO::Services::Zaqar: ../docker/services/zaqar-api.yaml
-  OS::TripleO::AllNodes::Validation: ../common/all-nodes-validation-disabled.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: /usr/share/openstack-tripleo-heat-templates/ci/common/net-config-multinode.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: /usr/share/openstack-tripleo-heat-templates/ci/common/net-config-multinode.yaml
+  OS::TripleO::Services::NovaIronic: /usr/share/openstack-tripleo-heat-templates/docker/services/nova-ironic.yaml
+  OS::TripleO::Services::IronicApi: /usr/share/openstack-tripleo-heat-templates/docker/services/ironic-api.yaml
+  OS::TripleO::Services::IronicConductor: /usr/share/openstack-tripleo-heat-templates/docker/services/ironic-conductor.yaml
+  OS::TripleO::Services::IronicInspector: /usr/share/openstack-tripleo-heat-templates/docker/services/ironic-inspector.yaml
+  OS::TripleO::Services::IronicPxe: /usr/share/openstack-tripleo-heat-templates/docker/services/ironic-pxe.yaml
+  OS::TripleO::Services::Zaqar: /usr/share/openstack-tripleo-heat-templates/docker/services/zaqar.yaml
+  OS::TripleO::AllNodes::Validation: /usr/share/openstack-tripleo-heat-templates/ci/common/all-nodes-validation-disabled.yaml
 
 parameter_defaults:
   ControllerServices:
