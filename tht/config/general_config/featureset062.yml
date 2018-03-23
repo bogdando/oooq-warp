@@ -69,3 +69,8 @@ run_tempest: false
 run_tripleo_validations: false
 run_tripleo_validations_negative_tests: false
 composable_roles: false
+
+# Tell tripleo which nodes to deploy (seems like missing in the nodes config!)
+topology: >-
+  --compute-scale 1
+  --control-scale 1
