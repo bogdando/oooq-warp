@@ -18,3 +18,38 @@ parameter_defaults:
   ZaqarMessageStore: 'swift'
   ZaqarManagementStore: 'sqlalchemy'
   SwiftCeilometerPipelineEnabled: false
+  # Copied from undercloud/environments: we want the overcloud's Heat/Ironic used the same way!
+  EnablePackageInstall: true
+  StackAction: CREATE
+  SoftwareConfigTransport: POLL_SERVER_HEAT
+  NeutronTunnelTypes: []
+  NeutronBridgeMappings: ctlplane:br-ctlplane
+  NeutronAgentExtensions: []
+  NeutronFlatNetworks: '*'
+  NeutronDnsDomain: ''
+  NovaSchedulerAvailableFilters: 'tripleo_common.filters.list.tripleo_filters'
+  NovaSchedulerDefaultFilters: ['RetryFilter', 'TripleOCapabilitiesFilter', 'ComputeCapabilitiesFilter', 'AvailabilityZoneFilter', 'RamFilter', 'DiskFilter', 'ComputeFilter', 'ImagePropertiesFilter', 'ServerGroupAntiAffinityFilter', 'ServerGroupAffinityFilter']
+  NovaSchedulerMaxAttempts: 30
+  NeutronDhcpAgentsPerNetwork: 2
+  HeatConvergenceEngine: false
+  HeatMaxResourcesPerStack: -1
+  HeatMaxJsonBodySize: 2097152
+  IronicDefaultResourceClass: 'baremetal'
+  IronicEnabledHardwareTypes: ['ipmi', 'redfish', 'idrac', 'ilo']
+  IronicEnabledBootInterfaces: ['pxe', 'ilo-pxe']
+  IronicEnabledConsoleInterfaces: ['ipmitool-socat', 'ilo', 'no-console']
+  IronicEnabledDeployInterfaces: ['iscsi', 'ansible']
+  IronicEnabledInspectInterfaces: ['inspector', 'no-inspect']
+  IronicEnabledManagementInterfaces: ['ipmitool', 'redfish', 'idrac', 'ilo']
+  IronicEnabledNetworkInterfaces: ['flat']
+  IronicEnabledPowerInterfaces: ['ipmitool', 'redfish', 'idrac', 'ilo']
+  IronicEnabledRaidInterfaces: ['no-raid']
+  IronicEnabledStorageInterfaces: ['noop']
+  IronicEnabledVendorInterfaces: ['ipmitool', 'idrac', 'no-vendor']
+  IronicEnableStagingDrivers: true
+  IronicInspectorCollectors: default,extra-hardware,numa-topology,logs
+  IronicInspectorInterface: br-ctlplane
+  IronicInspectorIpRange: '192.168.24.100,192.168.24.200'
+  NeutronPublicInterface: eth1
+  MistralExecutionFieldSizeLimit: 16384
+  NeutronServicePlugins: ['router']
