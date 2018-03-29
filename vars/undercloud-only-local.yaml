@@ -1,0 +1,109 @@
+# Undercloud all-in-one libvirt scenario to host openshift VMs.
+# Replace custom.yaml with that file or specify it via CUSTOMVARS.
+# Based on fs027 from quickstart.
+undercloud_vcpu: 6
+undercloud_memory: 16384
+undercloud_user: "{{ lookup('env', 'USER') }}"
+#overcloud_user: "{{ undercloud_user }}"
+ssh_user: "{{ undercloud_user }}"
+non_root_user: "{{ undercloud_user }}"
+non_root_group: "{{ undercloud_user }}"
+local_working_dir: "{{ lookup('env', 'LWD') }}"
+working_dir: /home/{{ undercloud_user }}
+update_images: true
+# We have nothing to inject, but it can't be empty string to make overcloud
+# as undercloud magic working
+inject_images: ['ironic-python-agent.tar.md5']
+undercloud_use_custom_boot_images: false
+undercloud_image_url: file://{{ image_cache_dir }}/undercloud.qcow2
+enable_vnc_console: false
+enable_vbmc: false
+use_external_images: false
+overcloud_as_undercloud: true
+chrooted: true
+inject_instackenv: false
+undercloud_user: "{{ lookup('env', 'USER') }}"
+overcloud_user: "{{ undercloud_user }}"
+ssh_user: "{{ undercloud_user }}"
+non_root_user: "{{ lookup('env', 'USER') }}"
+non_root_group: "{{ non_root_user }}"
+ansible_user_id: "{{ non_root_user }}"
+
+libvirt_cpu_mode: host-passthrough
+libguestfs_kernel_override: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"
+libvirt_volume_pool: default
+libvirt_volume_path: /var/lib/libvirt/images
+libvirt_domain_type: kvm
+
+enable_opstools_repo: false
+deployed_server: false
+deploy_multinode: false
+overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
+extra_tht_configs: /tmp/scripts/tht
+configure_repos: true
+release: master
+dlrn_hash_tag: current-tripleo
+repos:
+  - type: generic
+    reponame: delorean
+    filename: delorean.repo
+    baseurl: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/
+    hash_url: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/delorean.repo
+    priority: 20
+  - type: file
+    filename: delorean-deps.repo
+    down_url: http://trunk.rdoproject.org/centos7-{{ release }}/delorean-deps.repo
+repo_cmd_after: ''
+undercloud_cloud_domain: rdocloud
+undercloud_extra_services_args: >-
+  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
+  -e {{overcloud_templates_path}}/environments/disable-telemetry.yaml
+  -e {{working_dir}}/network-environment.yaml
+  -e {{working_dir}}/undercloud-parameter-defaults.yaml
+  -e {{working_dir}}/tht/environments/all-in-one-local.yaml
+containerized_undercloud: true
+step_install_undercloud: true
+undercloud_install_script: undercloud-deploy.sh.j2
+undercloud_docker_registry_host: docker.io
+undercloud_docker_registry_namespace: tripleomaster
+undercloud_docker_image_tag: "{{ dlrn_hash_tag }}"
+extra_args: >-
+  --ntp-server pool.ntp.org
+network_isolation: false
+enable_pacemaker: false
+overcloud_ipv6: false
+containerized_overcloud: false
+containerized_undercloud: true
+undercloud_undercloud_hostname: "undercloud.{{ undercloud_cloud_domain }}"
+step_overcloud_image: false
+step_glance_upload: false
+step_register: false
+step_root_device_size: false
+step_root_device_hints: false
+step_introspect: false
+undercloud_generate_service_certificate: true
+ssl_overcloud: false
+test_ping: false
+run_tempest: false
+enable_port_forward_for_tripleo_ui: false
+delete_docker_cache: true
+undercloud_rpm_dependencies: "python-tripleoclient*"
+#local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
+#undercloud_ip: "{{ local_docker_registry_host }}"
+undercloud_network_cidr: 192.168.0.0/24
+undercloud_external_network_cidr: 192.168.253.0/24
+external_network_cidr: "{{ undercloud_external_network_cidr }}"
+overcloud_dns_servers:
+  - "{{ undercloud_network_cidr|nthhost(2) }}"
+  - 208.67.222.220
+undercloud_undercloud_nameservers:
+  - 208.67.222.220
+network_environment_args:
+  ExternalNetCidr: "{{ undercloud_external_network_cidr }}"
+  ExternalAllocationPools: >
+    [{'start': '{{ undercloud_external_network_cidr|nthhost(128) }}',
+    'end': '{{ undercloud_external_network_cidr|nthhost(250) }}'}]
+  ControlPlaneSubnetCidr: "{{ undercloud_network_cidr|ipaddr('prefix') }}"
+  ControlPlaneDefaultRoute: "{{ undercloud_network_cidr|nthhost(1) }}"
+  EC2MetadataIp: "{{ undercloud_network_cidr|nthhost(1) }}"
+  DnsServers: "{{ overcloud_dns_servers }}"

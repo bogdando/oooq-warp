@@ -16,7 +16,6 @@
       ansible_user_id: "{{ non_root_user }}"
       when: teardown|bool
     - role: libvirt/setup/overcloud
-      when: overcloud_nodes is defined
     - role: libvirt/setup/undercloud
       environment:
         SUPERMIN_KERNEL_VERSION: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"

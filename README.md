@@ -242,6 +242,21 @@ If you want to include steps like re-fetching remote images and re-building
 the kernel images et al, just remove the corresponding images from the
 backup dir.
 
+### Example commands for all-in-one undercloud to deploy openshift on top
+
+WIP
+
+```
+(oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh \
+           -e@/tmp/scripts/tht/environments/all-in-one-local.yaml #\
+           #-e undercloud_use_custom_boot_images=true \
+           #-e undercloud_custom_initrd=${IMAGECACHE}/overcloud-full.initrd \
+           #-e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
+           #-e force_cached_images=true -e image_cache_expire_days=300
+
+(oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh -e@/tmp/scripts/tht/environments/all-in-one-local.yaml
+```
+
 ### Troubleshooting local libvirt envs
 
 If the undercloud VM refuses to start (permission deinied) on Ubuntu, try

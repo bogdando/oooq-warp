@@ -1,0 +1,45 @@
+---
+# Libvirt local deployments by quickstart (no overclouds expected)
+# may be used to deploy openshift-on-openstack
+- name: Install delorian repos (oooq-extras)
+  any_errors_fatal: true
+  gather_facts: true
+  become: true
+  hosts: undercloud
+  vars_files:
+    - ../vars/undercloud-only-local.yaml
+  roles:
+    - {role: repo-setup,  when: configure_repos|bool}
+
+- name: Install the client
+  hosts: undercloud
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  tasks:
+    - package:
+        name: python-tripleoclient*
+
+- name: Upload custom tht env files
+  hosts: undercloud
+  any_errors_fatal: true
+  gather_facts: false
+  vars_files:
+    - ../vars/undercloud-only-local.yaml
+  tasks:
+    - copy:
+        src: /tmp/scripts/tht
+        dest: "{{working_dir}}"
+        force: yes
+        owner: "{{undercloud_user}}"
+      tags: upload
+
+- name: Install the undercloud (oooq-extras)
+  hosts: undercloud
+  any_errors_fatal: true
+  gather_facts: false
+  become: true
+  vars_files:
+    - ../vars/undercloud-only-local.yaml
+  roles:
+    - undercloud-deploy
