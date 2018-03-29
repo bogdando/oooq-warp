@@ -73,7 +73,7 @@ else
     rm -f ${s}/*.qcow2*
     rm -f ${s}/*.tar*
   done
-  rm -f /tmp/oooq/_deploy.log
+  rm -f /tmp/oooq/_deploy.log /tmp/oooq/_deploy_nice.log
   if [ "${IMAGECACHEBACKUP:-}" -a "${TEARDOWN}" != "false" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
     cp -a ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
@@ -92,19 +92,22 @@ else
   fi
 fi
 
-
+if [[ "$TERMOPTS" =~ "t" ]]; then
 cd /tmp/oooq
-echo Note: ansible virthost is now localhost
-echo export PLAY=oooq-libvirt-provision.yaml to bootstrap undercloud and generate inventory - default
-echo export PLAY=oooq-libvirt-provision-build.yaml if you plan to continue with overcloud deployments
-echo export PLAY=oooq-libvirt-under.yaml to deploy only an undercloud
-echo export TEARDOWN=false respin a failed local deployment omitting build/provision tasks
-echo ================================================================================================
-echo export PLAY=oooq-traas.yaml to generate inventory for existing openstack VMs
-echo export PLAY=oooq-traas-under.yaml to deploy an undercloud on openstack
-echo export PLAY=oooq-traas-over.yaml to deploy an overcloud on on openstack
-echo export PLAY=oooq-traas-kubespray.yaml to prepare overcloud for k8s on openstack
-echo ================================================================================================
-echo export CUSTOMVARS=path/file.yaml to override default '-e @custom.yaml' with it
-echo Run create_env_oooq.sh added optional args, to either provision or to deploy on top!
-/bin/bash
+  echo Note: ansible virthost is now localhost
+  echo export PLAY=oooq-libvirt-provision.yaml to bootstrap undercloud and generate inventory - default
+  echo export PLAY=oooq-libvirt-provision-build.yaml if you plan to continue with overcloud deployments
+  echo export PLAY=oooq-libvirt-under.yaml to deploy only an undercloud
+  echo export TEARDOWN=false respin a failed local deployment omitting build/provision tasks
+  echo ================================================================================================
+  echo export PLAY=oooq-traas.yaml to generate inventory for existing openstack VMs
+  echo export PLAY=oooq-traas-under.yaml to deploy an undercloud on openstack
+  echo export PLAY=oooq-traas-over.yaml to deploy an overcloud on on openstack
+  echo export PLAY=oooq-traas-kubespray.yaml to prepare overcloud for k8s on openstack
+  echo ================================================================================================
+  echo export CUSTOMVARS=path/file.yaml to override default '-e @custom.yaml' with it
+  echo Run create_env_oooq.sh added optional args, to either provision or to deploy on top!
+  /bin/bash
+else
+  exec $@
+fi

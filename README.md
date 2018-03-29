@@ -107,9 +107,18 @@ To start a scratch local dev env with libvirt and kvm:
   releases config files! You can also override ``custom.yaml``/``CUSTOMVARS`` from
   extra files or parameters passed with ``create_env_oooq.sh -e foo=bar -e@baz.yml``.
 
+* Start an interactive wrapper-container session:
+```
+$ ./oooq-warp.sh
+```
+
 * Execute the wanted ``PLAY`` with the command like:
 ```
 (oooq) PLAY=something.yaml create_env_oooq.sh -e foo=bar -e@baz.yml -vvvv
+```
+Or you can start the container non-interactively/without a terminal:
+```
+$ PLAY=something.yaml TERMOPTS=-i ./oooq-warp.sh create_env_oooq.sh -e foo=bar -e@baz.yml -vvvv
 ```
 
 > **NOTE** You can access the undercloud VMs with the command:
@@ -258,6 +267,10 @@ WIP
 ```
 
 ### Troubleshooting local libvirt envs
+
+> **NOTE** there is ``_deploy.log`` and ``_deploy_nice.log`` produced for
+> inspection if the deployment results. It is also persisted by the given
+> ``OOOQ_PATH``.
 
 If the undercloud VM refuses to start (permission deinied) on Ubuntu, try
 to disable apparmor for libvirt and reconfigure qemu as well:

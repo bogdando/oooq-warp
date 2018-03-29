@@ -3,7 +3,19 @@
 # requires ansible in the given venv or host
 # must be executed from the oooq root dir
 set -uxe
+if [ -t 1 ] ; then
+  export ANSIBLE_FORCE_COLOR=true
+else
+  export ANSIBLE_FORCE_COLOR=false
+fi
+echo "## Storing outputs to ./_deploy.log"
+echo "$0 $@" > _deploy.log
+# results|message|msg|get_xml|std\w+ get line-wrapped nicely
+# item|cmd|end|start|failed|rc|delta left intact but its own quotes stripped off
+exec &> >(tee -i -a _deploy.log |\
+  sed -r 's/"\S+":\s(""|\[\]|\{\})(,\s)?//g; s/\\n/\n/g; s/\\t/\t/g; s/",\s"/",\n"/g')
 
+LANG=C
 ARGS=${@:-" "}
 USER=${USER:-bogdando}
 SCRIPTS=/tmp/scripts
@@ -20,6 +32,7 @@ SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-}
 SUPERMIN_MODULES=${SUPERMIN_MODULES:-}
 SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-}
 
+RC=1
 function with_ansible {
   ansible-playbook \
     --become-user=root \
@@ -27,7 +40,8 @@ function with_ansible {
     -e teardown=$TEARDOWN \
     -e @${SCRIPTS}/${CUSTOMVARS} \
     ${ARGS} \
-    $LOG_LEVEL $@ 2>&1 | tee -a _deploy.log
+    $LOG_LEVEL $@ 2>&1
+  RC=$?
 }
 
 # A tricky sync for the state spread across LWD/WORKSPACE
@@ -44,8 +58,11 @@ function finalize {
   chmod 600 ${LWD}/id_* 2>/dev/null
   cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/ 2>/dev/null ||:
   set -e
+  cat _deploy.log |\
+  sed -r 's/"\S+":\s(""|\[\]|\{\})(,\s)?//g; s/\\n/\n/g; s/\\t/\t/g; s/",\s"/",\n"/g' >\
+    _deploy_nice.log
 }
-trap finalize EXIT
+trap finalize INT EXIT
 
 sudo mkdir -p /etc/ansible
 

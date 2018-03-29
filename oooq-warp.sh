@@ -11,6 +11,7 @@ CPU=${CPU:-0}
 MEM=${MEM:-0}
 
 # defaults
+TERMOPTS=${TERMOPTS:--it}
 TEARDOWN=${TEARDOWN:-true}
 USER=${USER:-bogdando}
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
@@ -42,7 +43,7 @@ if [ "${IMAGECACHEBACKUP:-}" ]; then
   MOUNT_IMAGECACHEBACKUP="-v ${IMAGECACHEBACKUP}:${IMAGECACHEBACKUP}:ro"
 fi
 
-docker run -it --rm --privileged \
+docker run ${TERMOPTS} --rm --privileged \
   --device-read-bps=${DEV}:${IOR} \
   --device-write-bps=${DEV}:${IOW} \
   --device-read-iops=${DEV}:${IOPSR} \
@@ -76,6 +77,7 @@ docker run -it --rm --privileged \
   -e OPT_WORKDIR=/tmp/oooq \
   -e DLRN_HASH=${DLRN_HASH} \
   -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
+  -e TERMOPTS=${TERMOPTS} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /dev:/dev \
@@ -97,4 +99,4 @@ docker run -it --rm --privileged \
   --entrypoint /bin/bash \
   --name runner bogdando/oooq-runner:0.1 \
   -c "sudo cp /tmp/scripts/*.sh /usr/local/sbin/ && \
-      sudo chmod +x /usr/local/sbin/* && entry.sh"
+      sudo chmod +x /usr/local/sbin/* && entry.sh ${@}"
