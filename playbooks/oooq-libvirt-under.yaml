@@ -8,8 +8,12 @@
   vars_files:
     - ../vars/undercloud-local.yaml
     - ../vars/repodata.yaml
+  pre_tasks:
+    - meta: clear_facts
   roles:
-    - {role: repo-setup,  when: configure_repos|bool}
+    - role: repo-setup
+      dlrn_hash: "{{release}}"
+      when: configure_repos|bool
 
 - name: Install the client
   hosts: undercloud
@@ -18,7 +22,7 @@
   become: true
   tasks:
     - package:
-        name: python-tripleoclient
+        name: python-tripleoclient*
 
 - name: Upload custom tht env files
   hosts: undercloud

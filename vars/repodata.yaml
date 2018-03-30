@@ -26,6 +26,9 @@ repos:
 #    pkg_name: centos-release-ceph-jewel
 #    custom_cmd: 'sudo yum install -y --enablerepo=extras'
 
+repo_cmd_after: ''
+repo_cmd_before: ''
+
 #repo_cmd_after: |
 #  sudo yum-config-manager --save --setopt centos-ceph-jewel.gpgcheck=0
 
