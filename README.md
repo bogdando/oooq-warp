@@ -56,6 +56,9 @@ To start a scratch local dev env with libvirt and kvm:
   * [The one](https://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/master/delorean/) from the
     [Docs](https://tripleo.org/basic_deployment/basic_deployment_cli.html).
 
+  When using ``overcloud_as_undercloud``, you may omit downloading the
+  `undercloud.qcow2` image.
+
 * Customize and export some env vars, for example:
   ```
   $ export USER=bogdando # used as undercloud/overcloud SSH user as well
@@ -75,9 +78,8 @@ To start a scratch local dev env with libvirt and kvm:
   is ``oooq-libvirt-provision-build.yaml`` (see the `playbooks` dir) and the default
   overrides file is invoked as `-e@custom.yaml`:
 
-* If picked ``PLAY=oooq-libvirt-provision.yaml``, which may be the case for
-  undercloud-only deployments (w/o overclouds expected on top), extract kernel images
-  with the command executed from the host machine:
+* If you do not use ``overcloud_as_undercloud`, pick ``PLAY=oooq-libvirt-provision.yaml``,
+  and extract kernel images manually. The command needs to be executed from the host machine:
   ```
   # virt-copy-out -a ${IMAGECACHE}/undercloud.qcow2 \
     /home/stack/overcloud-full.vmlinuz \
@@ -85,7 +87,11 @@ To start a scratch local dev env with libvirt and kvm:
   ```
 
   > **NOTE** this might leave you with an oudated kernel, fall back to the
-  > default ``PLAY`` option then!
+  > default ``PLAY=oooq-libvirt-provision-build.yaml`` option then! It
+  > leverages the ``overcloud_as_undercloud`` magic and you need no to have
+  > `undercloud.qcow2` at all, the vmlinuz/initrd images will be prepared
+  > for you by the quickstart libvirt provision roles from the overcloud image
+  > and used to boot the undercloud VM.
 
 * Prepare host for nested kvm and do some sysctl magic:
   ```
@@ -232,7 +238,7 @@ To start a new libvirt env from the scratch:
 * start a new container with ``TEARDOWN=true ./oooq-warp.sh``, or the like.
 
 > **NOTE** When rebuilding from the scratch, you can still configure quickstart
-> to re-use the kernel/latest fetched overcloud/ironic-python-agent images from
+> to re-use the kernel/latest fetched images from
 > the ``IMAGECACHEBACKUP`` dir, for example:
 > ```
 > (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
@@ -245,7 +251,6 @@ To start a new libvirt env from the scratch:
 >            -e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
 >            -e force_cached_images=true -e image_cache_expire_days=30
 > ```
-> **TODO**: needs https://review.openstack.org/#/c/554627 !
 
 If you want to include steps like re-fetching remote images and re-building
 the kernel images et al, just remove the corresponding images from the
@@ -257,11 +262,11 @@ WIP
 
 ```
 (oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh \
-           -e@/tmp/scripts/tht/environments/all-in-one-local.yaml #\
+           -e@/tmp/scripts/tht/environments/all-in-one-local.yaml \
+           -e force_cached_images=true -e image_cache_expire_days=300 #\
            #-e undercloud_use_custom_boot_images=true \
            #-e undercloud_custom_initrd=${IMAGECACHE}/overcloud-full.initrd \
            #-e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
-           #-e force_cached_images=true -e image_cache_expire_days=300
 
 (oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh -e@/tmp/scripts/tht/environments/all-in-one-local.yaml
 ```
