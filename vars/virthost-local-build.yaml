@@ -1,18 +1,25 @@
 # May be used  to deploy undercloud with overcloud to host OVB stack
+# Undercloud works well for non-stack undercloud_user
+# FIXME Overcloud does not work well with non-default (heat-admin) overcloud user!
 inventory: undercloud
 working_dir: "{{ lookup('env', 'WORKSPACE') }}"
 image_cache_dir: "{{ lookup('env', 'IMAGECACHE') }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 image_fetch_dir: "{{ working_dir }}"
+images_working_dir: "{{ working_dir }}"
+images_destroy_working_dir: false
 
-undercloud_use_custom_boot_images: false
+package_images: false
+build_image_isolated: true
 build_undercloud: true
+undercloud_use_custom_boot_images: false
 overcloud_as_undercloud: true
 update_images: true
 undercloud_image_url: file://{{ image_cache_dir }}/undercloud.qcow2
 overcloud_image_url: file:///{{ image_cache_dir }}/overcloud-full.tar
 enable_vnc_console: true
 enable_vbmc: true
+use_external_images: false
 chrooted: true
 inject_instackenv: true
 

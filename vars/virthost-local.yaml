@@ -1,18 +1,24 @@
+# May be used to deploy only underclouds omitting most of the image build steps
+# It does not work well with non-stack undercloud users!
 inventory: undercloud
 working_dir: "{{ lookup('env', 'WORKSPACE') }}"
 image_cache_dir: "{{ lookup('env', 'IMAGECACHE') }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 image_fetch_dir: "{{ working_dir }}"
+images_working_dir: "{{ working_dir }}"
+images_destroy_working_dir: false
 
-undercloud_use_custom_boot_images: true
-undercloud_custom_initrd: "{{ image_cache_dir }}/overcloud-full.initrd"
+package_images: false
+build_image_isolated: true
+build_undercloud: false
+undercloud_use_custom_boot_images: false
+overcloud_as_undercloud: false
+update_images: false
 undercloud_image_url: file://{{ image_cache_dir }}/undercloud.qcow2
 overcloud_image_url: file:///{{ image_cache_dir }}/overcloud-full.tar
-undercloud_custom_vmlinuz: "{{ image_cache_dir }}/overcloud-full.vmlinuz"
 enable_vnc_console: true
 enable_vbmc: false
 use_external_images: false
-overcloud_as_undercloud: false
 chrooted: true
 inject_instackenv: false
 

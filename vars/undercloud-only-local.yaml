@@ -2,14 +2,15 @@
 # Replace custom.yaml with that file or specify it via CUSTOMVARS.
 # Based on fs027 from quickstart.
 undercloud_vcpu: 6
-undercloud_memory: 16384
-update_images: true
-# We have nothing to inject, but it can't be empty string to make overcloud
-# as undercloud magic working
-inject_images: ['ironic-python-agent.tar.md5']
+undercloud_memory: 20480
 undercloud_use_custom_boot_images: false
 undercloud_image_url: file://{{ image_cache_dir }}/undercloud.qcow2
-overcloud_as_undercloud: true
+# NOTE: This may be needed if undercloud image contains outdated initrd/vmlinuz!
+#update_images: true
+## We have nothing to inject, but it can't be empty string to make overcloud
+## as undercloud magic working
+#inject_images: ['ironic-python-agent.tar.md5']
+#overcloud_as_undercloud: true
 enable_opstools_repo: false
 deployed_server: false
 deploy_multinode: false

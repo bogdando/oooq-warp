@@ -86,6 +86,13 @@ To start a scratch local dev env with libvirt and kvm:
     /home/stack/overcloud-full.initrd ${WORKSPACE}
   ```
 
+  Then you'll need to specify the extracted images via additional args:
+  ```
+  (oooq) ... -e undercloud_use_custom_boot_images=true \
+             -e undercloud_custom_initrd="${IMAGECACHE}/overcloud-full.initrd" \
+             -e undercloud_custom_vmlinuz="${IMAGECACHE}/overcloud-full.vmlinuz"
+  ```
+
   > **NOTE** this might leave you with an oudated kernel, fall back to the
   > default ``PLAY=oooq-libvirt-provision-build.yaml`` option then! It
   > leverages the ``overcloud_as_undercloud`` magic and you need no to have
