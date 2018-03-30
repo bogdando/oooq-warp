@@ -275,7 +275,7 @@ WIP
            #-e undercloud_custom_initrd=${IMAGECACHE}/overcloud-full.initrd \
            #-e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
 
-(oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh -e@/tmp/scripts/tht/environments/all-in-one-local.yaml
+(oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh
 ```
 
 ### Troubleshooting local libvirt envs

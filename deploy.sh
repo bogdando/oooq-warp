@@ -79,6 +79,7 @@ if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
   inventory=${SCRIPTS}/inventory.ini
   with_ansible -u ${USER} -i ${inventory} ${PLAY}
   finalize
+  trap - INT EXIT
   sudo cp -f ${LWD}/hosts /etc/ansible/ 2>/dev/null
   cp -f ${LWD}/hosts /tmp/oooq/ 2>/dev/null
   echo "!!! ADD THIS TO THE HOST'S /home/$USER/.ssh/authorized_keys !!!"
