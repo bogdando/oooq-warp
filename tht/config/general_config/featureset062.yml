@@ -1,6 +1,8 @@
 # Composed of fs026/27/17/01 mutated to host OVB jobs
 # scenario062-multinode-containers.yaml
 # is invoked with scenario_args instead of composable_scenario!
+undercloud_user: "{{ lookup('env', 'USER') }}"
+overcloud_user: "{{ undercloud_user }}"
 composable_scenario: ""
 scenario_args: "-e tht/environments/scenario062-multinode-containers.yaml"
 deployed_server: false

@@ -3,38 +3,13 @@
 # Based on fs027 from quickstart.
 undercloud_vcpu: 6
 undercloud_memory: 16384
-undercloud_user: "{{ lookup('env', 'USER') }}"
-#overcloud_user: "{{ undercloud_user }}"
-ssh_user: "{{ undercloud_user }}"
-non_root_user: "{{ undercloud_user }}"
-non_root_group: "{{ undercloud_user }}"
-local_working_dir: "{{ lookup('env', 'LWD') }}"
-working_dir: /home/{{ undercloud_user }}
 update_images: true
 # We have nothing to inject, but it can't be empty string to make overcloud
 # as undercloud magic working
 inject_images: ['ironic-python-agent.tar.md5']
 undercloud_use_custom_boot_images: false
 undercloud_image_url: file://{{ image_cache_dir }}/undercloud.qcow2
-enable_vnc_console: false
-enable_vbmc: false
-use_external_images: false
 overcloud_as_undercloud: true
-chrooted: true
-inject_instackenv: false
-undercloud_user: "{{ lookup('env', 'USER') }}"
-overcloud_user: "{{ undercloud_user }}"
-ssh_user: "{{ undercloud_user }}"
-non_root_user: "{{ lookup('env', 'USER') }}"
-non_root_group: "{{ non_root_user }}"
-ansible_user_id: "{{ non_root_user }}"
-
-libvirt_cpu_mode: host-passthrough
-libguestfs_kernel_override: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"
-libvirt_volume_pool: default
-libvirt_volume_path: /var/lib/libvirt/images
-libvirt_domain_type: kvm
-
 enable_opstools_repo: false
 deployed_server: false
 deploy_multinode: false

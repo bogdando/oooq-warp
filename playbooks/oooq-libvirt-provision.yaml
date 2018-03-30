@@ -13,6 +13,7 @@
     - { role: environment/setup, when: teardown|bool }
     - { role: libvirt/teardown, when: teardown|bool }
     - role: libvirt/setup/user
+      ssh_user: "{{ lookup('env', 'USER') }}"
       become: false
       ansible_user_id: "{{ non_root_user }}"
       when: teardown|bool
