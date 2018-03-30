@@ -77,6 +77,12 @@ else
   if [ "${IMAGECACHEBACKUP:-}" -a "${TEARDOWN}" != "false" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
     cp -a ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
+    if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then
+      echo "Symlinking the latest undercloud images from restored md5 hashes"
+      iname=$(cat ${IMAGECACHE}/undercloud.qcow2.md5 | awk '{print $1}')
+      ln -f ${IMAGECACHE}/undercloud.qcow2 ${IMAGECACHE}/${iname}.qcow2
+      ln -sf ${IMAGECACHE}/${iname}.qcow2 ${IMAGECACHE}/latest-undercloud.qcow2
+    fi
     if [ -f ${IMAGECACHE}/overcloud-full.tar -a -f ${IMAGECACHE}/overcloud-full.tar.md5 ]; then
       echo "Symlinking the latest overcloud images from restored md5 hashes"
       iname=$(cat ${IMAGECACHE}/overcloud-full.tar.md5 | awk '{print $1}')
