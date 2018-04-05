@@ -12,7 +12,6 @@
     - meta: clear_facts
   roles:
     - role: repo-setup
-      dlrn_hash: "{{release}}"
       when: configure_repos|bool
 
 - name: Install the client

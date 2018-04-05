@@ -8,14 +8,13 @@ gating_repo_enabled: false
 #  - type: tripleo-repos
 #    bundle: current
 #    release: master
-# TODO: rework with dlrn_hash_tag: current-tripleo / dlrn_hash_tag_newest: current ?
-dlrn_hash: current-tripleo
+dlrn_hash_tag: current-tripleo
 repos:
   - type: generic
     reponame: delorean
     filename: delorean.repo
-    baseurl: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/
-    hash_url: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash }}/delorean.repo
+    baseurl: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash_tag }}/
+    hash_url: https://trunk.rdoproject.org/centos7-{{ release }}/{{ dlrn_hash_tag }}/delorean.repo
     priority: 20
 
   - type: file
@@ -26,8 +25,15 @@ repos:
 #    pkg_name: centos-release-ceph-jewel
 #    custom_cmd: 'sudo yum install -y --enablerepo=extras'
 
-repo_cmd_after: ''
-repo_cmd_before: ''
+repo_cmd_before: |
+  sudo yum clean all;
+  sudo rm -rf /etc/yum.repos.d/delorean*;
+  sudo rm -rf /etc/yum.repos.d/*.rpmsave;
+  sudo yum install -y yum-plugin-priorities;
+repo_cmd_after: |
+  sudo yum repolist;
+  sudo yum update -y
+
 
 #repo_cmd_after: |
 #  sudo yum-config-manager --save --setopt centos-ceph-jewel.gpgcheck=0
