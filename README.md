@@ -62,7 +62,6 @@ To start a scratch local dev env with libvirt and kvm:
 * Customize and export some env vars, for example:
   ```
   $ export USER=bogdando # used as undercloud/overcloud SSH user as well
-  $ export DLRN_HASH=current-tripleo
   $ export WORKSPACE=/tmp/qs       #persisted on host, libvirt revers to it
   $ export IMAGECACHE=/opt/cache   #persistent on host
   $ export LWD=${HOME}/.quickstart #persistent on host, may be equal to WORKSPACE
@@ -163,10 +162,9 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
 ```
 Add the generated public key into the host's ``USER`` ``authorized_keys`` file.
 
-> **NOTE** The ``dlrn_hash_tag`` value is configured from ``DLRN_HASH`` and
-> must be matching the version in the source URL of the downloaded images. Do
-> not attempt to override ``dlrn_hash`` top-scope as it breaks the fact
-> auto-eval in quickstart repo-setup!
+> **NOTE** The ``dlrn_hash_tag`` value must be matching the version in the
+> source URL of the downloaded images. Do not attempt to override
+> ``dlrn_hash`` top-scope as it breaks the fact auto-eval in quickstart repo-setup!
 
 * Install undercloud (keeping in mind fs062 for overcloud has top precedence)
 ```

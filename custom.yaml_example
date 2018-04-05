@@ -8,7 +8,8 @@ overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
 
 ## DEV
 # Do not override dlrn_hash top-scope as it breaks facts evaluation
-release: master
+#release: master
+#dlrn_hash_tag: current-tripleo
 
 # THT, see also in-repo custom tht example
 #overcloud_templates_repo: https://github.com/openstack/tripleo-heat-templates
@@ -20,13 +21,13 @@ release: master
 extra_tht_configs: /tmp/scripts/tht
 
 ## UNDERCLOUD
-undercloud_docker_registry_host: docker.io
-#undercloud_docker_registry_port: a port
-undercloud_docker_registry_namespace: tripleomaster
-undercloud_docker_image_tag: "{{ lookup('env', 'DLRN_HASH') }}"
+#undercloud_docker_registry_host: docker.io
+#undercloud_docker_registry_port: 8787
+#undercloud_docker_registry_namespace: tripleomaster
+#undercloud_docker_image_tag: "{{ dlrn_hash_tag }}"
 
 ## OVERCLOUD
 #docker_registry_host: docker.io
 #docker_registry_namespace: tripleomaster
-#docker_image_tag: "{{ lookup('env', 'DLRN_HASH') }}"
+#docker_image_tag: "{{ dlrn_hash_tag }}"
 validation_args: --disable-validations

@@ -15,7 +15,7 @@ undercloud_enable_tempest: false
 undercloud_type: virtual
 
 # overrides the hash in releases configs
-dlrn_hash_tag: "{{ lookup('env', 'DLRN_HASH') }}"
+dlrn_hash_tag: current-tripleo
 enable_swap: true
 swap_type: file
 enable_pacemaker: false

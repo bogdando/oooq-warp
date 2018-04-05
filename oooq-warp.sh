@@ -29,7 +29,6 @@ COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
-DLRN_HASH=${DLRN_HASH:-current}
 
 if [ "${OOOQE_PATH}" ]; then
   MOUNT_EXTRAS="-v ${OOOQE_PATH}:/tmp/oooq-extras"
@@ -75,7 +74,6 @@ docker run ${TERMOPTS} --rm --privileged \
   -e SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-} \
   -e OOOQ_DIR=/tmp/oooq \
   -e OPT_WORKDIR=/tmp/oooq \
-  -e DLRN_HASH=${DLRN_HASH} \
   -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
   -e TERMOPTS=${TERMOPTS} \
   -v /var/lib/libvirt:/var/lib/libvirt \
