@@ -9,7 +9,7 @@ overcloud_dns_servers:
   - 38.145.32.66
   - 38.145.32.79
 undercloud_undercloud_nameservers: 208.67.222.220
-network_environment_args:
+undercloud_network_environment_args:
   ExternalNetCidr: "{{ undercloud_external_network_cidr }}"
   ExternalAllocationPools: >
     [{'start': '{{ undercloud_external_network_cidr|nthhost(128) }}',
