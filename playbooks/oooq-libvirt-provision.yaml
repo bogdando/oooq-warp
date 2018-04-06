@@ -14,10 +14,19 @@
     - { role: libvirt/teardown, when: teardown|bool }
     - role: libvirt/setup/user
       ssh_user: "{{ lookup('env', 'USER') }}"
+      non_root_user: "{{ ssh_user }}"
+      non_root_group: "{{ ssh_user }}"
+      ansible_user_id: "{{ ssh_user }}"
+      # FIXME hack required for libvirt setup and custom
+      # non-stack local user
+      undercloud_user: "{{ ssh_user }}"
       become: false
-      ansible_user_id: "{{ non_root_user }}"
       when: teardown|bool
     - role: libvirt/setup/undercloud
+      ssh_user: "{{ lookup('env', 'USER') }}"
+      non_root_user: "{{ ssh_user }}"
+      non_root_group: "{{ ssh_user }}"
+      ansible_user_id: "{{ ssh_user }}"
       environment:
         SUPERMIN_KERNEL_VERSION: "{{ lookup('env', 'SUPERMIN_KERNEL_VERSION') }}"
         SUPERMIN_KERNEL: "{{ lookup('env', 'SUPERMIN_KERNEL') }}"

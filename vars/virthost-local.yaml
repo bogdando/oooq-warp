@@ -1,5 +1,4 @@
 # May be used to deploy only underclouds omitting most of the image build steps
-# It does not work well with non-stack undercloud users!
 inventory: undercloud
 working_dir: "{{ lookup('env', 'WORKSPACE') }}"
 image_cache_dir: "{{ lookup('env', 'IMAGECACHE') }}"
@@ -21,13 +20,6 @@ enable_vbmc: false
 use_external_images: false
 chrooted: true
 inject_instackenv: false
-
-undercloud_user: stack
-overcloud_user: heat-admin
-ssh_user: "{{ undercloud_user }}"
-non_root_user: "{{ lookup('env', 'USER') }}"
-non_root_group: "{{ non_root_user }}"
-ansible_user_id: "{{ non_root_user }}"
 
 undercloud_vcpu: 1
 undercloud_memory: 7168

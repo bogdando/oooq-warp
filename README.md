@@ -264,11 +264,14 @@ backup dir.
 ### Example commands for all-in-one undercloud to deploy openshift on top
 
 WIP
+> **NOTE** Setting ``update_images: true`` is needed to setup root password
+> for VM. It drastically extends the image build time! Uncomment
+> ``undercloud_use_custom_boot_images``, if you already have kernel images.
 
 ```
 (oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh \
-           -e@/tmp/scripts/tht/environments/all-in-one-local.yaml \
            -e@/tmp/scripts/vars/undercloud-only-local.yaml \
+           -e update_images=true \
            -e force_cached_images=true -e image_cache_expire_days=300 #\
            #-e undercloud_use_custom_boot_images=true \
            #-e undercloud_custom_initrd=${IMAGECACHE}/overcloud-full.initrd \

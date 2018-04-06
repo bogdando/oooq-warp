@@ -13,6 +13,8 @@
     - meta: clear_facts
   roles:
     - role: repo-setup
+      local_working_dir: "{{ lookup('env', 'LWD') }}"
+      working_dir: /home/{{ undercloud_user }}
       when: configure_repos|bool
 
 - name: Install the client
@@ -30,6 +32,9 @@
   gather_facts: false
   vars_files:
     - ../vars/undercloud-only-local.yaml
+  vars:
+    local_working_dir: "{{ lookup('env', 'LWD') }}"
+    working_dir: /home/{{ undercloud_user }}
   tasks:
     - copy:
         src: /tmp/scripts/tht
@@ -46,4 +51,6 @@
   vars_files:
     - ../vars/undercloud-only-local.yaml
   roles:
-    - undercloud-deploy
+    - role: undercloud-deploy
+      local_working_dir: "{{ lookup('env', 'LWD') }}"
+      working_dir: /home/{{ undercloud_user }}

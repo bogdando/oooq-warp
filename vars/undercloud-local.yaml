@@ -1,8 +1,3 @@
-undercloud_user: stack
-overcloud_user: heat-admin
-ssh_user: "{{ undercloud_user }}"
-non_root_user: "{{ undercloud_user }}"
-non_root_group: "{{ undercloud_user }}"
 local_working_dir: "{{ lookup('env', 'LWD') }}"
 working_dir: /home/{{ undercloud_user }}
 enable_opstools_repo: true
