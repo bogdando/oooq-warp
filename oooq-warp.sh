@@ -86,6 +86,7 @@ docker run ${TERMOPTS} --rm --privileged \
   ${MOUNT_EXTRAS:-} \
   ${MOUNT_IMAGECACHEBACKUP:-} \
   -v $(pwd)/ansible.cfg:/tmp/oooq/ansible.cfg:ro \
+  -v $(pwd)/entry.sh:/usr/local/sbin/entry.sh:ro \
   -v ${WORKSPACE}:${WORKSPACE} \
   -v ${LWD}:$LWD \
   -v /home/${USER}/.ssh/authorized_keys:/tmp/.ssh/authorized_keys \
@@ -94,7 +95,6 @@ docker run ${TERMOPTS} --rm --privileged \
   -v /etc/group:/etc/group:ro \
   -v /boot:/boot:ro \
   -u $(id -u $USER):$(id -g $USER) \
-  --entrypoint /bin/bash \
+  --entrypoint /usr/local/sbin/entry.sh \
   --name runner bogdando/oooq-runner:0.1 \
-  -c "sudo cp /tmp/scripts/*.sh /usr/local/sbin/ && \
-      sudo chmod +x /usr/local/sbin/* && entry.sh ${@}"
+  ${@:-}

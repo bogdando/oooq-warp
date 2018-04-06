@@ -16,7 +16,7 @@ exec &> >(tee -i -a _deploy.log |\
   sed -r 's/"\S+":\s(""|\[\]|\{\})(,\s)?//g; s/\\n/\n/g; s/\\t/\t/g; s/",\s"/",\n"/g')
 
 LANG=C
-ARGS=${@:-" "}
+ARGS=${@:-}
 USER=${USER:-bogdando}
 SCRIPTS=/tmp/scripts
 LOG_LEVEL=${LOG_LEVEL:--v}

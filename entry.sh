@@ -15,6 +15,10 @@ PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 WORKSPACE=${WORKSPACE:-/opt/oooq}
 LWD=${LWD:-~/.quickstart}
 TEARDOWN=${TEARDOWN:-true}
+ARGS="${@:-}"
+
+sudo cp -f /tmp/scripts/*.sh /usr/local/sbin/ 2>/dev/null ||:
+sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
 
 sudo mkdir -p /tmp/oooq
 sudo mkdir -p ${LWD}
@@ -115,5 +119,5 @@ cd /tmp/oooq
   echo Run create_env_oooq.sh added optional args, to either provision or to deploy on top!
   /bin/bash
 else
-  exec $@
+  create_env_oooq.sh $ARGS
 fi

@@ -130,7 +130,7 @@ $ ./oooq-warp.sh
 ```
 Or you can start the container non-interactively/without a terminal:
 ```
-$ PLAY=something.yaml TERMOPTS=-i ./oooq-warp.sh create_env_oooq.sh -e foo=bar -e@baz.yml -vvvv
+$ PLAY=something.yaml TERMOPTS=-i ./oooq-warp.sh -e foo=bar -e@baz.yml -vvvv
 ```
 
 > **NOTE** You can access the undercloud VMs with the command:
