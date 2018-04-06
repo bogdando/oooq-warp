@@ -81,8 +81,6 @@ parameter_defaults:
   MistralCorsAllowedOrigin: '*'
   MistralExecutionFieldSizeLimit: 16384
   NeutronExternalNetworkBridge: "''"
-  NeutronPublicInterface: eth1
-  HypervisorNeutronPublicInterface: eth1
   NeutronBridgeMappings: 'floating:br-ex,ctlplane:br-ctlplane'
   NeutronServicePlugins: 'router,qos,trunk,segments'
   NeutronPluginExtensions: 'qos,port_security,dns,dns_domain_ports'

@@ -70,8 +70,23 @@ undercloud_rpm_dependencies: "python-tripleoclient*"
 #local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
 #undercloud_ip: "{{ local_docker_registry_host }}"
 undercloud_network_cidr: 192.168.0.0/24
-undercloud_external_network_cidr: 192.168.253.0/24
+# It should be eth1, which is brovc connected for the libvirt case
+undercloud_local_interface: eth1
+# It should match the libvirt brovc CIDR and
+# ExternalAllocationPools to not overlap with brovc's dhcp ranges
+undercloud_external_network_cidr: 192.168.23.0/24
 external_network_cidr: "{{ undercloud_external_network_cidr }}"
+local_docker_registry_host: "{{ undercloud_network_cidr|nthhost(1) }}"
+undercloud_ip: "{{ undercloud_network_cidr|nthhost(1) }}"
+undercloud_local_ip: "{{ undercloud_network_cidr|nthhost(1) }}"
+undercloud_network_gateway: "{{ undercloud_network_cidr|nthhost(1) }}"
+# Assumes libvirt brovc dhcp range ends on .50
+undercloud_undercloud_public_vip: "{{ undercloud_external_network_cidr|nthhost(51) }}"
+undercloud_undercloud_admin_vip: "{{ undercloud_network_cidr|nthhost(1) }}"
+undercloud_masquerade_network: "{{ undercloud_network_cidr }}"
+undercloud_dhcp_start: "{{ undercloud_network_cidr|nthhost(5) }}"
+undercloud_dhcp_end: "{{ undercloud_network_cidr|nthhost(24) }}"
+undercloud_inspection_iprange: "{{ undercloud_network_cidr|nthhost(25) }},{{ undercloud_network_cidr|nthhost(39) }}"
 overcloud_dns_servers:
   - "{{ undercloud_network_cidr|nthhost(2) }}"
   - 208.67.222.220
@@ -101,3 +116,6 @@ undercloud_network_environment_args:
       DhcpRangeStart: "{{ undercloud_network_cidr|nthhost(5) }}"
       DhcpRangeEnd: "{{ undercloud_network_cidr|nthhost(24) }}"
   UndercloudCtlplaneLocalSubnet: 'ctlplane-subnet'
+  # It should be eth0, which is brext connected for the libvirt case
+  NeutronPublicInterface: eth0
+  HypervisorNeutronPublicInterface: eth0
