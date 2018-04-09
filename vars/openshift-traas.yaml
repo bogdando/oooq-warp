@@ -1,4 +1,4 @@
-# from kubespray-traas.yaml, with external_deployments and configs download
+# WIP from kubespray-traas.yaml, with external_deployments and configs download
 # added from tripleo-quickstart/tree/config/general_config/featureset010.yml
 # and openshift on overcloud CI job https://review.openstack.org/#/c/494418/
 deploy_multinode: true

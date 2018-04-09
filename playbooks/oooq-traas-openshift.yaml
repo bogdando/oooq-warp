@@ -1,5 +1,5 @@
 ---
-# Non local deployments by quickstart, from oooq-traas-over.yaml, but for k8s
+# WIP Non local deployments by quickstart, from oooq-traas-over.yaml, but for k8s
 - name: Validate CONTROLLER_HOSTS exported for deployed server
   hosts: localhost
   connection: local
