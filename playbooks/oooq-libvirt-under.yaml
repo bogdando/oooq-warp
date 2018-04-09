@@ -34,6 +34,7 @@
   vars:
     local_working_dir: "{{ lookup('env', 'LWD') }}"
     working_dir: /home/{{ undercloud_user }}
+    undercloud_user: stack
   tasks:
     - copy:
         src: /tmp/scripts/tht

@@ -3,12 +3,9 @@
 # Based on fs027 from quickstart.
 undercloud_vcpu: 6
 undercloud_memory: 20480
-undercloud_use_custom_boot_images: false
-undercloud_image_url: file://{{ image_cache_dir }}/undercloud.qcow2
 enable_opstools_repo: false
 deployed_server: false
 deploy_multinode: false
-overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
 extra_tht_configs: /tmp/scripts/tht
 configure_repos: true
 release: master
@@ -27,8 +24,6 @@ undercloud_extra_services_args: >-
   -e {{working_dir}}/undercloud-parameter-defaults.yaml
   -e {{working_dir}}/tht/environments/all-in-one-local.yaml
   -e {{overcloud_templates_path}}/environments/docker.yaml
-containerized_undercloud: true
-step_install_undercloud: true
 undercloud_install_script: undercloud-deploy.sh.j2
 undercloud_docker_registry_host: docker.io
 undercloud_docker_registry_namespace: tripleomaster
@@ -41,6 +36,7 @@ overcloud_ipv6: false
 containerized_overcloud: false
 containerized_undercloud: true
 undercloud_undercloud_hostname: "undercloud.{{ undercloud_cloud_domain }}"
+step_install_undercloud: true
 step_overcloud_image: false
 step_glance_upload: false
 step_register: false
@@ -55,7 +51,6 @@ enable_port_forward_for_tripleo_ui: false
 delete_docker_cache: true
 undercloud_rpm_dependencies: "python-tripleoclient*"
 #local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
-#undercloud_ip: "{{ local_docker_registry_host }}"
 undercloud_network_cidr: 192.168.0.0/24
 # It should be eth1, which is brovc connected for the libvirt case
 undercloud_local_interface: eth1
@@ -64,7 +59,6 @@ undercloud_local_interface: eth1
 undercloud_external_network_cidr: 192.168.23.0/24
 external_network_cidr: "{{ undercloud_external_network_cidr }}"
 local_docker_registry_host: "{{ undercloud_network_cidr|nthhost(1) }}"
-undercloud_ip: "{{ undercloud_network_cidr|nthhost(1) }}"
 undercloud_local_ip: "{{ undercloud_network_cidr|nthhost(1) }}"
 undercloud_network_gateway: "{{ undercloud_network_cidr|nthhost(1) }}"
 # Assumes libvirt brovc dhcp range ends on .50
