@@ -270,14 +270,15 @@ WIP
 
 ```
 (oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh \
-           -e@/tmp/scripts/vars/undercloud-only-local.yaml \
+           -e@/tmp/scripts/tht/config/general_config/featureset127.yml \
            -e update_images=true \
            -e force_cached_images=true -e image_cache_expire_days=300 #\
            #-e undercloud_use_custom_boot_images=true \
            #-e undercloud_custom_initrd=${IMAGECACHE}/overcloud-full.initrd \
            #-e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
 
-(oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh
+(oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh \
+           -e@/tmp/scripts/tht/config/general_config/featureset127.yml
 ```
 
 ### Troubleshooting local libvirt envs

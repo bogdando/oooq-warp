@@ -7,7 +7,6 @@
   become: true
   hosts: undercloud
   vars_files:
-    - ../vars/undercloud-only-local.yaml
     - ../vars/repodata.yaml
   pre_tasks:
     - meta: clear_facts
@@ -30,8 +29,6 @@
   hosts: undercloud
   any_errors_fatal: true
   gather_facts: false
-  vars_files:
-    - ../vars/undercloud-only-local.yaml
   vars:
     local_working_dir: "{{ lookup('env', 'LWD') }}"
     working_dir: /home/{{ undercloud_user }}
@@ -48,8 +45,6 @@
   any_errors_fatal: true
   gather_facts: false
   become: true
-  vars_files:
-    - ../vars/undercloud-only-local.yaml
   roles:
     - role: undercloud-deploy
       local_working_dir: "{{ lookup('env', 'LWD') }}"
