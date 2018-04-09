@@ -95,7 +95,9 @@ undercloud_network_environment_args:
   ControlPlaneDefaultRoute: "{{ undercloud_network_cidr|nthhost(1) }}"
   EC2MetadataIp: "{{ undercloud_network_cidr|nthhost(1) }}"
   DnsServers: "{{ overcloud_dns_servers }}"
-  ControlPlaneStaticRoutes: []
+  ControlPlaneStaticRoutes:
+    - ip_netmask: "{{ undercloud_external_network_cidr }}"
+      next_hop: "{{ undercloud_external_network_cidr|nthhost(1) }}"
   UndercloudCtlplaneSubnets:
     ctlplane-subnet:
       NetworkCidr: "{{ undercloud_network_cidr }}"
