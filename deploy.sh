@@ -10,10 +10,7 @@ else
 fi
 echo "## Storing outputs to ./_deploy.log"
 echo "$0 $@" > _deploy.log
-# results|message|msg|get_xml|std\w+ get line-wrapped nicely
-# item|cmd|end|start|failed|rc|delta left intact but its own quotes stripped off
-exec &> >(tee -i -a _deploy.log |\
-  sed -r 's/"\S+":\s(""|\[\]|\{\})(,\s)?//g; s/\\n/\n/g; s/\\t/\t/g; s/",\s"/",\n"/g')
+exec &> >(tee -i -a _deploy.log)
 
 LANG=C
 ARGS=${@:-}
@@ -58,6 +55,8 @@ function finalize {
   chmod 600 ${LWD}/id_* 2>/dev/null
   cp -f ${WORKSPACE}/overcloud-full.{vmlinuz,initrd} ${LWD}/ 2>/dev/null ||:
   set -e
+  # results|message|msg|get_xml|std\w+ get line-wrapped nicely
+  # item|cmd|end|start|failed|rc|delta left intact but its own quotes stripped off
   cat _deploy.log |\
   sed -r 's/"\S+":\s(""|\[\]|\{\})(,\s)?//g; s/\\n/\n/g; s/\\t/\t/g; s/",\s"/",\n"/g' >\
     _deploy_nice.log
