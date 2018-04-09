@@ -25,7 +25,7 @@
     - package:
         name: python-tripleoclient*
 
-- name: Upload custom tht env files
+- name: UC host prep tasks
   hosts: undercloud
   any_errors_fatal: true
   gather_facts: false
@@ -34,18 +34,23 @@
     working_dir: /home/{{ undercloud_user }}
     undercloud_user: stack
   tasks:
-    - copy:
+    - name: Upload custom tht env files
+      copy:
         src: /tmp/scripts/tht
         dest: "{{working_dir}}"
         force: yes
         owner: "{{undercloud_user}}"
       tags: upload
+    - name: Allow docker CLI for user stack
+      command: /usr/sbin/usermod -aG root,docker stack
+      become: true
 
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
   any_errors_fatal: true
   gather_facts: false
-  become: true
+  # --use-heat installer can't be sudo'ed
+  become: false
   roles:
     - role: undercloud-deploy
       local_working_dir: "{{ lookup('env', 'LWD') }}"

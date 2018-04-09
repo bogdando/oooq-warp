@@ -1,4 +1,4 @@
-# Undercloud TLS all-in-one to deploy openshift on top
+# Undercloud local-libvirt/BM(maybe) TLS all-in-one to deploy openshift on top
 # FIXME: Octavia relies on Mistral and can not be deployed
 # w/o hacks. Add octavia services for a second deploy run
 # so self-hosted Mistral will handle new role scale out
