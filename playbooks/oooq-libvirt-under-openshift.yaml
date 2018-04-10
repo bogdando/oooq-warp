@@ -44,6 +44,13 @@
     - name: Allow docker CLI for user stack
       command: /usr/sbin/usermod -aG root,docker stack
       become: true
+    #FIXME: should be wired into undercloud.conf instead
+    - name: hack in custom all-in-one role data
+      command: >-
+        cp -f
+        /home/stack/tht/roles/UndercloudAIOOpenshift.yaml
+        /usr/share/openstack-tripleo-heat-templates/roles_data_undercloud.yaml
+      become: true
 
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud

@@ -14,6 +14,7 @@ undercloud_enable_ui: false
 enable_libvirt_tripleo_ui: false
 release: master
 dlrn_hash_tag: current-tripleo
+undercloud_undercloud_debug: false
 undercloud_cloud_domain: localdomain
 undercloud_enable_ironic: false
 undercloud_enable_ironic_inspector: false
@@ -27,8 +28,7 @@ undercloud_install_cli_options: " --use-heat"
 undercloud_custom_env_files: >-
  {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml,
  {{overcloud_templates_path}}/environments/disable-telemetry.yaml,
- {{working_dir}}/undercloud-parameter-defaults.yaml,
- {{working_dir}}/tht/environments/all-in-one-local.yaml
+ {{working_dir}}/undercloud-parameter-defaults.yaml
 # FIXME undercloud-deploy.sh can not be used with a custom undercloud_ip,
 # different to the one generated with libivrt setup inventory tasks
 undercloud_install_script: undercloud-install.sh.j2
@@ -118,3 +118,46 @@ undercloud_network_environment_args:
   # It should match the undercloud_local_interface value
   NeutronPublicInterface: eth0
   HypervisorNeutronPublicInterface: eth0
+  KernelIpForward: 1
+  KeystoneCorsAllowedOrigin: '*'
+  TokenExpiration: 14400
+  HeatConvergenceEngine: true
+  Debug: false
+  DockerDebug: false
+  DockerPuppetDebug: false
+  GlanceBackend: 'swift'
+  NotificationDriver: 'noop'
+  SwiftCeilometerPipelineEnabled: false
+  EnablePackageInstall: true
+  StackAction: CREATE
+  SoftwareConfigTransport: POLL_SERVER_HEAT
+  NeutronTunnelTypes: []
+  NeutronFlatNetworks: '*'
+  NeutronDnsDomain: 'openshift.cluster.lc'
+  NovaSchedulerAvailableFilters: 'tripleo_common.filters.list.tripleo_filters'
+  NovaSchedulerDefaultFilters: ['RetryFilter', 'TripleOCapabilitiesFilter', 'ComputeCapabilitiesFilter', 'AvailabilityZoneFilter', 'RamFilter', 'DiskFilter', 'ComputeFilter', 'ImagePropertiesFilter', 'ServerGroupAntiAffinityFilter', 'ServerGroupAffinityFilter']
+  NovaSchedulerMaxAttempts: 30
+  NovaAutoDisabling: '0'
+  NeutronDhcpAgentsPerNetwork: 2
+  HeatConvergenceEngine: false
+  HeatCorsAllowedOrigin: '*'
+  HeatMaxResourcesPerStack: -1
+  HeatMaxJsonBodySize: 2097152
+  MistralExecutionFieldSizeLimit: 16384
+  MistralCorsAllowedOrigin: '*'
+  MistralExecutionFieldSizeLimit: 16384
+  NeutronExternalNetworkBridge: "''"
+  NeutronBridgeMappings: 'floating:br-ex,ctlplane:br-ctlplane'
+  NeutronServicePlugins: 'router,qos,trunk,segments'
+  NeutronPluginExtensions: 'qos,port_security,dns,dns_domain_ports'
+  NeutronAgentExtensions: 'qos'
+  NeutronNetworkVLANRanges: 'physnet1:1000:2999'
+  NeutronPluginExtensions: 'port_security'
+  NeutronFirewallDriver: ''
+  NeutronNetworkType: ['local','flat','vlan','gre','vxlan']
+  NeutronTunnelIdRanges: '20:100'
+  NeutronTypeDrivers: ['local','flat','vlan','gre','vxlan']
+  NeutronVniRanges: '10:100'
+  NeutronPortQuota: '-1'
+  MigrateLegacyNeutronDb: true
+  SwiftCorsAllowedOrigin: '*'

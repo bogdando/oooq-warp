@@ -1,0 +1,69 @@
+- name: Undercloud
+  description: |
+    A role to deploy the undercloud all-in-one via heat using the 'openstack
+    undercloud install --use-heat' command. And to host an openshift cluster
+    on top. Octavia may be hacked in via Mistral deployed self-hosted.
+  CountDefault: 1
+  uses_deprecated_params: False
+  disable_constraints: True
+  default_route_networks: ['External']
+  tags:
+    - primary
+    - controller
+    - compute
+    - storage
+  networks:
+    - External
+    - InternalApi
+    - Storage
+    - StorageMgmt
+    - Tenant
+  ServicesDefault:
+    # FIXME: Octavia relies on Mistral and can not be deployed
+    # w/o hacks. Add octavia services for a second deploy run
+    # so self-hosted Mistral will handle new role scale out
+    - OS::TripleO::Services::CACerts
+    - OS::TripleO::Services::ContainersLogrotateCrond
+    - OS::TripleO::Services::Docker
+    - OS::TripleO::Services::GlanceApi
+    - OS::TripleO::Services::HeatApi
+    - OS::TripleO::Services::HeatApiCfn
+    - OS::TripleO::Services::HeatEngine
+    - OS::TripleO::Services::Iscsid
+    - OS::TripleO::Services::Kernel
+    - OS::TripleO::Services::Keystone
+    - OS::TripleO::Services::Memcached
+    - OS::TripleO::Services::MySQL
+    - OS::TripleO::Services::NeutronCorePlugin
+    - OS::TripleO::Services::NeutronDhcpAgent
+    - OS::TripleO::Services::NeutronL3Agent
+    - OS::TripleO::Services::NeutronMetadataAgent
+    - OS::TripleO::Services::NeutronOvsAgent
+    - OS::TripleO::Services::NeutronServer
+    - OS::TripleO::Services::NovaApi
+    - OS::TripleO::Services::NovaCompute
+    - OS::TripleO::Services::NovaConductor
+    - OS::TripleO::Services::NovaLibvirt
+    - OS::TripleO::Services::NovaMetadata
+    - OS::TripleO::Services::NovaPlacement
+    - OS::TripleO::Services::NovaScheduler
+    - OS::TripleO::Services::Ntp
+    - OS::TripleO::Services::RabbitMQ
+    - OS::TripleO::Services::SwiftProxy
+    - OS::TripleO::Services::SwiftRingBuilder
+    - OS::TripleO::Services::SwiftStorage
+    - OS::TripleO::Services::Timezone
+    - OS::TripleO::Services::TripleoFirewall
+    - OS::TripleO::Services::TripleoPackages
+    - OS::TripleO::Services::UndercloudCinderApi
+    - OS::TripleO::Services::UndercloudCinderScheduler
+    - OS::TripleO::Services::UndercloudCinderVolume
+    - OS::TripleO::Services::UndercloudHAProxy
+    - OS::TripleO::Services::UndercloudKeepalived
+    # Should only be re-enabled on a 2nd deploy run
+    #- OS::TripleO::Services::OctaviaApi
+    #- OS::TripleO::Services::OctaviaDeploymentConfig
+    #- OS::TripleO::Services::OctaviaHealthManager
+    #- OS::TripleO::Services::OctaviaHousekeeping
+    #- OS::TripleO::Services::OctaviaWorker
+
