@@ -29,6 +29,11 @@ undercloud_custom_env_files: >-
  {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml,
  {{overcloud_templates_path}}/environments/disable-telemetry.yaml,
  {{working_dir}}/undercloud-parameter-defaults.yaml
+# FIXME only needed for prep containers script, w/o undercloud_custom_env_files
+# supported in it yet
+undercloud_extra_services_args: >-
+    -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
+    -e {{overcloud_templates_path}}/environments/docker.yaml
 # FIXME undercloud-deploy.sh can not be used with a custom undercloud_ip,
 # different to the one generated with libivrt setup inventory tasks
 undercloud_install_script: undercloud-install.sh.j2
@@ -117,48 +122,47 @@ undercloud_network_environment_args:
       DhcpRangeEnd: "{{ undercloud_network_cidr|nthhost(24) }}"
   UndercloudCtlplaneLocalSubnet: 'ctlplane-subnet'
   # It should match the undercloud_local_interface value
-  NeutronPublicInterface: eth0
-  HypervisorNeutronPublicInterface: eth0
-  KernelIpForward: 1
-  KeystoneCorsAllowedOrigin: '*'
-  TokenExpiration: 14400
-  HeatConvergenceEngine: true
   Debug: false
   DockerDebug: false
   DockerPuppetDebug: false
-  GlanceBackend: 'swift'
-  NotificationDriver: 'noop'
-  SwiftCeilometerPipelineEnabled: false
   EnablePackageInstall: true
-  StackAction: CREATE
-  SoftwareConfigTransport: POLL_SERVER_HEAT
-  NeutronTunnelTypes: []
-  NeutronFlatNetworks: '*'
+  GlanceBackend: 'swift'
+  HeatConvergenceEngine: true
+  HeatCorsAllowedOrigin: '*'
+  HeatMaxJsonBodySize: 2097152
+  HeatMaxResourcesPerStack: -1
+  HypervisorNeutronPublicInterface: eth0
+  KernelIpForward: 1
+  KeystoneCorsAllowedOrigin: '*'
+  MigrateLegacyNeutronDb: true
+  MistralCorsAllowedOrigin: '*'
+  MistralExecutionFieldSizeLimit: 16384
+  MistralExecutionFieldSizeLimit: 16384
+  NeutronAgentExtensions: 'qos'
+  NeutronBridgeMappings: 'floating:br-ex,ctlplane:br-ctlplane'
+  NeutronDhcpAgentsPerNetwork: 2
   NeutronDnsDomain: 'openshift.cluster.lc'
+  NeutronExternalNetworkBridge: "''"
+  NeutronFirewallDriver: ''
+  NeutronFlatNetworks: '*'
+  NeutronNetworkType: ['local','flat','vlan','gre','vxlan']
+  NeutronNetworkVLANRanges: 'physnet1:1000:2999'
+  NeutronPluginExtensions: 'port_security'
+  NeutronPluginExtensions: 'qos,port_security,dns,dns_domain_ports'
+  NeutronPortQuota: '-1'
+  NeutronPublicInterface: eth0
+  NeutronServicePlugins: 'router,qos,trunk,segments'
+  NeutronTunnelIdRanges: '20:100'
+  NeutronTunnelTypes: []
+  NeutronTypeDrivers: ['local','flat','vlan','gre','vxlan']
+  NeutronVniRanges: '10:100'
+  NotificationDriver: 'noop'
+  NovaAutoDisabling: '0'
   NovaSchedulerAvailableFilters: 'tripleo_common.filters.list.tripleo_filters'
   NovaSchedulerDefaultFilters: ['RetryFilter', 'TripleOCapabilitiesFilter', 'ComputeCapabilitiesFilter', 'AvailabilityZoneFilter', 'RamFilter', 'DiskFilter', 'ComputeFilter', 'ImagePropertiesFilter', 'ServerGroupAntiAffinityFilter', 'ServerGroupAffinityFilter']
   NovaSchedulerMaxAttempts: 30
-  NovaAutoDisabling: '0'
-  NeutronDhcpAgentsPerNetwork: 2
-  HeatConvergenceEngine: false
-  HeatCorsAllowedOrigin: '*'
-  HeatMaxResourcesPerStack: -1
-  HeatMaxJsonBodySize: 2097152
-  MistralExecutionFieldSizeLimit: 16384
-  MistralCorsAllowedOrigin: '*'
-  MistralExecutionFieldSizeLimit: 16384
-  NeutronExternalNetworkBridge: "''"
-  NeutronBridgeMappings: 'floating:br-ex,ctlplane:br-ctlplane'
-  NeutronServicePlugins: 'router,qos,trunk,segments'
-  NeutronPluginExtensions: 'qos,port_security,dns,dns_domain_ports'
-  NeutronAgentExtensions: 'qos'
-  NeutronNetworkVLANRanges: 'physnet1:1000:2999'
-  NeutronPluginExtensions: 'port_security'
-  NeutronFirewallDriver: ''
-  NeutronNetworkType: ['local','flat','vlan','gre','vxlan']
-  NeutronTunnelIdRanges: '20:100'
-  NeutronTypeDrivers: ['local','flat','vlan','gre','vxlan']
-  NeutronVniRanges: '10:100'
-  NeutronPortQuota: '-1'
-  MigrateLegacyNeutronDb: true
+  SoftwareConfigTransport: POLL_SERVER_HEAT
+  StackAction: CREATE
+  SwiftCeilometerPipelineEnabled: false
   SwiftCorsAllowedOrigin: '*'
+  TokenExpiration: 14400
