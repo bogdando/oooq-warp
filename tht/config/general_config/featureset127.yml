@@ -55,10 +55,9 @@ run_tempest: false
 enable_port_forward_for_tripleo_ui: false
 delete_docker_cache: true
 undercloud_rpm_dependencies: "python-tripleoclient*"
-# The internal/isolated ctlplane network CIDR
-# TODO try it flat with the ext net prolly
-undercloud_network_cidr: 192.168.25.0/24
-undercloud_local_interface: eth1
+# The flat external co-located with internal/isolated ctlplane network CIDR
+undercloud_network_cidr: 192.168.23.0/24
+undercloud_local_interface: eth0
 undercloud_network_gateway: "{{ undercloud_network_cidr|nthhost(1) }}"
 undercloud_local_ip: "{{ hostvars['undercloud'].undercloud_ip }}/{{ undercloud_network_cidr|ipaddr('prefix') }}"
 # Use remote/local KVM host registry IP otherwise
@@ -117,5 +116,5 @@ undercloud_network_environment_args:
       DhcpRangeEnd: "{{ undercloud_network_cidr|nthhost(24) }}"
   UndercloudCtlplaneLocalSubnet: 'ctlplane-subnet'
   # It should match the undercloud_local_interface value
-  NeutronPublicInterface: eth1
-  HypervisorNeutronPublicInterface: eth1
+  NeutronPublicInterface: eth0
+  HypervisorNeutronPublicInterface: eth0
