@@ -30,6 +30,8 @@ repo_cmd_before: |
   sudo rm -rf /etc/yum.repos.d/*.rpmsave;
   sudo yum install -y yum-plugin-priorities;
 repo_cmd_after: |
+  sudo yum clean all;
+  sudo rm -rf /var/cache/yum;
   sudo yum repolist;
   sudo yum update -y
 
