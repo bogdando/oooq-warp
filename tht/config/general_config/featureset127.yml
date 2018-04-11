@@ -1,6 +1,8 @@
-# Undercloud TLS all-in-one BM(maybe) and VM-libvirt scenario to host openshift VMs.
+# Undercloud puiblic TLS all-in-one BM(maybe) and VM-libvirt scenario to host openshift VMs.
 # Must be applied top-scope via -e@.
-# Based on fs027 from quickstart.
+# Based on fs027
+# NOTE: internal TLS requires some config/general_config/deprecated/ipa.yml oooq vars and
+# novajoin added in tht/role files.
 # Assumes eth0 is libvirt brext or phys ext-net. And eth1 is internal ctlplane (phys/brovc).
 undercloud_vcpu: 6
 undercloud_memory: 20480
@@ -22,6 +24,8 @@ undercloud_enable_telemetry: false
 undercloud_enable_zaqar: true
 undercloud_enable_mistral: true
 undercloud_install_cli_options: " --use-heat"
+# NOTE: not used yet, only needed for internal TLS
+# {{overcloud_templates_path}}/environments/services-docker/novajoin.yaml,
 # FIXME hack in self-hosted Mistral for octavia:
 # that env file should only be added on a 2nd deploy run!
 # {{overcloud_templates_path}}/environments/services-docker/octavia.yaml
@@ -31,6 +35,8 @@ undercloud_custom_env_files: >-
  {{working_dir}}/undercloud-parameter-defaults.yaml
 # FIXME only needed for prep containers script, w/o undercloud_custom_env_files
 # supported in it yet
+# NOTE: not used yet, only needed for internal TLS
+# -e {{overcloud_templates_path}}/environments/services-docker/novajoin.yaml
 undercloud_extra_services_args: >-
     -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
     -e {{overcloud_templates_path}}/environments/docker.yaml
@@ -56,6 +62,10 @@ step_root_device_hints: false
 step_introspect: false
 undercloud_generate_service_certificate: true
 ssl_overcloud: false
+# NOTE: those need to be enabled for internal TLS
+prepare_novajoin: false
+enable_tls_everywhere: false
+undercloud_enable_novajoin: false
 test_ping: false
 run_tempest: false
 enable_port_forward_for_tripleo_ui: false
@@ -141,7 +151,9 @@ undercloud_network_environment_args:
   NeutronAgentExtensions: 'qos'
   NeutronBridgeMappings: 'floating:br-ex,ctlplane:br-ctlplane'
   NeutronDhcpAgentsPerNetwork: 2
-  NeutronDnsDomain: 'openshift.cluster.lc'
+  # NOTE: this comes from undercloud.conf's overcloud_domain_name but is used
+  # as --local-domain for undercloud, so prolly should be a 'localdomain'?
+  NeutronDnsDomain: 'localdomain'
   NeutronExternalNetworkBridge: "''"
   NeutronFirewallDriver: ''
   NeutronFlatNetworks: '*'

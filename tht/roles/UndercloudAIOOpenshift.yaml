@@ -1,8 +1,9 @@
 - name: Undercloud
   description: |
-    A role to deploy the undercloud all-in-one via heat using the 'openstack
-    undercloud install --use-heat' command. And to host an openshift cluster
-    on top. Octavia may be hacked in via Mistral deployed self-hosted.
+    A role to deploy the undercloud all-in-one public TLS via heat using the
+    'openstack undercloud install --use-heat' command. And to host an
+    openshift cluster on top. Octavia may be hacked in only with a 2nd deploy
+    run, via Mistral deployed self-hosted in the 1st run.
   CountDefault: 1
   uses_deprecated_params: False
   disable_constraints: True
@@ -23,8 +24,10 @@
     # w/o hacks. Add octavia services for a second deploy run
     # so self-hosted Mistral will handle new role scale out
     - OS::TripleO::Services::CACerts
+    - OS::TripleO::Services::CertmongerUser
     - OS::TripleO::Services::ContainersLogrotateCrond
     - OS::TripleO::Services::Docker
+    - OS::TripleO::Services::DockerRegistry
     - OS::TripleO::Services::GlanceApi
     - OS::TripleO::Services::HeatApi
     - OS::TripleO::Services::HeatApiCfn
@@ -43,6 +46,7 @@
     - OS::TripleO::Services::NovaApi
     - OS::TripleO::Services::NovaCompute
     - OS::TripleO::Services::NovaConductor
+    #- OS::TripleO::Services::Novajoin
     - OS::TripleO::Services::NovaLibvirt
     - OS::TripleO::Services::NovaMetadata
     - OS::TripleO::Services::NovaPlacement
