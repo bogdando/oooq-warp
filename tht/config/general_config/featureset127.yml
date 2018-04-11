@@ -1,9 +1,9 @@
-# Undercloud puiblic TLS all-in-one BM(maybe) and VM-libvirt scenario to host openshift VMs.
+# Undercloud public TLS all-in-one BM(maybe) and VM-libvirt scenario to host openshift VMs.
 # Must be applied top-scope via -e@.
 # Based on fs027
 # NOTE: internal TLS requires some config/general_config/deprecated/ipa.yml oooq vars and
 # novajoin added in tht/role files.
-# Assumes eth0 is libvirt brext or phys ext-net. And eth1 is internal ctlplane (phys/brovc).
+# Assumes eth0 is libvirt brext or phys ext-net. And eth1 is internal ctlplane (phys/brovc)
 undercloud_vcpu: 6
 undercloud_memory: 20480
 enable_opstools_repo: false
@@ -24,10 +24,10 @@ undercloud_enable_telemetry: false
 undercloud_enable_zaqar: true
 undercloud_enable_mistral: true
 undercloud_install_cli_options: " --use-heat"
-# NOTE: not used yet, only needed for internal TLS
+# NOTE: not used yet, only needed for internal TLS (undercloud_custom_env_files)
 # {{overcloud_templates_path}}/environments/services-docker/novajoin.yaml,
 # FIXME hack in self-hosted Mistral for octavia:
-# that env file should only be added on a 2nd deploy run!
+# that env file should only be added to undercloud_custom_env_files on a 2nd deploy run!
 # {{overcloud_templates_path}}/environments/services-docker/octavia.yaml
 undercloud_custom_env_files: >-
  {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml,
@@ -71,65 +71,66 @@ run_tempest: false
 enable_port_forward_for_tripleo_ui: false
 delete_docker_cache: true
 undercloud_rpm_dependencies: "python-tripleoclient*"
-# The flat external co-located with internal/isolated ctlplane network CIDR
-undercloud_network_cidr: 192.168.23.0/24
-undercloud_local_interface: eth0
+# FIXME: It should define non-isolated networks as:
+# eth0 - for br-ex and public VIP and tenants' FIPs,
+# eth1 - for br-ctlplane and admin VIP
+undercloud_network_cidr: 192.168.25.0/24
+undercloud_local_interface: eth1
 undercloud_network_gateway: "{{ undercloud_network_cidr|nthhost(1) }}"
 undercloud_local_ip: "{{ hostvars['undercloud'].undercloud_ip }}/{{ undercloud_network_cidr|ipaddr('prefix') }}"
-# Use remote/local KVM host registry IP otherwise
-# e.g. undercloud_external_network_cidr|nthhost(1)
 local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
-# The external (to UC) network CIDR and interface routed from the remote
-# ansible control node or local libvirt host. We want it reachable from
-# outside (or local KVM host), for ansible to access Heat et al APIs and
-# provision VMs for openshift clusters.
-# Undercloud_ip comes from it at the libvirt-provision stage.
 undercloud_external_network_cidr: 192.168.23.0/24
 undercloud_external_network_gateway: "{{ undercloud_external_network_cidr|nthhost(1) }}"
-# Assumes the external/admin network dhcp range ends on .50
+# Assumes the external dhcp range ends on .50
 undercloud_undercloud_public_host: "{{ undercloud_external_network_cidr|nthhost(51) }}"
 undercloud_undercloud_admin_host: "{{ undercloud_network_cidr|nthhost(52) }}"
-# FIXME Or should these be undercloud_network_cidr?..
-# It would be nice to provision non-nested VMs, which reside on the external
-# libvirt/BM network instead of the isolated ctlplane!
-undercloud_masquerade_network: "{{ undercloud_external_network_cidr }}"
-undercloud_dhcp_start: "{{ undercloud_external_network_cidr|nthhost(60) }}"
-undercloud_dhcp_end: "{{ undercloud_external_network_cidr|nthhost(69) }}"
 # Not really used here as all-in-one does not include Ironic (for now)
 undercloud_inspection_iprange: "{{ undercloud_external_network_cidr|nthhost(70) }},{{ undercloud_external_network_cidr|nthhost(79) }}"
+undercloud_dhcp_start: "{{ undercloud_network_cidr|nthhost(60) }}"
+undercloud_dhcp_end: "{{ undercloud_network_cidr|nthhost(69) }}"
 undercloud_undercloud_nameservers:
   - 208.67.222.220
+# FIXME: Not sure with these values below...
+undercloud_masquerade_network: "{{ undercloud_network_cidr }}"
 undercloud_resource_registry_args:
-  "OS::TripleO::Undercloud::Net::SoftwareConfig": "{{ overcloud_templates_path }}/net-config-undercloud.yaml"
+  "OS::TripleO::Undercloud::Net::SoftwareConfig": "{{ overcloud_templates_path }}/net-config-bridge.yaml"
   "OS::TripleO::Network::Ports::RedisVipPort": "{{ overcloud_templates_path }}/network/ports/noop.yaml"
   "OS::TripleO::Network::Ports::ControlPlaneVipPort": "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
   "OS::TripleO::NodeExtraConfigPost": "{{ overcloud_templates_path }}/extraconfig/post_deploy/undercloud_post.yaml"
   "OS::TripleO::Services::DockerRegistry": "{{ overcloud_templates_path }}/puppet/services/docker-registry.yaml"
   "OS::TripleO::Network::Ports::ExternalVipPort": "{{ overcloud_templates_path }}/network/ports/external_from_pool.yaml"
 undercloud_network_environment_args:
-  ExternalNetCidr: "{{ undercloud_external_network_cidr }}"
+  ControlFixedIPs: [{'ip_address':"{{undercloud_undercloud_admin_host}}"}]
+  ControlPlaneDefaultRoute: "{{ undercloud_network_gateway }}"
+  ControlPlaneSubnetCidr: "{{ undercloud_network_cidr|ipaddr('prefix') }}"
   ExternalAllocationPools: >
     [{'start': '{{ undercloud_external_network_cidr|nthhost(128) }}',
-    'end': '{{ undercloud_external_network_cidr|nthhost(250) }}'}]
-  ControlPlaneSubnetCidr: "{{ undercloud_network_cidr|ipaddr('prefix') }}"
-  ControlPlaneDefaultRoute: "{{ undercloud_network_gateway }}"
+    'end': '{{ undercloud_external_network_cidr|nthhost(150) }}'}]
+  ExternalInterfaceDefaultRoute: "{{ undercloud_external_network_gateway }}"
+  ExternalNetCidr: "{{ undercloud_external_network_cidr|ipaddr('prefix') }}"
+  PublicVirtualFixedIPs: [{'ip_address':"{{undercloud_undercloud_public_host}}" }]
+  TenantAllocationPools: >
+    [{'start': '{{ undercloud_external_network_cidr|nthhost(80) }}',
+    'end': '{{ undercloud_external_network_cidr|nthhost(99) }}'}]
+  TenantNetCidr: "{{ undercloud_external_network_cidr|ipaddr('prefix') }}"
   EC2MetadataIp: "{{ hostvars['undercloud'].undercloud_ip }}"
   DnsServers: "{{ undercloud_undercloud_nameservers }}"
-  ControlPlaneStaticRoutes:
-    - ip_netmask: 169.254.169.254/32
-      next_hop: "{{ undercloud_network_gateway }}"
-    - ip_netmask: "{{ undercloud_network_cidr }}"
-      next_hop: "{{ undercloud_network_gateway }}"
-    - ip_netmask: "{{ undercloud_external_network_cidr }}"
-      next_hop: "{{ undercloud_external_network_gateway }}"
-    - ip_netmask: 0.0.0.0/0
-      next_hop: "{{ undercloud_external_network_gateway }}"
+  ## This only works with net-config-undercloud.yaml
+  #ControlPlaneStaticRoutes:
+  #  - ip_netmask: 169.254.169.254/32
+  #    next_hop: "{{ undercloud_network_gateway }}"
+  #  - ip_netmask: "{{ undercloud_network_cidr }}"
+  #    next_hop: "{{ undercloud_network_gateway }}"
+  #  - ip_netmask: "{{ undercloud_external_network_cidr }}"
+  #    next_hop: "{{ undercloud_external_network_gateway }}"
+  #  - ip_netmask: 0.0.0.0/0
+  #    next_hop: "{{ undercloud_external_network_gateway }}"
   UndercloudCtlplaneSubnets:
     ctlplane-subnet:
       NetworkCidr: "{{ undercloud_network_cidr }}"
       NetworkGateway: "{{ undercloud_network_gateway }}"
-      DhcpRangeStart: "{{ undercloud_network_cidr|nthhost(5) }}"
-      DhcpRangeEnd: "{{ undercloud_network_cidr|nthhost(24) }}"
+      DhcpRangeStart: "{{ undercloud_network_cidr|nthhost(100) }}"
+      DhcpRangeEnd: "{{ undercloud_network_cidr|nthhost(109) }}"
   UndercloudCtlplaneLocalSubnet: 'ctlplane-subnet'
   # It should match the undercloud_local_interface value
   Debug: false
