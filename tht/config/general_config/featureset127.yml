@@ -25,20 +25,20 @@ undercloud_enable_zaqar: true
 undercloud_enable_mistral: true
 undercloud_install_cli_options: " --use-heat"
 # NOTE: not used yet, only needed for internal TLS (undercloud_custom_env_files)
-# {{overcloud_templates_path}}/environments/services-docker/novajoin.yaml,
+# {{overcloud_templates_path}}/environments/services/novajoin.yaml,
 # FIXME hack in self-hosted Mistral for octavia:
 # that env file should only be added to undercloud_custom_env_files on a 2nd deploy run!
-# {{overcloud_templates_path}}/environments/services-docker/octavia.yaml
+# {{overcloud_templates_path}}/environments/services/octavia.yaml
 undercloud_custom_env_files: >-
- {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml,
+ {{overcloud_templates_path}}/environments/services/undercloud-cinder.yaml,
  {{overcloud_templates_path}}/environments/disable-telemetry.yaml,
  {{working_dir}}/undercloud-parameter-defaults.yaml
 # FIXME only needed for prep containers script, w/o undercloud_custom_env_files
 # supported in it yet
 # NOTE: not used yet, only needed for internal TLS
-# -e {{overcloud_templates_path}}/environments/services-docker/novajoin.yaml
+# -e {{overcloud_templates_path}}/environments/services/novajoin.yaml
 undercloud_extra_services_args: >-
-    -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
+    -e {{overcloud_templates_path}}/environments/services/undercloud-cinder.yaml
     -e {{overcloud_templates_path}}/environments/docker.yaml
 undercloud_install_script: undercloud-install.sh.j2
 undercloud_docker_registry_host: docker.io

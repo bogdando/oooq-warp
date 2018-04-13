@@ -22,10 +22,10 @@ undercloud_generate_service_certificate: false
 undercloud_update_packages: "'*'"
 undercloud_cloud_domain: rdocloud
 undercloud_extra_services_args: >-
-  -e {{overcloud_templates_path}}/environments/services-docker/mistral.yaml
-  -e {{overcloud_templates_path}}/environments/services-docker/zaqar.yaml
+  -e {{overcloud_templates_path}}/environments/services/mistral.yaml
+  -e {{overcloud_templates_path}}/environments/services/zaqar.yaml
   -e {{overcloud_templates_path}}/environments/docker.yaml
-  -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
+  -e {{overcloud_templates_path}}/environments/services/undercloud-cinder.yaml
   -e {{overcloud_templates_path}}/environments/manila-cephfsnative-config-docker.yaml
   -e {{ working_dir }}/network-environment.yaml
   -e {{working_dir}}/tht/environments/all-in-one-manila.yaml
