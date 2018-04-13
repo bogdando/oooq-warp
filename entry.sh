@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/home/bogdando/Envs/oooq/bin/dumb-init /bin/bash
 # Stub the given user home and ssh setup
 # Prepare to run oooq via ansible
 set -eu
