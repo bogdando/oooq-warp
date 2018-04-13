@@ -40,8 +40,6 @@ undercloud_custom_env_files: >-
 undercloud_extra_services_args: >-
     -e {{overcloud_templates_path}}/environments/services-docker/undercloud-cinder.yaml
     -e {{overcloud_templates_path}}/environments/docker.yaml
-# FIXME undercloud-deploy.sh can not be used with a custom undercloud_ip,
-# different to the one generated with libivrt setup inventory tasks
 undercloud_install_script: undercloud-install.sh.j2
 undercloud_docker_registry_host: docker.io
 undercloud_docker_registry_namespace: tripleomaster
@@ -77,8 +75,8 @@ undercloud_rpm_dependencies: "python-tripleoclient*"
 undercloud_network_cidr: 192.168.25.0/24
 undercloud_local_interface: eth1
 undercloud_network_gateway: "{{ undercloud_network_cidr|nthhost(1) }}"
-undercloud_local_ip: "{{ hostvars['undercloud'].undercloud_ip }}/{{ undercloud_network_cidr|ipaddr('prefix') }}"
-local_docker_registry_host: "{{ hostvars['undercloud'].undercloud_ip }}"
+undercloud_local_ip: "{{ undercloud_network_cidr|nthhost(53) }}/{{ undercloud_network_cidr|ipaddr('prefix') }}"
+local_docker_registry_host: "{{ undercloud_network_cidr|nthhost(53) }}"
 undercloud_external_network_cidr: 192.168.23.0/24
 undercloud_external_network_gateway: "{{ undercloud_external_network_cidr|nthhost(1) }}"
 # Assumes the external dhcp range ends on .50
@@ -113,7 +111,7 @@ undercloud_network_environment_args:
     [{'start': '{{ undercloud_external_network_cidr|nthhost(80) }}',
     'end': '{{ undercloud_external_network_cidr|nthhost(99) }}'}]
   TenantNetCidr: "{{ undercloud_external_network_cidr|ipaddr('prefix') }}"
-  EC2MetadataIp: "{{ hostvars['undercloud'].undercloud_ip }}"
+  EC2MetadataIp: "{{ undercloud_network_cidr|nthhost(53) }}"
   DnsServers: "{{ undercloud_undercloud_nameservers }}"
   ## This only works with net-config-undercloud.yaml
   #ControlPlaneStaticRoutes:

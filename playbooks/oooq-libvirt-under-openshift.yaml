@@ -33,6 +33,8 @@
     local_working_dir: "{{ lookup('env', 'LWD') }}"
     working_dir: /home/{{ undercloud_user }}
     undercloud_user: stack
+  vars_files:
+    - ../tht/config/general_config/featureset127.yml
   tasks:
     - name: Upload custom tht env files
       copy:
@@ -51,6 +53,12 @@
         /home/stack/tht/roles/UndercloudAIOOpenshift.yaml
         /usr/share/openstack-tripleo-heat-templates/roles_data_undercloud.yaml
       become: true
+    # FIXME use custom undercloud_ip different to the one
+    # generated with libivrt setup inventory tasks
+    - name: override undercloud_ip hostvars
+      set_fact:
+        undercloud_ip: "{{ undercloud_local_ip }}"
+        cacheable: true
 
 - name: Install the undercloud (oooq-extras)
   hosts: undercloud
