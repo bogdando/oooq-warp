@@ -15,9 +15,6 @@
     - storage
   networks:
     - External
-    - InternalApi
-    - Storage
-    - StorageMgmt
     - Tenant
   ServicesDefault:
     # FIXME: Octavia relies on Mistral and can not be deployed

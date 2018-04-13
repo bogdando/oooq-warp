@@ -55,7 +55,11 @@
       become: true
     # FIXME use custom undercloud_ip different to the one
     # generated with libivrt setup inventory tasks
-    - name: override undercloud_ip hostvars
+    - name: use provisioned undercloud_ip hostvar as external IP
+      set_fact:
+        undercloud_external_ip: "{{ undercloud_ip }}"
+        cacheable: true
+    - name: override undercloud_ip hostvar as we want its internal IP
       set_fact:
         undercloud_ip: "{{ undercloud_local_ip }}"
         cacheable: true
