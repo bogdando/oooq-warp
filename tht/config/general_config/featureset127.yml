@@ -162,6 +162,7 @@ undercloud_network_environment_args:
   NeutronPluginExtensions: 'qos,port_security,dns,dns_domain_ports'
   NeutronPortQuota: '-1'
   NeutronPublicInterface: eth0
+  # Use lbaasv2-proxy for octavia? (though buggy https://review.openstack.org/#/c/554004/)
   NeutronServicePlugins: 'router,qos,trunk,segments'
   NeutronTunnelIdRanges: '20:100'
   NeutronTunnelTypes: []
