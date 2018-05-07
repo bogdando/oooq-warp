@@ -5,6 +5,7 @@
 # novajoin added in tht/role files.
 # Assumes eth0 is libvirt brext or phys ext-net. And eth1 is internal ctlplane (phys/brovc)
 # Libvirt-provision only related network configs
+# TODO rework Undercloud* as Standalone*
 networks:
   - name: external
     bridge: brext
@@ -19,6 +20,8 @@ networks:
       - 65535
   - name: overcloud
     bridge: brovc
+public_int: eth0
+local_int: eth1
 undercloud_vcpu: 6
 undercloud_memory: 20480
 enable_opstools_repo: false
@@ -88,11 +91,11 @@ delete_docker_cache: true
 undercloud_rpm_dependencies: "python-tripleoclient*"
 # FIXME: It should define non-isolated networks as:
 # eth0 - for br-ex and public VIP and tenants' FIPs,
-# eth1 - for br-ctlplane and admin VIP
+# eth1 - for br-ctlplane and admin VIP and local_ip
 # internal_api is replaced by ctlplane
 undercloud_network_cidr: 192.168.25.0/24
 # To be added into br-ctlplane
-undercloud_local_interface: eth1
+undercloud_local_interface: "{{ local_int }}"
 undercloud_network_gateway: "{{ undercloud_network_cidr|nthhost(1) }}"
 undercloud_local_ip: "{{ undercloud_network_cidr|nthhost(53) }}/{{ undercloud_network_cidr|ipaddr('prefix') }}"
 local_docker_registry_host: "{{ undercloud_network_cidr|nthhost(53) }}"
@@ -107,33 +110,67 @@ undercloud_dhcp_start: "{{ undercloud_network_cidr|nthhost(60) }}"
 undercloud_dhcp_end: "{{ undercloud_network_cidr|nthhost(69) }}"
 undercloud_undercloud_nameservers:
   - 208.67.222.220
-# NOTE: Based on tht environments/fixed-ip-vips.yam, to specify a fixed IP address for the VIPs,
-# to get passed to Pacemaker (if applicable) and HAProxy configs. <network>_from_pool.yaml will
-# not work out-of-the-box for VIPs (environments/ips-from-pool.yaml). Alternatively, VIPs prolly
-# should also be supported via DeployedServerPortMap?
-# FIXME: /tmp/undercloud_parameters.yaml in client does not count in those below,
-# We consume it from /home/stack/undercloud-parameter-defaults.yaml produced by quickstart instead
-# FIXME: Not sure with these values, like masquerade_network, below.
 undercloud_masquerade_network: "{{ undercloud_network_cidr }}"
 undercloud_resource_registry_args:
-  "OS::TripleO::Undercloud::Net::SoftwareConfig": "{{ overcloud_templates_path }}/net-config-bridge.yaml"
+  "OS::TripleO::Undercloud::Net::SoftwareConfig": "{{ overcloud_templates_path }}/net-config-undercloud.yaml"
   # An external IP pre-provisioned with libvirt or pre-configured for BM host
-  "OS::TripleO::Undercloud::Ports::ExternalPort": "{{ undercloud_undercloud_output_dir }}/templates/network/ports/external_from_pool.yaml"
+  #"OS::TripleO::Undercloud::Ports::ExternalPort": "{{ undercloud_undercloud_output_dir }}/templates/network/ports/external_from_pool.yaml"
   # ^-- Uses UndercloudIPs parameter
-  #"OS::TripleO::Network::Ports::ExternalVipPort": "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
-  "OS::TripleO::Network::Ports::ExternalVipPort": "{{ undercloud_undercloud_output_dir }}/templates/network/ports/external.yaml"
-  # ^-- Uses ControlFixedIPs and PublicVirtualFixedIps
-  "OS::TripleO::Network::Ports::InternalApiVipPort": "{{ overcloud_templates_path }}/network/ports/noop.yaml"
+  "OS::TripleO::Network::Ports::ExternalVipPort": "{{ undercloud_undercloud_output_dir }}/templates/network/ports/external_from_pool.yaml"
   "OS::TripleO::Network::Ports::ControlPlaneVipPort": "{{ overcloud_templates_path }}/deployed-server/deployed-neutron-port.yaml"
-  "OS::TripleO::Network::Ports::StorageVipPort": "{{ overcloud_templates_path }}/network/ports/noop.yaml"
-  "OS::TripleO::Network::Ports::StorageMgmtVipPort": "{{ overcloud_templates_path }}/network/ports/noop.yaml"
   "OS::TripleO::Network::Ports::RedisVipPort": "{{ overcloud_templates_path }}/network/ports/noop.yaml"
 undercloud_network_environment_args:
+  PublicVirtualInterface: 'br-ex'
+  ControlVirtualInterface: 'br-ctlplane'
+  UndercloudNetConfigOverride:
+    network_config:
+      - type: ovs_bridge
+        name: br-ex
+        ovs_extra: [ "br-set-external-id br-ex bridge-id br-ex" ]
+        members:
+          - type: interface
+            name: "{{public_int}}"
+            primary: "true"
+            # NOTE: use your public interface MTU and external/libvirt DNS servers
+            mtu: 1500
+            dns_servers: "{{ undercloud_undercloud_nameservers }}"
+        addresses:
+          # this one should be configured by keepalived
+          #- ip_netmask: "{{ undercloud_undercloud_public_host }}/32"
+          - ip_netmask: "{{ hostvars['undercloud'].undercloud_external_ip }}/{{ undercloud_external_network_cidr|ipaddr('prefix') }}"
+        routes:
+          - ip_netmask: "{{ undercloud_external_network_cidr }}"
+            next_hop: "{{ undercloud_external_network_gateway }}"
+          - ip_netmask: "169.254.169.254/32"
+            next_hop: "{{ undercloud_external_network_gateway }}"
+          - ip_netmask: "0.0.0.0/0"
+            next_hop: "{{ undercloud_external_network_gateway }}"
+        mtu: 1500
+      - type: ovs_bridge
+        name: br-ctlplane
+        ovs_extra: [ "br-set-external-id br-ctlplane bridge-id br-ctlplane" ]
+        members:
+          - type: interface
+            name: "{{ local_int }}"
+            primary: "true"
+            mtu: 1500
+            dns_servers: "{{ undercloud_undercloud_nameservers }}"
+        addresses:
+          # this one should be configured by keepalived
+          #- ip_netmask: "{{ undercloud_undercloud_admin_host }}/32"
+          - ip_netmask: "{{ hostvars['undercloud'].undercloud_ip }}"
+        routes:
+          - ip_netmask: 169.254.169.254/32
+            next_hop: "{{ undercloud_network_gateway }}"
+          - ip_netmask: "{{ undercloud_network_cidr }}"
+            next_hop: "{{ undercloud_network_gateway }}"
+        mtu: 1500
   # NOTE: pre-provisioned IPs
-  # We set a cached fact for undercloud_external_ip in the calling playbook
+  # We set cached facts for undercloud_*_ip in the calling playbook
   UndercloudIPs:
     external:
-      - "{{ hostvars['undercloud'].undercloud_external_ip }}"
+      - "{{ undercloud_undercloud_public_host }}"
+      #- "{{ hostvars['undercloud'].undercloud_external_ip }}"
   # We only want ctlplane and External networks for simplicity, but let's
   # do overrides for future cases
   ServiceNetMap:
@@ -145,7 +182,7 @@ undercloud_network_environment_args:
     StorageMgmtNetwork: ctlplane
     ExternalNetwork: external
     TenantNetwork: external
-  # VIPs to be created by HAProxy/pcmk, when applicable
+  # FIXME?: VIPs to be created by HAProxy/pcmk, when applicable
   PublicVirtualFixedIPs: [{'ip_address':"{{undercloud_undercloud_public_host}}" }]
   ControlFixedIPs: [{'ip_address':"{{ undercloud_undercloud_admin_host }}"}]
   ControlPlaneDefaultRoute: "{{ undercloud_network_gateway }}"
@@ -194,7 +231,7 @@ undercloud_network_environment_args:
   HeatMaxJsonBodySize: 2097152
   HeatMaxResourcesPerStack: -1
   # To be added into br-ex
-  HypervisorNeutronPublicInterface: eth0
+  HypervisorNeutronPublicInterface: "{{ public_int }}"
   KernelIpForward: 1
   KeystoneCorsAllowedOrigin: '*'
   MigrateLegacyNeutronDb: true
@@ -215,7 +252,7 @@ undercloud_network_environment_args:
   NeutronPluginExtensions: 'port_security'
   NeutronPluginExtensions: 'qos,port_security,dns,dns_domain_ports'
   NeutronPortQuota: '-1'
-  NeutronPublicInterface: eth0
+  NeutronPublicInterface: "{{ public_int }}"
   # Use lbaasv2-proxy for octavia? (though buggy https://review.openstack.org/#/c/554004/)
   NeutronServicePlugins: 'router,qos,trunk,segments'
   NeutronTunnelIdRanges: '20:100'
