@@ -43,8 +43,13 @@
         force: yes
         owner: "{{undercloud_user}}"
       tags: upload
+    # FIXME: adopt openstack/ansible-role-container-registry for this
+    - name: Ensure docker group
+      group:
+        name: docker
+      become: true
     - name: Allow docker CLI for user stack
-      command: /usr/sbin/usermod -aG root,docker stack
+      command: /usr/sbin/usermod -aG root,docker {{ undercloud_user }}
       become: true
     #FIXME: should be wired into undercloud.conf instead
     - name: hack in custom all-in-one role data
