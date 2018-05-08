@@ -10,11 +10,11 @@ networks:
   - name: external
     bridge: brext
     forward_mode: nat
-    address: "{{ external_network_cidr|nthhost(1) }}"
-    netmask: "{{ external_network_cidr|ipaddr('netmask') }}"
+    address: "{{ undercloud_external_network_cidr|nthhost(1) }}"
+    netmask: "{{ undercloud_external_network_cidr|ipaddr('netmask') }}"
     dhcp_range:
-      - "{{ external_network_cidr|nthhost(10) }}"
-      - "{{ external_network_cidr|nthhost(50) }}"
+      - "{{ undercloud_external_network_cidr|nthhost(10) }}"
+      - "{{ undercloud_external_network_cidr|nthhost(50) }}"
     nat_port_range:
       - 1024
       - 65535
