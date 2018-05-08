@@ -123,7 +123,8 @@ overcloud_roles:
       - OS::TripleO::Services::NeutronServer
       - OS::TripleO::Services::NeutronCorePlugin
       - OS::TripleO::Services::NeutronOvsAgent
-      - OS::TripleO::Services::RabbitMQ
+      - OS::TripleO::Services::OsloMessagingRpc
+      - OS::TripleO::Services::OsloMessagingNotify
       - OS::TripleO::Services::Memcached
       - OS::TripleO::Services::NovaConductor
       - OS::TripleO::Services::NovaApi

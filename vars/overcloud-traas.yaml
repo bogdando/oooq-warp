@@ -83,7 +83,8 @@ overcloud_services:
       - OS::TripleO::Services::Kernel
       - OS::TripleO::Services::Keystone
       - OS::TripleO::Services::NovaApi
-      - OS::TripleO::Services::RabbitMQ
+      - OS::TripleO::Services::OsloMessagingRpc
+      - OS::TripleO::Services::OsloMessagingNotify
       - OS::TripleO::Services::MySQL
       - OS::TripleO::Services::Memcached
       - OS::TripleO::Services::MySQLClient
