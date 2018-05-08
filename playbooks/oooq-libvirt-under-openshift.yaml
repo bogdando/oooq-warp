@@ -58,8 +58,9 @@
         /home/{{ undercloud_user }}/tht/roles/UndercloudAIOOpenshift.yaml
         /usr/share/openstack-tripleo-heat-templates/roles_data_undercloud.yaml
       become: true
-    # FIXME use custom undercloud_ip different to the one
-    # generated with libivrt setup inventory tasks
+    # FIXME: Hack in custom undercloud_ip generated with libivrt or openstack
+    # host-cloud setup inventory tasks to become external IP, and override
+    # undercloud_ip in hostvars as we want it instead
     - name: use provisioned undercloud_ip hostvar as external IP
       set_fact:
         undercloud_external_ip: "{{ undercloud_ip }}"
