@@ -11,8 +11,6 @@
   tags:
     - primary
     - controller
-    - compute
-    - storage
   networks:
     - External
     - Tenant
