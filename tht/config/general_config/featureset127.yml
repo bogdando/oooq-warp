@@ -41,22 +41,16 @@ undercloud_enable_zaqar: true
 undercloud_enable_mistral: true
 undercloud_install_cli_options: " --use-heat"
 undercloud_undercloud_output_dir: /home/stack
-# NOTE: not used yet, only needed for internal TLS (undercloud_custom_env_files)
-# {{overcloud_templates_path}}/environments/services/novajoin.yaml,
+# needs https://review.openstack.org/#/c/563636/
+undercloud_custom_env_files: >-
+ {{overcloud_templates_path}}/environments/services/undercloud-cinder.yaml
+ {{overcloud_templates_path}}/environments/disable-telemetry.yaml
+ {{working_dir}}/undercloud-parameter-defaults.yaml
+# NOTE: not used yet, only needed for internal TLS
+# {{overcloud_templates_path}}/environments/services/novajoin.yaml
 # FIXME hack in self-hosted Mistral for octavia:
 # that env file should only be added to undercloud_custom_env_files on a 2nd deploy run!
 # {{overcloud_templates_path}}/environments/services/octavia.yaml
-undercloud_custom_env_files: >-
- {{overcloud_templates_path}}/environments/services/undercloud-cinder.yaml,
- {{overcloud_templates_path}}/environments/disable-telemetry.yaml,
- {{working_dir}}/undercloud-parameter-defaults.yaml
-# FIXME: rework undercloud_extra_services_args via undercloud_custom_env_files,\
-# see https://review.openstack.org/#/c/563636
-# NOTE: not used yet, only needed for internal TLS
-# -e {{overcloud_templates_path}}/environments/services/novajoin.yaml
-undercloud_extra_services_args: >-
-    -e {{overcloud_templates_path}}/environments/services/undercloud-cinder.yaml
-    -e {{overcloud_templates_path}}/environments/docker.yaml
 undercloud_install_script: undercloud-install.sh.j2
 undercloud_docker_registry_host: docker.io
 undercloud_docker_registry_namespace: tripleomaster
@@ -81,7 +75,8 @@ ssl_overcloud: false
 prepare_novajoin: false
 enable_tls_everywhere: false
 undercloud_enable_novajoin: false
-test_ping: false
+# seems ignored, run this manually post deploy!
+test_ping: true
 run_tempest: false
 enable_port_forward_for_tripleo_ui: false
 delete_docker_cache: true
@@ -177,23 +172,6 @@ undercloud_network_environment_args:
     StorageMgmtNetwork: ctlplane
     ExternalNetwork: external
     TenantNetwork: external
-  # Not sure, if these are even used as I have a net config override defined?..
-  PublicVirtualFixedIPs: [{'ip_address':"{{undercloud_undercloud_public_host}}" }]
-  ControlFixedIPs: [{'ip_address':"{{ undercloud_undercloud_admin_host }}"}]
-  ControlPlaneDefaultRoute: "{{ undercloud_network_gateway }}"
-  ControlPlaneSubnetCidr: "{{ undercloud_network_cidr|ipaddr('prefix') }}"
-  # FIXME: External/Tenant pools seem ignored
-  ExternalAllocationPools: >
-    [{'start': '{{ undercloud_external_network_cidr|nthhost(128) }}',
-    'end': '{{ undercloud_external_network_cidr|nthhost(150) }}'}]
-  ExternalInterfaceDefaultRoute: "{{ undercloud_external_network_gateway }}"
-  ExternalNetCidr: "{{ undercloud_external_network_cidr|ipaddr('prefix') }}"
-  # A kind of a provider network for tenants, not sure if it works...
-  TenantAllocationPools: >
-    [{'start': '{{ undercloud_external_network_cidr|nthhost(80) }}',
-    'end': '{{ undercloud_external_network_cidr|nthhost(99) }}'}]
-  TenantInterfaceDefaultRoute: "{{ undercloud_external_network_gateway }}"
-  TenantNetCidr: "{{ undercloud_external_network_cidr|ipaddr('prefix') }}"
   # More data similar to environments/undercloud.yaml adapted for AIO
   EC2MetadataIp: "{{ undercloud_network_cidr|nthhost(253) }}"
   DnsServers: "{{ undercloud_undercloud_nameservers }}"
