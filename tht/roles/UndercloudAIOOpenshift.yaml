@@ -55,11 +55,11 @@
     - OS::TripleO::Services::Timezone
     - OS::TripleO::Services::TripleoFirewall
     - OS::TripleO::Services::TripleoPackages
-    - OS::TripleO::Services::UndercloudCinderApi
-    - OS::TripleO::Services::UndercloudCinderScheduler
-    - OS::TripleO::Services::UndercloudCinderVolume
-    - OS::TripleO::Services::UndercloudHAProxy
-    - OS::TripleO::Services::UndercloudKeepalived
+    - OS::TripleO::Services::CinderApi
+    - OS::TripleO::Services::CinderScheduler
+    - OS::TripleO::Services::CinderVolume
+    - OS::TripleO::Services::HAproxy
+    - OS::TripleO::Services::Keepalived
     # Should only be re-enabled on a 2nd deploy run
     #- OS::TripleO::Services::OctaviaApi
     #- OS::TripleO::Services::OctaviaDeploymentConfig
