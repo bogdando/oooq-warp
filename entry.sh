@@ -80,7 +80,7 @@ else
   rm -f /tmp/oooq/_deploy.log /tmp/oooq/_deploy_nice.log
   if [ "${IMAGECACHEBACKUP:-}" -a "${TEARDOWN}" != "false" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
-    cp -a ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
+    cp -af ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
     if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then
       echo "Symlinking the latest undercloud images from restored md5 hashes"
       iname=$(cat ${IMAGECACHE}/undercloud.qcow2.md5 | awk '{print $1}')
@@ -98,6 +98,12 @@ else
       iname=$(cat ${IMAGECACHE}/ironic-python-agent.tar.md5 | awk '{print $1}')
       ln -f ${IMAGECACHE}/ironic-python-agent.tar ${IMAGECACHE}/${iname}.tar
       ln -sf ${IMAGECACHE}/${iname}.tar ${IMAGECACHE}/latest-ipa_images.tar
+    fi
+    centos_latest=$(find ${IMAGECACHEBACKUP} -type f -regextype posix-extended -regex "\/opt\/cache\.bak\/[^liou].*")
+    if [ "$centos_latest" ]; then
+      echo "Symlinking the latest centos image from restored md5 hashes"
+      centos_latest=${centos_latest##*/}
+      ln -sf ${IMAGECACHE}/${centos_latest} ${IMAGECACHE}/latest-centos.qcow2
     fi
   fi
 fi
