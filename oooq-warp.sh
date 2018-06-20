@@ -76,6 +76,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e OPT_WORKDIR=/tmp/oooq \
   -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
   -e TERMOPTS=${TERMOPTS} \
+  -v /opt/vm_images/:/opt/vm_images/ \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /dev:/dev \
