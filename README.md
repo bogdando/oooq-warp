@@ -77,7 +77,7 @@ To start a scratch local dev env with libvirt and kvm:
   is ``oooq-libvirt-provision-build.yaml`` (see the `playbooks` dir) and the default
   overrides file is invoked as `-e@custom.yaml`:
 
-* If you do not use ``overcloud_as_undercloud`, pick ``PLAY=oooq-libvirt-provision.yaml``,
+* If you do not use ``overcloud_as_undercloud``, pick ``PLAY=oooq-libvirt-provision.yaml``,
   and extract kernel images manually. The command needs to be executed from the host machine:
   ```
   # virt-copy-out -a ${IMAGECACHE}/undercloud.qcow2 \
