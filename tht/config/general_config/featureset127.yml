@@ -172,6 +172,7 @@ undercloud_network_environment_args:
     StorageMgmtNetwork: ctlplane
     ExternalNetwork: external
     TenantNetwork: external
+    PublicNetwork: external
   # More data similar to environments/undercloud.yaml adapted for AIO
   EC2MetadataIp: "{{ undercloud_network_cidr|nthhost(253) }}"
   DnsServers: "{{ undercloud_undercloud_nameservers }}"
@@ -204,10 +205,10 @@ undercloud_network_environment_args:
   NeutronDhcpAgentsPerNetwork: 2
   NeutronDnsDomain: 'localdomain'
   NeutronExternalNetworkBridge: "''"
-  NeutronFirewallDriver: ''
+  NeutronFirewallDriver: 'openvswitch'
   NeutronFlatNetworks: '*'
   NeutronNetworkType: ['local','flat','vlan','gre','vxlan']
-  NeutronNetworkVLANRanges: 'physnet1:1000:2999'
+  NeutronNetworkVLANRanges: 'ctlplane:1000:2999'
   NeutronPluginExtensions: 'port_security'
   NeutronPluginExtensions: 'qos,port_security,dns,dns_domain_ports'
   NeutronPortQuota: '-1'
@@ -224,7 +225,6 @@ undercloud_network_environment_args:
   NovaSchedulerDefaultFilters: ['RetryFilter', 'TripleOCapabilitiesFilter', 'ComputeCapabilitiesFilter', 'AvailabilityZoneFilter', 'RamFilter', 'DiskFilter', 'ComputeFilter', 'ImagePropertiesFilter', 'ServerGroupAntiAffinityFilter', 'ServerGroupAffinityFilter']
   NovaSchedulerMaxAttempts: 30
   SoftwareConfigTransport: POLL_SERVER_HEAT
-  StackAction: CREATE
   SwiftCeilometerPipelineEnabled: false
   SwiftCorsAllowedOrigin: '*'
   TokenExpiration: 14400

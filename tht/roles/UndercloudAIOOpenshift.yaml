@@ -15,21 +15,33 @@
     - External
     - Tenant
   ServicesDefault:
-    # FIXME: Octavia relies on Mistral and can not be deployed
-    # w/o hacks. Add octavia services for a second deploy run
-    # so self-hosted Mistral will handle new role scale out
+    - OS::TripleO::Services::Aide
+    - OS::TripleO::Services::AuditD
+    - OS::TripleO::Services::BarbicanApi
+    - OS::TripleO::Services::BarbicanBackendDogtag
+    - OS::TripleO::Services::BarbicanBackendKmip
+    - OS::TripleO::Services::BarbicanBackendPkcs11Crypto
+    - OS::TripleO::Services::BarbicanBackendSimpleCrypto
     - OS::TripleO::Services::CACerts
     - OS::TripleO::Services::CertmongerUser
     - OS::TripleO::Services::ContainersLogrotateCrond
+    - OS::TripleO::Services::DesignateApi
+    - OS::TripleO::Services::DesignateCentral
+    - OS::TripleO::Services::DesignateMDNS
+    - OS::TripleO::Services::DesignateProducer
+    - OS::TripleO::Services::DesignateSink
+    - OS::TripleO::Services::DesignateWorker
     - OS::TripleO::Services::Docker
     - OS::TripleO::Services::DockerRegistry
     - OS::TripleO::Services::GlanceApi
     - OS::TripleO::Services::HeatApi
     - OS::TripleO::Services::HeatApiCfn
+    - OS::TripleO::Services::HeatApiCloudwatch
     - OS::TripleO::Services::HeatEngine
     - OS::TripleO::Services::Iscsid
     - OS::TripleO::Services::Kernel
     - OS::TripleO::Services::Keystone
+    - OS::TripleO::Services::MasqueradeNetworks
     - OS::TripleO::Services::Memcached
     - OS::TripleO::Services::MySQL
     - OS::TripleO::Services::NeutronCorePlugin
@@ -41,11 +53,13 @@
     - OS::TripleO::Services::NovaApi
     - OS::TripleO::Services::NovaCompute
     - OS::TripleO::Services::NovaConductor
+    - OS::TripleO::Services::NovaConsoleauth
     #- OS::TripleO::Services::Novajoin
     - OS::TripleO::Services::NovaLibvirt
     - OS::TripleO::Services::NovaMetadata
     - OS::TripleO::Services::NovaPlacement
     - OS::TripleO::Services::NovaScheduler
+    - OS::TripleO::Services::NovaVncProxy
     - OS::TripleO::Services::Ntp
     - OS::TripleO::Services::OsloMessagingRpc
     - OS::TripleO::Services::OsloMessagingNotify
@@ -60,10 +74,10 @@
     - OS::TripleO::Services::CinderVolume
     - OS::TripleO::Services::HAproxy
     - OS::TripleO::Services::Keepalived
-    # Should only be re-enabled on a 2nd deploy run
-    #- OS::TripleO::Services::OctaviaApi
-    #- OS::TripleO::Services::OctaviaDeploymentConfig
-    #- OS::TripleO::Services::OctaviaHealthManager
-    #- OS::TripleO::Services::OctaviaHousekeeping
-    #- OS::TripleO::Services::OctaviaWorker
+    - OS::TripleO::Services::OctaviaApi
+    - OS::TripleO::Services::OctaviaDeploymentConfig
+    - OS::TripleO::Services::OctaviaHealthManager
+    - OS::TripleO::Services::OctaviaHousekeeping
+    - OS::TripleO::Services::OctaviaWorker
+    - OS::TripleO::Services::Zaqar
 
