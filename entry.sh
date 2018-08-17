@@ -2,114 +2,138 @@
 # Stub the given user home and ssh setup
 # Prepare to run oooq via ansible
 set -eu
+[ "${SUPERMIN_KERNEL:-}" ] || unset SUPERMIN_KERNEL
+[ "${SUPERMIN_MODULES:-}" ] || unset SUPERMIN_MODULES
+[ "${SUPERMIN_KERNEL_VERSION:-}" ] || unset SUPERMIN_KERNEL_VERSION
+[ "${CONTROLLER_HOSTS:-}" ] || unset CONTROLLER_HOSTS
+[ "${COMPUTE_HOSTS:-}" ] || unset COMPUTE_HOSTS
+[ "${OOOQ_PATH:-}" ] || unset OOOQ_PATH
+[ "${OOOQE_PATH:-}" ] || unset OOOQE_PATH
+[ "${HOST_BREXT_IP:-}" ] || unset HOST_BREXT_IP
+export PS1='$ '
 export WORKON_HOME=~/Envs
-USER=${USER:-bogdando}
-OOOQ_PATH=${OOOQ_PATH:-}
-OOOQ_FORK=${OOOQ_FORK:-openstack}
-OOOQ_BRANCH=${OOOQ_BRANCH:-master}
-OOOQE_PATH=${OOOQE_PATH:-}
-OOOQE_FORK=${OOOQE_FORK:-openstack}
-OOOQE_BRANCH=${OOOQE_BRANCH:-master}
-VPATH=${VPATH:-/Envs}
-PLAY=${PLAY:-oooq-libvirt-provision.yaml}
-WORKSPACE=${WORKSPACE:-/opt/oooq}
-LWD=${LWD:-~/.quickstart}
-TEARDOWN=${TEARDOWN:-true}
-ARGS="${@:-}"
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
+export ARGS="${@:-}"
+export STATE_ITEMS="
+id_*
+ironic*
+hosts
+ssh.*
+overcloud*
+ironic*
+*.tar*
+*.qcow2*
+undercloud*
+volume_pool.xml
+instackenv.json
+"
 
-sudo cp -f /tmp/scripts/*.sh /usr/local/sbin/ 2>/dev/null ||:
+sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null ||:
 sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
+# link the venv as quickstart --botstrap/--clean knows it
+ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
 
-sudo mkdir -p /tmp/oooq
-sudo mkdir -p ${LWD}
-sudo chown -R ${USER}:${USER} ${LWD}
-sudo mkdir -p ${WORKSPACE}
-sudo chown -R ${USER}:${USER} ${WORKSPACE}
+sudo mkdir -p "${dest}"
+for p in $(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u); do
+  [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" ] && continue
+  echo "Chowning images cache and working dirs for ${p} (may take a while)..."
+  sudo mkdir -p ${p}
+  sudo chown -R ${USER}:${USER} ${p}
+done
+
 cd $HOME
-set +u
 . /usr/bin/virtualenvwrapper.sh
 . ${VPATH}/oooq/bin/activate
-[[ "$PLAY" =~ "libvirt" ]] && (. /tmp/scripts/ssh_config)
-set -u
+[[ "$PLAY" =~ "libvirt" ]] && (. ${SCRIPTS_WORKPATH}/ssh_config)
 
 if [ -z ${OOOQ_PATH} ]; then
   # Hack into oooq dev branch
   sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart@${OOOQE_BRANCH}
-  sudo rsync -aLH /usr/config /tmp/oooq/
-  sudo rsync -aLH /usr/playbooks /tmp/oooq/
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/roles /tmp/oooq/
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/library /tmp/oooq/
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/test_plugins /tmp/oooq/
+  sudo rsync -aLH /usr/config "${dest}"
+  sudo rsync -aLH /usr/playbooks "${dest}"
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/roles "${dest}"
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/library "${dest}"
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/test_plugins "${dest}"
+elif [ "$dest" != "$OOOQ_WORKPATH" ]; then
+  # Place the local git repo under the work path
+  sudo rsync -aLH $OOOQ_WORKPATH/config "${dest}"
+  sudo rsync -aLH $OOOQ_WORKPATH/playbooks "${dest}"
+  sudo rsync -aLH $OOOQ_WORKPATH/roles "${dest}"
+  sudo rsync -aLH $OOOQ_WORKPATH/library "${dest}"
+  sudo rsync -aLH $OOOQ_WORKPATH/test_plugins "${dest}"
 fi
 
 if [ -z ${OOOQE_PATH} ]; then
   # Hack into oooq-extras dev branch
   sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
-  sudo rsync -aLH /usr/config /tmp/oooq/
-  sudo rsync -aLH /usr/playbooks /tmp/oooq/
-  sudo rsync -aLH /usr/local/share/ansible/roles /tmp/oooq/
+  sudo rsync -aLH /usr/config "${dest}"
+  sudo rsync -aLH /usr/playbooks "${dest}"
+  sudo rsync -aLH /usr/local/share/ansible/roles "${dest}"
 else
-  sudo rsync -aLH /tmp/oooq-extras/config /tmp/oooq/
-  sudo rsync -aLH /tmp/oooq-extras/playbooks /tmp/oooq/
-  sudo rsync -aLH /tmp/oooq-extras/roles /tmp/oooq/
+  # Place the local git repo under the work path
+  sudo rsync -aLH $OOOQE_WORKPATH/config "${dest}"
+  sudo rsync -aLH $OOOQE_WORKPATH/playbooks "${dest}"
+  sudo rsync -aLH $OOOQE_WORKPATH/roles "${dest}"
 fi
 
-# Restore the saved state spread across LWD/WORKSPACE dirs
-# (ssh keys/setup, inventory, kernel images)
+set +ex
+# Restore the saved state spread across LWD/WORKSPACE/IMAGECACHE dirs
+# (ssh keys/setup, inventory, kernel images et al)
 if [ "${TEARDOWN}" = "false" ]; then
-  set +ex
-  echo "Restoring state"
-  for state in 'id_rsa_undercloud' 'id_rsa_virt_power' \
-      'id_rsa_undercloud.pub' 'id_rsa_virt_power.pub' \
-      'hosts' 'ssh.config.ansible' 'ssh.config.local.ansible' \
-      'overcloud-full.vmlinuz' 'overcloud-full.initrd'; do
-    cp -uL "${WORKSPACE}/${state}" ${LWD}/ 2>/dev/null ||
-    cp -uL "${LWD}/${state}" ${WORKSPACE}/ 2>/dev/null
-  done
+  echo "Restoring state (syncing across known LWD/WORKSPACE/IMAGECACHE paths)"
+  save-state.sh sync
   sudo mkdir -p /etc/ansible
-  sudo cp -f "${LWD}/hosts" /etc/ansible/
-  cp -f "${LWD}/hosts" /tmp/oooq/
-  set -e
+  sudo cp -f "${LWD}/hosts" /etc/ansible/ 2>/dev/null
+  cp -f "${LWD}/hosts" "${dest}" 2>/dev/null
 else
   echo "Cleaning up state as TEARDOWN was requested"
-  for s in "$WORKSPACE" "$IMAGECACHE" "$LWD"; do
-    rm -f ${s}/{id_rsa,hosts,ssh.config}*
-    rm -f ${s}/*.qcow2*
-    rm -f ${s}/*.tar*
+  for s in $(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u); do
+    for i in $STATE_ITEMS; do
+      rm -f $s/$i
+    done
   done
-  rm -f /tmp/oooq/_deploy.log /tmp/oooq/_deploy_nice.log
-  if [ "${IMAGECACHEBACKUP:-}" -a "${TEARDOWN}" != "false" ]; then
+  rm -f "${dest}"_deploy.log "${dest}"_deploy_nice.log
+  if [ "${IMAGECACHEBACKUP:-}" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
     cp -af ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
-    if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then
-      echo "Symlinking the latest undercloud images from restored md5 hashes"
-      iname=$(cat ${IMAGECACHE}/undercloud.qcow2.md5 | awk '{print $1}')
-      ln -f ${IMAGECACHE}/undercloud.qcow2 ${IMAGECACHE}/${iname}.qcow2
-      ln -sf ${IMAGECACHE}/${iname}.qcow2 ${IMAGECACHE}/latest-undercloud.qcow2
-    fi
-    if [ -f ${IMAGECACHE}/overcloud-full.tar -a -f ${IMAGECACHE}/overcloud-full.tar.md5 ]; then
-      echo "Symlinking the latest overcloud images from restored md5 hashes"
-      iname=$(cat ${IMAGECACHE}/overcloud-full.tar.md5 | awk '{print $1}')
-      ln -f ${IMAGECACHE}/overcloud-full.tar ${IMAGECACHE}/${iname}.tar
-      ln -sf ${IMAGECACHE}/${iname}.tar ${IMAGECACHE}/latest-overcloud-full.tar
-    fi
-    if [ -f ${IMAGECACHE}/ironic-python-agent.tar -a -f ${IMAGECACHE}/ironic-python-agent.tar.md5 ]; then
-      echo "Symlinking the latest ipa images from restored md5 hashes"
-      iname=$(cat ${IMAGECACHE}/ironic-python-agent.tar.md5 | awk '{print $1}')
-      ln -f ${IMAGECACHE}/ironic-python-agent.tar ${IMAGECACHE}/${iname}.tar
-      ln -sf ${IMAGECACHE}/${iname}.tar ${IMAGECACHE}/latest-ipa_images.tar
-    fi
-    centos_latest=$(find ${IMAGECACHEBACKUP} -type f -regextype posix-extended -regex "\/opt\/cache\.bak\/[^liou].*")
-    if [ "$centos_latest" ]; then
-      echo "Symlinking the latest centos image from restored md5 hashes"
-      centos_latest=${centos_latest##*/}
-      ln -sf ${IMAGECACHE}/${centos_latest} ${IMAGECACHE}/latest-centos.qcow2
-    fi
   fi
 fi
 
+# Regenerate the latest-* images from the existing state
+if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then
+  echo "Symlinking the latest undercloud images from restored md5 hashes"
+  iname=$(cat ${IMAGECACHE}/undercloud.qcow2.md5 | awk '{print $1}')
+  ln -f ${IMAGECACHE}/undercloud.qcow2 ${IMAGECACHE}/${iname}.qcow2
+  ln -sf ${IMAGECACHE}/${iname}.qcow2 ${IMAGECACHE}/latest-undercloud.qcow2
+fi
+if [ -f ${IMAGECACHE}/overcloud-full.tar -a -f ${IMAGECACHE}/overcloud-full.tar.md5 ]; then
+  echo "Symlinking the latest overcloud images from restored md5 hashes"
+  iname=$(cat ${IMAGECACHE}/overcloud-full.tar.md5 | awk '{print $1}')
+  ln -f ${IMAGECACHE}/overcloud-full.tar ${IMAGECACHE}/${iname}.tar
+  ln -sf ${IMAGECACHE}/${iname}.tar ${IMAGECACHE}/latest-overcloud-full.tar
+fi
+if [ -f ${IMAGECACHE}/ironic-python-agent.tar -a -f ${IMAGECACHE}/ironic-python-agent.tar.md5 ]; then
+  echo "Symlinking the latest ipa images from restored md5 hashes"
+  iname=$(cat ${IMAGECACHE}/ironic-python-agent.tar.md5 | awk '{print $1}')
+  ln -f ${IMAGECACHE}/ironic-python-agent.tar ${IMAGECACHE}/${iname}.tar
+  ln -sf ${IMAGECACHE}/${iname}.tar ${IMAGECACHE}/latest-ipa_images.tar
+fi
+
+# FIXME: better processing than having IMAGECACHEBACKUP=/opt/cache.back hardcoded?
+if [ "${IMAGECACHEBACKUP:-}" ]; then
+  centos_latest=$(find ${IMAGECACHEBACKUP} -type f -regextype posix-extended -regex "\/opt\/cache\.bak\/[^liou].*")
+  if [ "$centos_latest" ]; then
+    echo "Symlinking the latest centos image from restored md5 hashes"
+    centos_latest=${centos_latest##*/}
+    ln -sf ${IMAGECACHE}/${centos_latest} ${IMAGECACHE}/latest-centos.qcow2
+  fi
+fi
+# Silent sync for the regenerated hardlinks
+save-state.sh sync 2>&1 > /dev/null
+
 if [[ "$TERMOPTS" =~ "t" ]]; then
-cd /tmp/oooq
+cd "${dest}"
   echo Note: ansible virthost is now localhost
   echo export PLAY=oooq-libvirt-provision.yaml to bootstrap undercloud and generate inventory - default
   echo export PLAY=oooq-libvirt-provision-build.yaml if you plan to continue with overcloud deployments
@@ -123,7 +147,14 @@ cd /tmp/oooq
   echo ================================================================================================
   echo export CUSTOMVARS=path/file.yaml to override default '-e @custom.yaml' with it
   echo Run create_env_oooq.sh added optional args, to either provision or to deploy on top!
+  echo Or use quickstart.sh as usual - that requires manual saving for any produced state,
+  echo "like 'save-state.sh sync' or 'save-state.sh \$LWD/\$WORKSPACE/\$IMAGECACHE'"
   /bin/bash
 else
-  create_env_oooq.sh $ARGS
+  if [ "$USE_QUICKSTART_WRAP" = "false" ]; then
+    create_env_oooq.sh $ARGS
+  else
+    quickstart.sh --install-deps
+    quickstart.sh $ARGS
+  fi
 fi

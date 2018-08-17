@@ -2,6 +2,7 @@
 # Wrap OS of the given active user with the centos7 box and oooq
 set -uxe
 
+# Internal env vars, only used to run a container wrapper
 DEV=${DEV:-/dev/sda}
 IOPSW=${IOPSW:-0}
 IOPSR=${IOPSR:-0}
@@ -10,37 +11,102 @@ IOR=${IOR:-0}
 CPU=${CPU:-0}
 MEM=${MEM:-0}
 
-# defaults
+# Defines global env defaults in the wrapper container
+RAMFS=${RAMFS:-false}
 TERMOPTS=${TERMOPTS:--it}
 TEARDOWN=${TEARDOWN:-true}
+# non_root_user et al
 USER=${USER:-bogdando}
+# Known paths to bind-mount git repos (to clone or pick up from a local path)
 OOOQE_BRANCH=${OOOQE_BRANCH:-master}
 OOOQE_FORK=${OOOQE_FORK:-openstack}
-OOOQE_PATH=${OOOQE_PATH:-}
 OOOQ_BRANCH=${OOOQ_BRANCH:-master}
 OOOQ_FORK=${OOOQ_FORK:-openstack}
-OOOQ_PATH=${OOOQ_PATH:-}
+# oooq venv pre-created in the container
 VPATH=${VPATH:-/home/${USER}/Envs}
-WORKSPACE=${WORKSPACE:-/tmp/qs}
-LWD=${LWD:-/home/${USER}/.quickstart}
+# local_working_dir
+LWD=${LWD:-$VPATH/oooq}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
-CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-""}
-COMPUTE_HOSTS=${COMPUTE_HOSTS:-""}
-SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
+SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
+# Known work paths inside of the container
+OOOQ_WORKPATH=/tmp/oooq
+OOOQE_WORKPATH=/tmp/oooq-extras
+SCRIPTS_WORKPATH=/tmp/scripts
+USE_QUICKSTART_WRAP=false
 
-if [ "${OOOQE_PATH}" ]; then
-  MOUNT_EXTRAS="-v ${OOOQE_PATH}:/tmp/oooq-extras"
-  OOOQE_PATH=/tmp/oooq-extras
+set +x
+uid=$(id -u $USER)
+gid=$(id -g $USER)
+host_libvirt_gid=$(cut -d: -f3 <(getent group libvirt))
+
+if [ "$LWD" = "${VPATH}/oooq" ]; then
+  dest=$LWD
+else
+  dest=$OOOQ_WORKPATH
 fi
-if [ "${OOOQ_PATH}" ]; then
-  MOUNT_QUICKSTART="-v ${OOOQ_PATH}:/tmp/oooq"
-  OOOQ_PATH=/tmp/oooq
+
+if [ "${OOOQE_PATH:-}" -a -d "${OOOQE_PATH:-/tmp}" ]; then
+  MOUNT_EXTRAS="-v ${OOOQE_PATH}:${OOOQE_WORKPATH}"
+  OOOQE_PATH=$OOOQE_WORKPATH
 fi
-if [ "${IMAGECACHEBACKUP:-}" ]; then
+
+if [ "${OOOQ_PATH:-}" -a -d "${OOOQ_PATH:-/tmp}" ]; then
+  MOUNT_QUICKSTART="-v ${OOOQ_PATH}:${OOOQ_WORKPATH}"
+  OOOQ_PATH=$OOOQ_WORKPATH
+fi
+
+if [ "${IMAGECACHEBACKUP:-}" -a -d "${IMAGECACHEBACKUP:-/tmp}" ]; then
   MOUNT_IMAGECACHEBACKUP="-v ${IMAGECACHEBACKUP}:${IMAGECACHEBACKUP}:ro"
 fi
+
+if [ "${RAMFS}" = "true" ]; then
+  echo "Using ephemeral /tmp/qs for images cache stored in RAM."
+  echo "WARNING: With RAMFS=true, it may eat a lot of memory, USE WITH CAUTION!"
+  echo
+  echo "If you want an environment persisted after the container exited/node rebooted,"
+  echo "use an existing (non /tmp) host path for at least WORKSPACE or LWD."
+  echo "and save the env state by either of those real host paths."
+  echo "The saved state will be auto-picked up by the entry point, when starting new container."
+  echo
+  IMAGECACHE=${IMAGECACHE:-/var/tmp}
+  MOUNT_IMAGECACHE="-v /tmp/qs:/var/tmp"
+elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" ]; then
+  MOUNT_IMAGECACHE="-v ${IMAGECACHE}:${IMAGECACHE}"
+else
+  echo "Not bind-mounting IMAGECACHE ${IMAGECACHE:-}"
+  IMAGECACHE=/home/$USER
+  echo "Using ephemeral IMAGECACHE ${IMAGECACHE} instead"
+fi
+
+if [ "${LWD}" -a -d "${LWD}" -a "${LWD}" != "/home/$USER" ]; then
+  MOUNT_LWD="-v ${LWD}:${LWD}"
+else
+  echo "Not bind-mounting local working dir LWD ${LWD}"
+  echo "NOTE: it cannot take the current user's \$HOME path"
+  LWD="${VPATH}/oooq"
+  echo "Using ephemeral LWD ${LWD} instead"
+  echo
+fi
+
+if [ "${WORKSPACE:-}" -a -d "${WORKSPACE:-/tmp}" -a "${WORKSPACE:-}" != "/home/$USER" ]; then
+  MOUNT_WORKSPACE="-v ${WORKSPACE}:${WORKSPACE}"
+else
+  echo "Not bind-mounting working dir WORKSPACE ${WORKSPACE:-}"
+  echo "NOTE: it cannot take the current user's \$HOME path"
+  WORKSPACE=/home/$USER
+  echo "Using ephemeral WORKSPACE $WORKSPACE instead"
+  echo
+fi
+
+if [ "${MOUNT_IMAGECACHE:-}${MOUNT_LWD:-}${MOUNT_WORKSPACE:-}" = "-v /tmp/qs:/var/tmp" ]; then
+  echo "WARNING: Provisioned libvirt VMs may fail to start, if the node rebooted!"
+  echo "If you want BMs persistent across reboots, specify at least any of WORKSPACE/LWD"
+  echo "as existing host path or set RAMFS=false."
+  echo
+fi
+set -x
 
 docker run ${TERMOPTS} --rm --privileged \
   --device-read-bps=${DEV}:${IOR} \
@@ -50,53 +116,59 @@ docker run ${TERMOPTS} --rm --privileged \
   --cpus=4 --cpu-shares=${CPU} \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
+  -e PATH="${OOOQ_WORKPATH}:${LWD}:${PATH}" \
   -e USER=${USER} \
   -e PLAY=${PLAY} \
   -e WORKSPACE=${WORKSPACE} \
   -e LWD=${LWD} \
-  -e IMAGECACHE=${IMAGECACHE} \
+  -e IMAGECACHE=${IMAGECACHE:-} \
   -e IMAGECACHEBACKUP=${IMAGECACHEBACKUP:-} \
   -e OOOQ_PATH=${OOOQ_PATH:-} \
   -e OOOQE_PATH=${OOOQE_PATH:-} \
   -e VPATH=${VPATH} \
   -e HOME=/home/${USER} \
   -e TEARDOWN=${TEARDOWN} \
-  -e VIRTUALENVWRAPPER_PYTHON=/usr/bin/python \
   -e OOOQE_BRANCH=${OOOQE_BRANCH} \
   -e OOOQE_FORK=${OOOQE_FORK} \
-  -e CONTROLLER_HOSTS=${CONTROLLER_HOSTS} \
-  -e COMPUTE_HOSTS=${COMPUTE_HOSTS} \
+  -e CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-} \
+  -e COMPUTE_HOSTS=${COMPUTE_HOSTS:-} \
   -e SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY} \
   -e CUSTOMVARS=${CUSTOMVARS} \
   -e LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND} \
   -e SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-} \
   -e SUPERMIN_MODULES=${SUPERMIN_MODULES:-} \
   -e SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-} \
-  -e OOOQ_DIR=/tmp/oooq \
-  -e OPT_WORKDIR=/tmp/oooq \
+  -e dest=${dest} \
   -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
   -e TERMOPTS=${TERMOPTS} \
-  -v /opt/vm_images/:/opt/vm_images/ \
+  -e SCRIPTS_WORKPATH=${SCRIPTS_WORKPATH} \
+  -e OOOQ_WORKPATH=/tmp/oooq \
+  -e OOOQE_WORKPATH=/tmp/oooq-extras \
+  -e LOG_LEVEL=${LOG_LEVEL:--v} \
+  -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
+  -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
+  -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /etc/libvirt/libvirtd.conf:/etc/libvirt/libvirtd.conf:ro \
   -v /dev:/dev \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /lib/modules:/lib/modules:ro \
-  -v ${IMAGECACHE}:${IMAGECACHE} \
+  ${MOUNT_IMAGECACHE:-} \
   ${MOUNT_QUICKSTART:-} \
   ${MOUNT_EXTRAS:-} \
   ${MOUNT_IMAGECACHEBACKUP:-} \
-  -v $(pwd)/ansible.cfg:/tmp/oooq/ansible.cfg:ro \
-  -v $(pwd)/entry.sh:/usr/local/sbin/entry.sh:ro \
-  -v ${WORKSPACE}:${WORKSPACE} \
-  -v ${LWD}:$LWD \
+  ${MOUNT_WORKSPACE:-} \
+  ${MOUNT_LWD:-} \
+  -v ${PWD}/ansible.cfg:${dest}/ansible.cfg:ro \
+  -v ${PWD}/entry.sh:/usr/local/sbin/entry.sh:ro \
+  -v ${PWD}/save-state.sh:/usr/local/sbin/save-state.sh:ro \
   -v /home/${USER}/.ssh/authorized_keys:/tmp/.ssh/authorized_keys \
-  -v $(pwd):/tmp/scripts:ro \
+  -v ${PWD}:${SCRIPTS_WORKPATH}:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
   -v /boot:/boot:ro \
-  -u $(id -u $USER):$(id -g $USER) --group-add $(cut -d: -f3 <(getent group libvirt)) \
+  -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
   --entrypoint /usr/local/sbin/entry.sh \
   --name runner bogdando/oooq-runner:0.1 \
   ${@:-}
