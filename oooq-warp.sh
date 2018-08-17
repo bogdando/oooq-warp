@@ -79,6 +79,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v /opt/vm_images/:/opt/vm_images/ \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
+  -v /etc/libvirt/libvirtd.conf:/etc/libvirt/libvirtd.conf:ro \
   -v /dev:/dev \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /lib/modules:/lib/modules:ro \
@@ -95,7 +96,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
   -v /boot:/boot:ro \
-  -u $(id -u $USER):$(id -g $USER) \
+  -u $(id -u $USER):$(id -g $USER) --group-add $(cut -d: -f3 <(getent group libvirt)) \
   --entrypoint /usr/local/sbin/entry.sh \
   --name runner bogdando/oooq-runner:0.1 \
   ${@:-}
