@@ -30,3 +30,4 @@ libvirt_volume_path: /var/lib/libvirt/images
 libvirt_domain_type: kvm
 
 modify_image_vc_root_password: r00tme
+enable_port_forward_for_tripleo_ui: false
