@@ -20,14 +20,20 @@ cmd=${1:---sync}
 if [ "${cmd}" = "--sync" ]; then
   echo "Syncing state (only update with newer files) across known paths"
   for state in $STATE_ITEMS; do
-    echo "Sync ${state} working_dir -> local_working_dir"
-    rsync -qauxH $WORKSPACE/$state ${LWD}/
-    echo "Sync ${state} image_cache_dir -> local_working_dir"
-    rsync -qauxH $IMAGECACHE/$state ${LWD}/
-    echo "Sync ${state} local_working_dir -> image_cache_dir"
-    rsync -qauxH $LWD/$state ${IMAGECACHE}/
-    echo "Sync ${state} local_working_dir -> working_dir"
-    rsync -qauxH $LWD/$state ${WORKSPACE}/
+    if [ "$WORKSPACE" != "$LWD" ]; then
+      echo "Sync ${state} working_dir -> local_working_dir"
+      rsync -qauxH $WORKSPACE/$state ${LWD}/
+    fi
+    if [ "$IMAGECACHE" != "$LWD" ]; then
+      echo "Sync ${state} image_cache_dir -> local_working_dir"
+      rsync -qauxH $IMAGECACHE/$state ${LWD}/
+      echo "Sync ${state} local_working_dir -> image_cache_dir"
+      rsync -qauxH $LWD/$state ${IMAGECACHE}/
+    fi
+    if [ "$WORKSPACE" != "$LWD" ]; then
+      echo "Sync ${state} local_working_dir -> working_dir"
+      rsync -qauxH $LWD/$state ${WORKSPACE}/
+    fi
   done
   chmod 600 ${LWD}/id_*
   chmod 600 ${WORKSPACE}/id_*
