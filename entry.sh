@@ -17,10 +17,10 @@ export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
 export ARGS="${@:-}"
 sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null ||:
 sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
-# link the venv as quickstart --botstrap/--clean knows it
-ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
-
 sudo mkdir -p "${dest}"
+# FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
+ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
+ln -sf ${VPATH}/oooq/* "${dest}/"
 for p in $(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u); do
   [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" ] && continue
   echo "Chowning images cache and working dirs for ${p} (may take a while)..."
