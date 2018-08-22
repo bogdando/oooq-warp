@@ -15,20 +15,6 @@ export WORKON_HOME=~/Envs
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
 export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
 export ARGS="${@:-}"
-export STATE_ITEMS="
-id_*
-ironic*
-hosts
-ssh.*
-overcloud*
-ironic*
-*.tar*
-*.qcow2*
-undercloud*
-volume_pool.xml
-instackenv.json
-"
-
 sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null ||:
 sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
 # link the venv as quickstart --botstrap/--clean knows it
@@ -82,17 +68,13 @@ set +ex
 # (ssh keys/setup, inventory, kernel images et al)
 if [ "${TEARDOWN}" = "false" ]; then
   echo "Restoring state (syncing across known LWD/WORKSPACE/IMAGECACHE paths)"
-  save-state.sh sync
+  save-state.sh --sync
   sudo mkdir -p /etc/ansible
   sudo cp -f "${LWD}/hosts" /etc/ansible/ 2>/dev/null
   cp -f "${LWD}/hosts" "${dest}" 2>/dev/null
 else
   echo "Cleaning up state as TEARDOWN was requested"
-  for s in $(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u); do
-    for i in $STATE_ITEMS; do
-      rm -f $s/$i
-    done
-  done
+  save-state.sh --purge
   rm -f "${dest}"_deploy.log "${dest}"_deploy_nice.log
   if [ "${IMAGECACHEBACKUP:-}" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
@@ -130,7 +112,7 @@ if [ "${IMAGECACHEBACKUP:-}" ]; then
   fi
 fi
 # Silent sync for the regenerated hardlinks
-save-state.sh sync 2>&1 > /dev/null
+save-state.sh --sync 2>&1 > /dev/null
 
 if [[ "$TERMOPTS" =~ "t" ]]; then
 cd "${dest}"
@@ -147,8 +129,10 @@ cd "${dest}"
   echo ================================================================================================
   echo export CUSTOMVARS=path/file.yaml to override default '-e @custom.yaml' with it
   echo Run create_env_oooq.sh added optional args, to either provision or to deploy on top!
+  echo ================================================================================================
   echo Or use quickstart.sh as usual - that requires manual saving for any produced state,
-  echo "like 'save-state.sh sync' or 'save-state.sh \$LWD/\$WORKSPACE/\$IMAGECACHE'"
+  echo "like 'save-state.sh --sync' or 'save-state.sh \$LWD/\$WORKSPACE/\$IMAGECACHE'"
+  echo "Use 'save-state.sh --purge' to nuke all the saved quickstart state but in \$IMAGECACHEBACKUP"
   /bin/bash
 else
   if [ "$USE_QUICKSTART_WRAP" = "false" ]; then

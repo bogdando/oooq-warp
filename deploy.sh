@@ -29,7 +29,7 @@ function with_ansible {
 # A tricky sync for the state spread across LWD/WORKSPACE
 function finalize {
   set +e
-  save-state.sh sync
+  save-state.sh --sync
   set -e
   # results|message|msg|get_xml|std\w+ get line-wrapped nicely
   # item|cmd|end|start|failed|rc|delta left intact but its own quotes stripped off
