@@ -64,10 +64,11 @@ if [ "${RAMFS}" = "true" ]; then
   echo
   IMAGECACHE=/var/cache/tripleo-quickstart/images
   MOUNT_IMAGECACHE="-v /tmp/qs:${IMAGECACHE}"
-elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" ]; then
+elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" -a "${IMAGECACHE:-}" != "/home/$USER" ]; then
   MOUNT_IMAGECACHE="-v ${IMAGECACHE}:/var/cache/tripleo-quickstart/images"
 else
   echo "Not bind-mounting IMAGECACHE ${IMAGECACHE:-}"
+  echo "NOTE: it cannot take the current user's \$HOME path"
   IMAGECACHE=/home/$USER
   echo "Using ephemeral IMAGECACHE ${IMAGECACHE} instead"
   echo
