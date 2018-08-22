@@ -70,13 +70,13 @@ if [ "${RAMFS}" = "true" ]; then
   echo "and save the env state by either of those real host paths."
   echo "The saved state will be auto-picked up by the entry point, when starting new container."
   echo
-  IMAGECACHE=${IMAGECACHE:-/var/tmp}
-  MOUNT_IMAGECACHE="-v /tmp/qs:/var/tmp"
+  IMAGECACHE=/var/cache/tripleo-quickstart/images
+  MOUNT_IMAGECACHE="-v /tmp/qs:${IMAGECACHE}"
 elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" ]; then
-  MOUNT_IMAGECACHE="-v ${IMAGECACHE}:${IMAGECACHE}"
+  MOUNT_IMAGECACHE="-v ${IMAGECACHE}:/var/cache/tripleo-quickstart/images"
 else
   echo "Not bind-mounting IMAGECACHE ${IMAGECACHE:-}"
-  IMAGECACHE=/home/$USER
+  IMAGECACHE="${VPATH}/oooq"
   echo "Using ephemeral IMAGECACHE ${IMAGECACHE} instead"
 fi
 
@@ -121,7 +121,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e PLAY=${PLAY} \
   -e WORKSPACE=${WORKSPACE} \
   -e LWD=${LWD} \
-  -e IMAGECACHE=${IMAGECACHE:-} \
+  -e IMAGECACHE=${IMAGECACHE} \
   -e IMAGECACHEBACKUP=${IMAGECACHEBACKUP:-} \
   -e OOOQ_PATH=${OOOQ_PATH:-} \
   -e OOOQE_PATH=${OOOQE_PATH:-} \
