@@ -24,8 +24,6 @@ OOOQ_BRANCH=${OOOQ_BRANCH:-master}
 OOOQ_FORK=${OOOQ_FORK:-openstack}
 # oooq venv pre-created in the container
 VPATH=${VPATH:-/home/${USER}/Envs}
-# local_working_dir
-LWD=${LWD:-$VPATH/oooq}
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
@@ -40,12 +38,6 @@ set +x
 uid=$(id -u $USER)
 gid=$(id -g $USER)
 host_libvirt_gid=$(cut -d: -f3 <(getent group libvirt))
-
-if [ "$LWD" = "${VPATH}/oooq" ]; then
-  dest=$LWD
-else
-  dest=$OOOQ_WORKPATH
-fi
 
 if [ "${OOOQE_PATH:-}" -a -d "${OOOQE_PATH:-/tmp}" ]; then
   MOUNT_EXTRAS="-v ${OOOQE_PATH}:${OOOQE_WORKPATH}"
@@ -76,16 +68,17 @@ elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" ]; then
   MOUNT_IMAGECACHE="-v ${IMAGECACHE}:/var/cache/tripleo-quickstart/images"
 else
   echo "Not bind-mounting IMAGECACHE ${IMAGECACHE:-}"
-  IMAGECACHE="${VPATH}/oooq"
+  IMAGECACHE=/home/$USER
   echo "Using ephemeral IMAGECACHE ${IMAGECACHE} instead"
+  echo
 fi
 
-if [ "${LWD}" -a -d "${LWD}" -a "${LWD}" != "/home/$USER" ]; then
+if [ "${LWD:-}" -a -d "${LWD:-/tmp}" -a "${LWD:-}" != "/home/$USER" ]; then
   MOUNT_LWD="-v ${LWD}:${LWD}"
 else
-  echo "Not bind-mounting local working dir LWD ${LWD}"
+  echo "Not bind-mounting local working dir LWD ${LWD:-}"
   echo "NOTE: it cannot take the current user's \$HOME path"
-  LWD="${VPATH}/oooq"
+  LWD=/home/$USER
   echo "Using ephemeral LWD ${LWD} instead"
   echo
 fi
@@ -105,6 +98,13 @@ if [ "${MOUNT_IMAGECACHE:-}${MOUNT_LWD:-}${MOUNT_WORKSPACE:-}" = "-v /tmp/qs:/va
   echo "If you want BMs persistent across reboots, specify at least any of WORKSPACE/LWD"
   echo "as existing host path or set RAMFS=false."
   echo
+fi
+
+# FIXME: May be I can always use the first case?
+if [ "${LWD:-}" = "/home/$USER" ]; then
+  dest=$LWD
+else
+  dest=$OOOQ_WORKPATH
 fi
 set -x
 
@@ -142,8 +142,8 @@ docker run ${TERMOPTS} --rm --privileged \
   -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
   -e TERMOPTS=${TERMOPTS} \
   -e SCRIPTS_WORKPATH=${SCRIPTS_WORKPATH} \
-  -e OOOQ_WORKPATH=/tmp/oooq \
-  -e OOOQE_WORKPATH=/tmp/oooq-extras \
+  -e OOOQ_WORKPATH=${OOOQ_WORKPATH} \
+  -e OOOQE_WORKPATH=${OOOQE_WORKPATH} \
   -e LOG_LEVEL=${LOG_LEVEL:--v} \
   -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
   -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
