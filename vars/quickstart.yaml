@@ -27,10 +27,8 @@ non_root_chown: false
 # May be overrided
 virthost_nameservers: 8.8.8.8
 undercloud_enable_validations: false
-default_disk: 20
 undercloud_disk: 30
 undercloud_vcpu: 3
-default_memory: 4096
 undercloud_memory: 12288
 modify_image_vc_root_password: r00tme
 enable_port_forward_for_tripleo_ui: false
@@ -38,5 +36,19 @@ libvirt_cpu_mode: host-passthrough
 libvirt_volume_pool: default
 libvirt_domain_type: kvm
 
-# This needs to be common defaults in oooq prolly!
-step_overcloud_prep_flavors: true
+# https://bugs.launchpad.net/tripleo/+bug/1788875
+# path B: map to fit to that UC post install creates
+# and disable generation of oooq_* flavors
+flavor_map:
+  control: control
+  compute: compute
+  ceph: ceph-storage
+  block: block-storage
+  blockstorage: block-storage
+  swift: swift-storage
+  swiftstorage: swift-storage
+  baremetal: baremetal
+step_overcloud_prep_flavors: false
+default_disk: 41
+default_vcpu: 1
+default_memory: 4096
