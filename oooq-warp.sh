@@ -79,26 +79,26 @@ elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" -a "${IMAGECACHE:-}" != "/h
 else
   echo "Not bind-mounting IMAGECACHE ${IMAGECACHE:-}"
   echo "NOTE: it cannot take the current user's \$HOME path"
-  IMAGECACHE=/home/$USER
+  IMAGECACHE=/var/cache/tripleo-quickstart/images
   echo "Using ephemeral IMAGECACHE ${IMAGECACHE} instead"
   echo
 fi
 
-if [ "${LWD:-}" -a -d "${LWD:-/tmp}" -a "${LWD:-}" != "/home/$USER" ]; then
+if [ "${LWD:-}" -a -d "${LWD:-/tmp}" -a "${LWD:-}" != "/home/$USER" -a "${LWD:-}" != "$IMAGECACHE" ]; then
   MOUNT_LWD="-v ${LWD}:${LWD}"
 else
   echo "Not bind-mounting local working dir LWD ${LWD:-}"
-  echo "NOTE: it cannot take the current user's \$HOME path"
+  echo "NOTE: it cannot take the current user's \$HOME path or share IMAGECACHE dir"
   LWD=/home/$USER
   echo "Using ephemeral LWD ${LWD} instead"
   echo
 fi
 
-if [ "${WORKSPACE:-}" -a -d "${WORKSPACE:-/tmp}" -a "${WORKSPACE:-}" != "/home/$USER" ]; then
+if [ "${WORKSPACE:-}" -a -d "${WORKSPACE:-/tmp}" -a "${WORKSPACE:-}" != "/home/$USER" -a "${WORKSPACE:-}" != "$IMAGECACHE" ]; then
   MOUNT_WORKSPACE="-v ${WORKSPACE}:${WORKSPACE}"
 else
   echo "Not bind-mounting working dir WORKSPACE ${WORKSPACE:-}"
-  echo "NOTE: it cannot take the current user's \$HOME path"
+  echo "NOTE: it cannot take the current user's \$HOME path or share IMAGECACHE dir"
   WORKSPACE=/home/$USER
   echo "Using ephemeral WORKSPACE $WORKSPACE instead"
   echo
