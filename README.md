@@ -4,9 +4,6 @@ A wrapper centos7 container that makes
 [Quickstart](https://git.openstack.org/cgit/openstack/tripleo-quickstart)
 thinking it's running at centos box.
 
-Some of the included example playbooks omit build/provision steps
-executed by default, when operated via ``quickstart.sh``.
-
 It also helps to use the quickstart/extras playbooks off-road, via direct
 ansible-playbook commands. And sometimes it works like a warp jump!
 
@@ -21,7 +18,7 @@ on openstack clouds and
 * Libvirt, qemu-kvm, libguestfs (latest perhaps?) with HW access/nested
   virtualization enabled, for local deployments only.
 
-For non local (traas) deployments:
+For openstack clouds hosted deployments:
 * OpenStack cloud >= Ocata with Heat.
 * OpenStack client installed locally.
 * OpenStack creds file and pem/pub key files to access the hosting cloud.
@@ -34,37 +31,54 @@ For non local (traas) deployments:
 $ packer build packer-docker-centos7.json
 $ packer build packer-docker-oooq-runner.json
 ```
-Note, adapt those for your case or jut use existing images. It also requires
+Adapt these for your case or jut use existing images. It also requires
 ``OOOQ_PATH`` set and pointing to the quickstart clonned locally.
 
 ## Pre-flight checks for a warp jump
 
 To start a scratch local dev env with libvirt and kvm:
 
-* Download the overcloud-full, undercloud and ironic-python-agent images and md5
-  files into ``IMAGECACHE``.
+Download the overcloud-full, undercloud and ironic-python-agent images and md5
+files into ``IMAGECACHE``. Or omit that step if you want quickstart do that
+for you based on the given ``dlrn_hash_tag``.
 
-  > **NOTE**: Backup those for future re-provision runs in ``${IMAGECACHEBACKUP}``!
-  > Quickstart mutates qcow2 files in-place. You may want to preserve the
-  > original images for future deployments.
+> **NOTE**: Backup those for future re-provision runs in ``${IMAGECACHEBACKUP}``!
+> You may want to preserve the original images for future deployments.
 
-  For libvirt dev envs, pick any of these sources:
-  * [The most recent, the less stable](https://images.rdoproject.org/master/delorean/current-tripleo/),
-    for hardcore devs
-  * [(Non HTTPS link!) more stable and older images](http://artifacts.ci.centos.org/rdo/images/master/delorean/consistent/),
-    it is also the default OOOQ choice ([HTTPS mirror](https://images.rdoproject.org/master/delorean/consistent/)).
-  * [The one](https://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/master/delorean/) from the
-    [Docs](https://tripleo.org/basic_deployment/basic_deployment_cli.html).
+Pick any of these sources:
 
-  When using ``overcloud_as_undercloud``, you may omit downloading the
-  `undercloud.qcow2` image.
+* [The most recent, the less stable](https://images.rdoproject.org/master/delorean/current-tripleo/),
+  for hardcore devs
+* [(Non HTTPS link!) more stable and older images](http://artifacts.ci.centos.org/rdo/images/master/delorean/consistent/),
+  it is also the default OOOQ choice ([HTTPS mirror](https://images.rdoproject.org/master/delorean/consistent/)).
+* [The one](https://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/master/delorean/) from the
+  [Docs](https://tripleo.org/basic_deployment/basic_deployment_cli.html).
 
-* Customize and export some env vars, for example:
+When using ``overcloud_as_undercloud``, you may omit downloading the
+`undercloud.qcow2` image.
+
+## Libvirt virthost preparations
+
+* Prepare host for nested kvm and do some sysctl magic:
   ```
-  $ export USER=bogdando # used as undercloud/overcloud SSH user as well
-  $ export WORKSPACE=/var/tmp/qs   #persisted on host, libvirt revers to it
-  $ export IMAGECACHE=/opt/cache   #persistent on host
-  $ export LWD=${HOME}/.quickstart #persistent on host, may be equal to WORKSPACE
+  # echo "options kvm_intel nested=1" > /etc/modprobe.d/kvm-nested.conf
+  # modprobe -r kvm_intel
+  # modprobe kvm_intel
+  # cat /sys/module/kvm_intel/parameters/nested
+  # export LIBGUESTFS_BACKEND_SETTINGS=network_bridge=virbr0
+  # export HOST_BREXT_IP=192.168.23.1 # should be real IP of virbr0
+  ```
+
+## Environment configuration basics
+
+* Customize and export some additional env-specific vars, for example:
+
+  ```
+  $ export TEARDOWN=true # start a scratch environment, rebuild images, regen ssh keys.
+  $ export USER=bogdando # undercloud/overcloud/SSH-admin/local virthost user
+  $ export WORKSPACE=/tmp # must exist on the virthost and UC VM, libvirt revers to it
+  $ export IMAGECACHE=/opt/cache # should exist on the virthost for persistent deployments
+  $ export LWD=${HOME}/.quickstart # should exist on the virthost, may be equal to WORKSPACE
   $ export OOOQE_BRANCH=dev
   $ export OOOQE_FORK=johndoe
   $ export OOOQ_BRANCH=dev
@@ -72,6 +86,76 @@ To start a scratch local dev env with libvirt and kvm:
   ```
   Or use ``OOOQE_PATH`` and/or ``OOOQ_PATH``, if you already have then clonned
   somewhere locally.
+
+> **NOTE** If you chose ``RAMFS=true`` or non existing virthost paths, some/all
+> of the WORKSPACE/IMAGECACHE/LWD paths may be ignored and become ephemeral
+> (like the container run time only) ``/home/$USER`` and/or bind-mounted via
+> ``/tmp`` host-path.  This speeds up provisioning steps, but eats a lot of RAM.
+> Also note, using the current user home is not allowed for these paths,
+> assuming the virthost is not a disbosable/throw-away host and logged in user
+> should be affected by potentially destructive teardown actions.
+
+* Start an interactive wrapper-container session:
+  ```
+  $ ./oooq-warp.sh
+  ```
+  See also non-interactive mode explained below.
+
+At this point, the content of ``IMAGECACHEBACKUP`` will be recovered by
+the ``IMAGECACHE`` path, and `latest-` sylinks will be auto-regenereted for
+future quickstart provisioning playbooks use.
+
+If you requested teardown and **really** want to nuke everything and fetch the
+new images, run ``save-state.sh --purge``.
+
+## Quickstart CLI wrapper (quickstart.sh)
+
+Use the ``quickstart.sh`` wrapper as usual but in the wrapper container. For example,
+using localhost as virthost and privileged libvirt mode:
+```
+(oooq) quickstart.sh -R master -e dlrn_hash_tag=current-tripleo --no-clone \
+         -N config/nodes/1ctlr_1comp.yml \
+         -E config/environments/dev_privileged_libvirt.yml \
+         -E /var/tmp/scripts/vars/quickstart.yaml \
+         -t all -T all localhost
+```
+Save the produced state with the ``save-state.sh --sync`` wrapper.
+
+> **NOTE** It is an important step to keep the disconnected working dirs and image caches
+> content in sync.
+
+## Reprovisioning quickly (warp! warp! warp!)
+
+To reprovision with the cached images, add the original command:
+```
+-E /var/tmp/scripts/vars/quickstart-cached-images.yaml -T none
+```
+
+> **FIXME**  It always stops the halfway of provisioning currently, as you manually
+> need to update the virthost authorized keys with the generated SSH keys. So
+> you'll need to continue it like in the given example command above.
+
+Running with ``--clean`` will recreate the venv. But it makes more sense just
+to rebuild the container and never use the ``--clean`` parameter run-time.
+
+If you only want to re-install/update in-place UC and skip anything that
+predates that even faster then doing idempotent ansible apply, add
+```
+--skip-tags teardown-all,provision,environment,libvirt,undercloud-inventory \
+  -T none -I
+```
+The same, but going stright to overcloud deployment:
+```
+--skip-tags provision,environment,libvirt,undercloud-setup,undercloud-install,undercloud-post-install,tripleo-validations \
+  -e docker_registry_namespace_used=tripleo-master -T none -I -t all
+```
+``docker_registry_namespace_used`` Needs to be defined as we skip the
+``undercloud-install`` tag.
+
+## Direct ansible-playbook commands with custom playbooks
+
+Alternatively, you can go with ``create_env_oooq.sh`` wrapper around direct
+ansible-playbook commands and custom playbooks:
 
 * Export a custom ``PLAY`` and/or ``CUSTOMVARS``. The default play is
   is ``oooq-libvirt-provision-build.yaml`` (see the `playbooks` dir) and the default
@@ -85,27 +169,15 @@ To start a scratch local dev env with libvirt and kvm:
     /home/stack/overcloud-full.initrd ${WORKSPACE}
   ```
 
-  Then you'll need to specify the extracted images via additional args:
-  ```
-  (oooq) ... -e undercloud_use_custom_boot_images=true \
-             -e undercloud_custom_initrd="${IMAGECACHE}/overcloud-full.initrd" \
-             -e undercloud_custom_vmlinuz="${IMAGECACHE}/overcloud-full.vmlinuz"
-  ```
+  Later you'll need to specify the extracted images by adding
+  ``-e @/var/tmp/scripts/vars/quickstart-cached-images.yaml`` to deployment commands.
 
-  > **NOTE** this might leave you with an oudated kernel, fall back to the
-  > default ``PLAY=oooq-libvirt-provision-build.yaml`` option then! It
-  > leverages the ``overcloud_as_undercloud`` magic and you need no to have
-  > `undercloud.qcow2` at all, the vmlinuz/initrd images will be prepared
-  > for you by the quickstart libvirt provision roles from the overcloud image
-  > and used to boot the undercloud VM.
-
-* Prepare host for nested kvm and do some sysctl magic:
-  ```
-  # echo "options kvm_intel nested=1" > /etc/modprobe.d/kvm-nested.conf
-  # modprobe -r kvm_intel
-  # modprobe kvm_intel
-  # cat /sys/module/kvm_intel/parameters/nested
-  ```
+> **NOTE** this might leave you with an oudated kernel, fall back to the
+> default ``PLAY=oooq-libvirt-provision-build.yaml`` option then! It
+> leverages the ``overcloud_as_undercloud`` magic and you need no to have
+> `undercloud.qcow2` at all, the vmlinuz/initrd images will be prepared
+> for you by the quickstart libvirt provision roles from the overcloud image
+> and used to boot the undercloud VM.
 
 * Copy example data vars ``custom.yaml_example`` as ``custom.yaml`` and check for
   needed data overrides. Note, it contains only common vars for all plays. Use var files
@@ -113,25 +185,25 @@ To start a scratch local dev env with libvirt and kvm:
   overrides. Additional overriding is also possible with ``CUSTOMVARS=something.yaml``
   and ``-e/-e@`` args.
 
-  > **NOTE** ``custom.yaml``/``CUSTOMVARS`` applies with each ``create_env_oooq.sh``
-  command with the **top level** vars precedence. Do not put there any vars you want
-  to override elsewhere, like from the vars files shipped with plays or quickstart's
-  releases config files! You can also override ``custom.yaml``/``CUSTOMVARS`` from
-  extra files or parameters passed with ``create_env_oooq.sh -e foo=bar -e@baz.yml``.
+> **NOTE** ``custom.yaml``/``CUSTOMVARS`` applies with each ``create_env_oooq.sh``
+> command with the **top level** vars precedence. Do not put there any vars you want
+> to override elsewhere, like from the vars files shipped with plays or quickstart's
+> releases config files! You can also override ``custom.yaml``/``CUSTOMVARS`` from
+> extra files or parameters passed with ``create_env_oooq.sh -e foo=bar -e@baz.yml``.
 
 * Start an interactive wrapper-container session:
-```
-$ ./oooq-warp.sh
-```
+	```
+	$ ./oooq-warp.sh
+	```
 
 * Execute the wanted ``PLAY`` with the command like:
-```
-(oooq) PLAY=something.yaml create_env_oooq.sh -e foo=bar -e@baz.yml -vvvv
-```
-Or you can start the container non-interactively/without a terminal:
-```
-$ PLAY=something.yaml TERMOPTS=-i ./oooq-warp.sh -e foo=bar -e@baz.yml -vvvv
-```
+	```
+	(oooq) PLAY=something.yaml create_env_oooq.sh -e foo=bar -e@baz.yml -vvvv
+	```
+	Or you can start the container non-interactively/without a terminal:
+	```
+	$ PLAY=something.yaml TERMOPTS=-i ./oooq-warp.sh -e foo=bar -e@baz.yml -vvvv
+	```
 
 > **NOTE** You can access the undercloud VMs with the command:
 > ```
@@ -140,6 +212,7 @@ $ PLAY=something.yaml TERMOPTS=-i ./oooq-warp.sh -e foo=bar -e@baz.yml -vvvv
 
 ### Example playbooks for a local libvirt env ready for OVB setup
 
+WIP (does not really work yet)
 The expected workflow is:
 
 * provision a libvirt env, it creates a running undercloud VM and shut-off VMs
@@ -329,6 +402,8 @@ to disable apparmor for libvirt and reconfigure qemu as well:
 
 If ``libguestfs-test-tool`` fails, try to adjust ``SUPERMIN_KERNEL``,
 ``SUPERMIN_KERNEL_VERSION``, ``SUPERMIN_MODULES`` and ``LIBGUESTFS_BACKEND``.
+Or only unset ``LIBGUESTFS_BACKEND_SETTINGS``, then quickstart picks up
+safe (and very slow) defaults.
 
 More sysctl adjustments may be required to fix inter-VMs connectivity:
 ```

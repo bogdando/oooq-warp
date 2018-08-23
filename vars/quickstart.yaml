@@ -1,0 +1,42 @@
+# Defaults to use quickstart.sh wrapper in the container
+# with virthost = localhost and privileged libvirt mode.
+# NOTE: Requires -E config/environments/dev_privileged_libvirt.yml
+# E.g.:
+# quickstart.sh -R master -e dlrn_hash_tag=current-tripleo --no-clone \
+#   -N config/nodes/1ctlr_1comp.yml -t all \
+#   -E config/environments/dev_privileged_libvirt.yml \
+#   -E /var/tmp/scripts/vars/quickstart.yaml \
+#   localhost
+
+# Must not be overrided
+vbmc_libvirt_uri: "qemu+ssh://{{ lookup('env','USER') }}@{{ lookup('env','HOST_BREXT_IP') }}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1"
+libvirt_volume_path: /var/lib/libvirt/images
+local_working_dir: "{{ lookup('env','LWD') }}"
+working_dir: "{{ lookup('env','WORKSPACE') }}"
+image_cache_dir: "{{ lookup('env','IMAGECACHE') }}"
+images_working_dir: "{{ lookup('env','IMAGECACHE') }}"
+images_destroy_working_dir: false
+chrooted: true
+non_root_group: "{{ lookup('env','USER') }}"
+non_root_user: "{{ lookup('env','USER') }}"
+ssh_user: "{{ lookup('env','USER') }}"
+undercloud_user: "{{ lookup('env', 'USER') }}"
+#overcloud_user: "{{ lookup('env', 'USER') }}"
+non_root_chown: false
+
+# May be overrided
+virthost_nameservers: 8.8.8.8
+undercloud_enable_validations: false
+default_disk: 20
+undercloud_disk: 30
+undercloud_vcpu: 3
+default_memory: 4096
+undercloud_memory: 12288
+modify_image_vc_root_password: r00tme
+enable_port_forward_for_tripleo_ui: false
+libvirt_cpu_mode: host-passthrough
+libvirt_volume_pool: default
+libvirt_domain_type: kvm
+
+# This needs to be common defaults in oooq prolly!
+step_overcloud_prep_flavors: true
