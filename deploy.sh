@@ -56,16 +56,11 @@ if [[ "${TEARDOWN}" == "true" && "${PLAY}" =~ "oooq-libvirt-provision" ]]; then
   finalize
   trap - INT EXIT
   sudo cp -f ${LWD}/hosts /etc/ansible/ 2>/dev/null
-  cp -f ${LWD}/hosts ${dest} 2>/dev/null
-  echo "!!! ADD THIS TO THE HOST'S /home/$USER/.ssh/authorized_keys !!!"
-  cat ${LWD}/id_rsa_virt_power.pub 2>/dev/null
-  cat ${LWD}/id_rsa_virt_host.pub 2>/dev/null
 else
   # switch to the generated inventory and deploy a PLAY, if already provisioned VMs
   inventory=${LWD}/hosts
   [ -f "${inventory}" ] || cp ${SCRIPTS_WORKPATH}/inventory.ini ${LWD}/hosts
   sudo cp -f ${inventory} /etc/ansible/ 2>/dev/null
-  cp -f ${inventory} ${dest} 2>/dev/null
 
   echo "Check nodes connectivity"
   ansible -m ping all

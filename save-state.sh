@@ -58,3 +58,12 @@ else
     done
   done
 fi
+if [ "${cmd}" = "--purge" ]; then
+  echo "!!! REMEMBER TO CLEAN UP THE HOST'S /home/$USER/.ssh/authorized_keys !!!"
+  cat ${LWD}/id_rsa_virt_power.pub 2>/dev/null
+  cat ${LWD}/id_rsa_virt_host.pub 2>/dev/null
+else
+  echo "!!! REMEMBER TO ADD THE HOST'S /home/$USER/.ssh/authorized_keys !!!"
+  cat ${LWD}/id_rsa_virt_power.pub 2>/dev/null
+  cat ${LWD}/id_rsa_virt_host.pub 2>/dev/null
+fi
