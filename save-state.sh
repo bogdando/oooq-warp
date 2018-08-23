@@ -14,7 +14,6 @@ undercloud*
 volume_pool.xml
 instackenv.json
 "
-KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u)
 
 cmd=${1:---sync}
 if [ "${cmd}" = "--sync" ]; then

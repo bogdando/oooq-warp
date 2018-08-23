@@ -17,11 +17,12 @@ export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
 export ARGS="${@:-}"
 sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null ||:
 sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
-sudo mkdir -p "${dest}"
+
 # FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
 ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
-ln -sf ${VPATH}/oooq/* "${dest}/"
-for p in $(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u); do
+ln -sf ${VPATH}/oooq/* "${LWD}/"
+
+for p in $KNOWN_PATHS; do
   [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" ] && continue
   echo "Chowning images cache and working dirs for ${p} (may take a while)..."
   sudo mkdir -p ${p}
@@ -36,32 +37,36 @@ cd $HOME
 if [ -z ${OOOQ_PATH} ]; then
   # Hack into oooq dev branch
   sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart@${OOOQE_BRANCH}
-  sudo rsync -aLH /usr/config "${dest}"
-  sudo rsync -aLH /usr/playbooks "${dest}"
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/roles "${dest}"
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/library "${dest}"
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/test_plugins "${dest}"
-elif [ "$dest" != "$OOOQ_WORKPATH" ]; then
+  sudo rsync -aLH /usr/config "${LWD}"
+  sudo rsync -aLH /usr/playbooks "${LWD}"
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/roles "${LWD}"
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/library "${LWD}"
+  sudo rsync -aLH /usr/local/share/tripleo-quickstart/test_plugins "${LWD}"
+elif [ "$LWD" != "$OOOQ_WORKPATH" ]; then
   # Place the local git repo under the work path
-  sudo rsync -aLH $OOOQ_WORKPATH/config "${dest}"
-  sudo rsync -aLH $OOOQ_WORKPATH/playbooks "${dest}"
-  sudo rsync -aLH $OOOQ_WORKPATH/roles "${dest}"
-  sudo rsync -aLH $OOOQ_WORKPATH/library "${dest}"
-  sudo rsync -aLH $OOOQ_WORKPATH/test_plugins "${dest}"
+  sudo rsync -aLH $OOOQ_WORKPATH/config "${LWD}"
+  sudo rsync -aLH $OOOQ_WORKPATH/playbooks "${LWD}"
+  sudo rsync -aLH $OOOQ_WORKPATH/roles "${LWD}"
+  sudo rsync -aLH $OOOQ_WORKPATH/library "${LWD}"
+  sudo rsync -aLH $OOOQ_WORKPATH/test_plugins "${LWD}"
 fi
 
 if [ -z ${OOOQE_PATH} ]; then
   # Hack into oooq-extras dev branch
   sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
-  sudo rsync -aLH /usr/config "${dest}"
-  sudo rsync -aLH /usr/playbooks "${dest}"
-  sudo rsync -aLH /usr/local/share/ansible/roles "${dest}"
+  sudo rsync -aLH /usr/config "${LWD}"
+  sudo rsync -aLH /usr/playbooks "${LWD}"
+  sudo rsync -aLH /usr/local/share/ansible/roles "${LWD}"
 else
   # Place the local git repo under the work path
-  sudo rsync -aLH $OOOQE_WORKPATH/config "${dest}"
-  sudo rsync -aLH $OOOQE_WORKPATH/playbooks "${dest}"
-  sudo rsync -aLH $OOOQE_WORKPATH/roles "${dest}"
+  sudo rsync -aLH $OOOQE_WORKPATH/config "${LWD}"
+  sudo rsync -aLH $OOOQE_WORKPATH/playbooks "${LWD}"
+  sudo rsync -aLH $OOOQE_WORKPATH/roles "${LWD}"
 fi
+for p in $KNOWN_PATHS; do
+  [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" ] && continue
+  sudo chown -R ${USER}:${USER} ${p}
+done
 
 set +ex
 # Restore the saved state spread across LWD/WORKSPACE/IMAGECACHE dirs
@@ -71,11 +76,10 @@ if [ "${TEARDOWN}" = "false" ]; then
   save-state.sh --sync
   sudo mkdir -p /etc/ansible
   sudo cp -f "${LWD}/hosts" /etc/ansible/ 2>/dev/null
-  cp -f "${LWD}/hosts" "${dest}" 2>/dev/null
 else
   echo "Cleaning up state as TEARDOWN was requested"
   save-state.sh --purge
-  rm -f "${dest}"_deploy.log "${dest}"_deploy_nice.log
+  rm -f "${LWD}"_deploy.log "${LWD}"_deploy_nice.log
   if [ "${IMAGECACHEBACKUP:-}" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
     cp -af ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
@@ -115,7 +119,7 @@ fi
 save-state.sh --sync 2>&1 > /dev/null
 
 if [[ "$TERMOPTS" =~ "t" ]]; then
-cd "${dest}"
+cd "${LWD}"
   echo Note: ansible virthost is now localhost
   echo export PLAY=oooq-libvirt-provision.yaml to bootstrap undercloud and generate inventory - default
   echo export PLAY=oooq-libvirt-provision-build.yaml if you plan to continue with overcloud deployments

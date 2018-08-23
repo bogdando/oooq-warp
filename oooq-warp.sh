@@ -100,13 +100,7 @@ if [ "${MOUNT_IMAGECACHE:-}${MOUNT_LWD:-}${MOUNT_WORKSPACE:-}" = "-v /tmp/qs:/va
   echo "as existing host path or set RAMFS=false."
   echo
 fi
-
-# FIXME: May be I can always use the first case?
-if [ "${LWD:-}" = "/home/$USER" ]; then
-  dest=$LWD
-else
-  dest=$OOOQ_WORKPATH
-fi
+KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u)
 set -x
 
 docker run ${TERMOPTS} --rm --privileged \
@@ -118,6 +112,7 @@ docker run ${TERMOPTS} --rm --privileged \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
   -e PATH="${OOOQ_WORKPATH}:${LWD}:${PATH}" \
+  -e KNOWN_PATHS="${KNOWN_PATHS}" \
   -e USER=${USER} \
   -e PLAY=${PLAY} \
   -e WORKSPACE=${WORKSPACE} \
@@ -139,7 +134,6 @@ docker run ${TERMOPTS} --rm --privileged \
   -e SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-} \
   -e SUPERMIN_MODULES=${SUPERMIN_MODULES:-} \
   -e SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-} \
-  -e dest=${dest} \
   -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
   -e TERMOPTS=${TERMOPTS} \
   -e SCRIPTS_WORKPATH=${SCRIPTS_WORKPATH} \
@@ -161,7 +155,7 @@ docker run ${TERMOPTS} --rm --privileged \
   ${MOUNT_IMAGECACHEBACKUP:-} \
   ${MOUNT_WORKSPACE:-} \
   ${MOUNT_LWD:-} \
-  -v ${PWD}/ansible.cfg:${dest}/ansible.cfg \
+  -v ${PWD}/ansible.cfg:${LWD}/ansible.cfg \
   -v ${PWD}/entry.sh:/usr/local/sbin/entry.sh \
   -v ${PWD}/save-state.sh:/usr/local/sbin/save-state.sh \
   -v /home/${USER}/.ssh/authorized_keys:/tmp/.ssh/authorized_keys \
