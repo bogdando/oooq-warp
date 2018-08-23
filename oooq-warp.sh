@@ -165,7 +165,7 @@ docker run ${TERMOPTS} --rm --privileged \
   ${MOUNT_IMAGECACHEBACKUP:-} \
   ${MOUNT_WORKSPACE:-} \
   ${MOUNT_LWD:-} \
-  -v ${PWD}/ansible.cfg:${LWD}/ansible.cfg:ro \
+  -v ${PWD}/ansible.cfg:${OOOQ_WORKPATH}/ansible.cfg:ro \
   -v ${PWD}/entry.sh:/usr/local/sbin/entry.sh:ro \
   -v ${PWD}/save-state.sh:/usr/local/sbin/save-state.sh:ro \
   -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys \

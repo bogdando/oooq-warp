@@ -34,6 +34,7 @@ cd $HOME
 . ${VPATH}/oooq/bin/activate
 [[ "$PLAY" =~ "libvirt" ]] && (. ${SCRIPTS_WORKPATH}/ssh_config)
 
+# Note we pick the hacked in paths in the custom ansible.cfg bind-mounted
 if [ -z ${OOOQ_PATH} ]; then
   # Hack into oooq dev branch
   sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart@${OOOQE_BRANCH}
