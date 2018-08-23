@@ -53,17 +53,26 @@ if [ "${IMAGECACHEBACKUP:-}" -a -d "${IMAGECACHEBACKUP:-/tmp}" ]; then
   MOUNT_IMAGECACHEBACKUP="-v ${IMAGECACHEBACKUP}:${IMAGECACHEBACKUP}:ro"
 fi
 
+# FIXME: UC cannot differentiate nor take non existing working_dir in quickstart.
+# We have to use the common path /tmp for wirthost and UC because of that
+# unfortunate reason. If/once fixed, make working_dir like /tmp/.quickstart at
+# virthost, and whatever else non-ephemeral for undercloud VM. Until then,
+# UC may not survive the VM reboot nicely (all artifacts produced by quickstart
+# will be gone)
 if [ "${RAMFS}" = "true" ]; then
-  echo "Using ephemeral /tmp/qs for images cache stored in RAM."
+  echo "Using /tmp for images cache and working dir, all stored in RAM."
   echo "WARNING: With RAMFS=true, it may eat a lot of memory, USE WITH CAUTION!"
   echo
   echo "If you want an environment persisted after the container exited/node rebooted,"
-  echo "use an existing (non /tmp) host path for at least WORKSPACE or LWD."
-  echo "and save the env state by either of those real host paths."
+  echo "use an existing (non /tmp) host path for LWD."
+  echo "And remember to save-state.sh manually by the real host path LWD."
   echo "The saved state will be auto-picked up by the entry point, when starting new container."
+  echo "WARNING: UC cannot persist its /tmp working dir though. So do not reboot it"
+  echo "but suspend/resume/snapshot/revert VM instead!"
   echo
   IMAGECACHE=/var/cache/tripleo-quickstart/images
-  MOUNT_IMAGECACHE="-v /tmp/qs:${IMAGECACHE}"
+  WORKSPACE=/tmp
+  MOUNT_IMAGECACHE="-v /tmp:${IMAGECACHE}"
 elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" -a "${IMAGECACHE:-}" != "/home/$USER" ]; then
   MOUNT_IMAGECACHE="-v ${IMAGECACHE}:/var/cache/tripleo-quickstart/images"
 else
@@ -100,7 +109,11 @@ if [ "${MOUNT_IMAGECACHE:-}${MOUNT_LWD:-}${MOUNT_WORKSPACE:-}" = "-v /tmp/qs:/va
   echo "as existing host path or set RAMFS=false."
   echo
 fi
-KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u)
+if [ "$RAMFS" != "false" ]; then
+  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}"|sort -u)
+else
+  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u)
+fi
 set -x
 
 docker run ${TERMOPTS} --rm --privileged \
@@ -111,6 +124,7 @@ docker run ${TERMOPTS} --rm --privileged \
   --cpus=4 --cpu-shares=${CPU} \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
+  -e RAMFS=${RAMFS} \
   -e PATH="${OOOQ_WORKPATH}:${LWD}:${PATH}" \
   -e KNOWN_PATHS="${KNOWN_PATHS}" \
   -e USER=${USER} \

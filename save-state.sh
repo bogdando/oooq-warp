@@ -23,7 +23,8 @@ if [ "${cmd}" = "--sync" ]; then
       echo "Sync ${state} working_dir -> local_working_dir"
       rsync -qauxH $WORKSPACE/$state ${LWD}/
     fi
-    if [ "$IMAGECACHE" != "$LWD" ]; then
+    # For RAMFS, we have WORKSPACE and IMAGECACHE sharing the /tmp host-path
+    if [ "$IMAGECACHE" != "$LWD" -a "$RAMFS" = "false" ]; then
       echo "Sync ${state} image_cache_dir -> local_working_dir"
       rsync -qauxH $IMAGECACHE/$state ${LWD}/
       echo "Sync ${state} local_working_dir -> image_cache_dir"
