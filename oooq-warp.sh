@@ -169,11 +169,11 @@ docker run ${TERMOPTS} --rm --privileged \
   ${MOUNT_IMAGECACHEBACKUP:-} \
   ${MOUNT_WORKSPACE:-} \
   ${MOUNT_LWD:-} \
-  -v ${PWD}/ansible.cfg:${LWD}/ansible.cfg \
-  -v ${PWD}/entry.sh:/usr/local/sbin/entry.sh \
-  -v ${PWD}/save-state.sh:/usr/local/sbin/save-state.sh \
+  -v ${PWD}/ansible.cfg:${LWD}/ansible.cfg:ro \
+  -v ${PWD}/entry.sh:/usr/local/sbin/entry.sh:ro \
+  -v ${PWD}/save-state.sh:/usr/local/sbin/save-state.sh:ro \
   -v /home/${USER}/.ssh/authorized_keys:/tmp/.ssh/authorized_keys \
-  -v ${PWD}:${SCRIPTS_WORKPATH} \
+  -v ${PWD}:${SCRIPTS_WORKPATH}:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
   -v /boot:/boot:ro \
