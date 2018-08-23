@@ -2,7 +2,7 @@
 # or specify it via CUSTOMVARS.
 deployed_server: true
 overcloud_templates_path: /usr/share/openstack-tripleo-heat-templates
-extra_tht_configs: /tmp/scripts/tht
+extra_tht_configs: /var/tmp/scripts/tht
 enable_vbmc: false
 configure_repos: true
 release: master

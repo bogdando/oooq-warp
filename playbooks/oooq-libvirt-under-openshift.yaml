@@ -38,7 +38,7 @@
   tasks:
     - name: Upload custom tht env files
       copy:
-        src: /tmp/scripts/tht
+        src: /var/tmp/scripts/tht
         dest: "{{working_dir}}"
         force: yes
         owner: "{{undercloud_user}}"

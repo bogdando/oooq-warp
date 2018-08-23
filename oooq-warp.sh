@@ -29,9 +29,9 @@ CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
 SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
 # Known work paths inside of the container
-OOOQ_WORKPATH=/tmp/oooq
-OOOQE_WORKPATH=/tmp/oooq-extras
-SCRIPTS_WORKPATH=/tmp/scripts
+OOOQ_WORKPATH=/var/tmp/oooq
+OOOQE_WORKPATH=/var/tmp/oooq-extras
+SCRIPTS_WORKPATH=/var/tmp/scripts
 USE_QUICKSTART_WRAP=false
 
 set +x
@@ -103,12 +103,6 @@ else
   echo
 fi
 
-if [ "${MOUNT_IMAGECACHE:-}${MOUNT_LWD:-}${MOUNT_WORKSPACE:-}" = "-v /tmp/qs:/var/tmp" ]; then
-  echo "WARNING: Provisioned libvirt VMs may fail to start, if the node rebooted!"
-  echo "If you want BMs persistent across reboots, specify at least any of WORKSPACE/LWD"
-  echo "as existing host path or set RAMFS=false."
-  echo
-fi
 if [ "$RAMFS" != "false" ]; then
   KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}"|sort -u)
 else
@@ -172,7 +166,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v ${PWD}/ansible.cfg:${LWD}/ansible.cfg:ro \
   -v ${PWD}/entry.sh:/usr/local/sbin/entry.sh:ro \
   -v ${PWD}/save-state.sh:/usr/local/sbin/save-state.sh:ro \
-  -v /home/${USER}/.ssh/authorized_keys:/tmp/.ssh/authorized_keys \
+  -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys \
   -v ${PWD}:${SCRIPTS_WORKPATH}:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \

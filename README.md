@@ -62,7 +62,7 @@ To start a scratch local dev env with libvirt and kvm:
 * Customize and export some env vars, for example:
   ```
   $ export USER=bogdando # used as undercloud/overcloud SSH user as well
-  $ export WORKSPACE=/tmp/qs       #persisted on host, libvirt revers to it
+  $ export WORKSPACE=/var/tmp/qs   #persisted on host, libvirt revers to it
   $ export IMAGECACHE=/opt/cache   #persistent on host
   $ export LWD=${HOME}/.quickstart #persistent on host, may be equal to WORKSPACE
   $ export OOOQE_BRANCH=dev
@@ -157,8 +157,8 @@ Example commands (``(oooq)`` represents the shell prompt in the wrapper containe
 (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
            -e@config/nodes/1ctlr_1comp.yml \
            -e@config/release/master.yml \
-           -e@/tmp/scripts/custom.yaml \
-           -e@/tmp/scripts/tht/config/general_config/featureset062.yml
+           -e@/var/tmp/scripts/custom.yaml \
+           -e@/var/tmp/scripts/tht/config/general_config/featureset062.yml
 ```
 Add the generated public key into the host's ``USER`` ``authorized_keys`` file.
 
@@ -171,9 +171,9 @@ Add the generated public key into the host's ``USER`` ``authorized_keys`` file.
 (oooq) export HOST_BREXT_IP=192.168.23.1
 (oooq) ./quickstart.sh -R master -n -I -T none -t all \
            -N config/nodes/1ctlr_1comp.yml \
-           -E /tmp/scripts/vars/undercloud-local.yaml \
-           -E /tmp/scripts/custom.yaml \
-           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /var/tmp/scripts/vars/undercloud-local.yaml \
+           -E /var/tmp/scripts/custom.yaml \
+           -E /var/tmp/scripts/tht/config/general_config/featureset062.yml \
            -p quickstart-extras-undercloud.yml \
            -e transport=local \
            -e vbmc_libvirt_uri="qemu+ssh://${USER}@${HOST_BREXT_IP}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1" \
@@ -209,18 +209,18 @@ $ sudo usermod -aG dockerroot $USER
            -S tripleo-validations \
            -p quickstart-extras-overcloud-prep.yml \
            -N config/nodes/1ctlr_1comp.yml \
-           -E /tmp/scripts/vars/undercloud-local.yaml \
-           -E /tmp/scripts/custom.yaml \
-           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /var/tmp/scripts/vars/undercloud-local.yaml \
+           -E /var/tmp/scripts/custom.yaml \
+           -E /var/tmp/scripts/tht/config/general_config/featureset062.yml \
            -e transport=local localhost
 
 (oooq) ./quickstart.sh -R master -n -I -T none -t all \
            -S tripleo-validations \
            -p quickstart-extras-overcloud.yml \
            -N config/nodes/1ctlr_1comp.yml \
-           -E /tmp/scripts/vars/undercloud-local.yaml \
-           -E /tmp/scripts/custom.yaml \
-           -E /tmp/scripts/tht/config/general_config/featureset062.yml \
+           -E /var/tmp/scripts/vars/undercloud-local.yaml \
+           -E /var/tmp/scripts/custom.yaml \
+           -E /var/tmp/scripts/tht/config/general_config/featureset062.yml \
            -e transport=local localhost
 ```
 > **NOTE** A known issue is that sometimes undercloud node cannot be connected
@@ -249,8 +249,8 @@ To start a new libvirt env from the scratch:
 > (oooq) PLAY=oooq-libvirt-provision-build.yaml create_env_oooq.sh \
 >            -e@config/nodes/1ctlr_1comp.yml \
 >            -e@config/release/master.yml \
->            -e@/tmp/scripts/custom.yaml \
->            -e@/tmp/scripts/tht/config/general_config/featureset062.yml \
+>            -e@/var/tmp/scripts/custom.yaml \
+>            -e@/var/tmp/scripts/tht/config/general_config/featureset062.yml \
 >            -e undercloud_use_custom_boot_images=true \
 >            -e undercloud_custom_initrd=${IMAGECACHE}/overcloud-full.initrd \
 >            -e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
@@ -271,7 +271,7 @@ backup dir.
 
 ```
 (oooq) PLAY=oooq-libvirt-provision.yaml create_env_oooq.sh \
-           -e@/tmp/scripts/tht/config/general_config/featureset127.yml \
+           -e@/var/tmp/scripts/tht/config/general_config/featureset127.yml \
            -e update_images=true \
            -e force_cached_images=true -e image_cache_expire_days=300 #\
            #-e undercloud_use_custom_boot_images=true \
@@ -279,7 +279,7 @@ backup dir.
            #-e undercloud_custom_vmlinuz=${IMAGECACHE}/overcloud-full.vmlinuz \
 
 (oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh \
-           -e@/tmp/scripts/tht/config/general_config/featureset127.yml
+           -e@/var/tmp/scripts/tht/config/general_config/featureset127.yml
 ```
 
 **Public openstack/RDO cloud**
@@ -300,7 +300,7 @@ was used above for the example libvirt deployment, like:
 (oooq) rm -rf $VIRTUAL_ENV/ansible_facts_cache hosts
 (oooq) PLAY=oooq-traas.yaml create_env_oooq.sh
 (oooq) PLAY=oooq-libvirt-under-openshift.yaml create_env_oooq.sh \
-  -e@/tmp/scripts/tht/config/general_config/featureset127.yml -v \
+  -e@/var/tmp/scripts/tht/config/general_config/featureset127.yml -v \
   -e undercloud_network_cidr=192.168.253.0/24 \
   -e undercloud_external_network_cidr=192.168.0.0/24 -e \
   undercloud_undercloud_output_dir=/home/centos -e undercloud_user=centos

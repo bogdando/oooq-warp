@@ -18,7 +18,7 @@ overcloud_dns_servers: "{{undercloud_undercloud_nameservers}}"
 
 # The path is specific for the oooq runner container's mounted volumes
 # Use with overcloud-prep-config to upload custom tht/role files from ./tht
-extra_tht_configs: /tmp/scripts/tht
+extra_tht_configs: /var/tmp/scripts/tht
 
 ## UNDERCLOUD
 #undercloud_docker_registry_host: docker.io

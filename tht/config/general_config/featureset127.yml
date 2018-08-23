@@ -25,7 +25,7 @@ undercloud_memory: 20480
 enable_opstools_repo: false
 deployed_server: false
 deploy_multinode: false
-extra_tht_configs: /tmp/scripts/tht
+extra_tht_configs: /var/tmp/scripts/tht
 configure_repos: true
 enable_vbmc: false
 undercloud_enable_ui: false
