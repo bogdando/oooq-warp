@@ -152,6 +152,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e LOG_LEVEL=${LOG_LEVEL:--v} \
   -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
   -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
+  -e ANSIBLE_STDOUT_CALLBACK=${ANSIBLE_STDOUT_CALLBACK:-debug} \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
