@@ -1,11 +1,25 @@
 # Only provision fedora28 VM
-# Repose should be setup as of
+# Repos should be setup as of
 # https://github.com/mwhahaha/tripleo-f28-testbed/blob/master/pre-provision.yml
 images:
   - name: undercloud
-    url:  https://nb02.openstack.org/images/fedora-28-0000005142.qcow2
+    # This has issues with dnf updating pre-installed packages
+    #url:  https://nb02.openstack.org/images/fedora-28-0000005142.qcow2
+
+    # This has no md5 file, so fetch the image and calc it on your own
+    #url: https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
+    # then modify with
+    #virt-customize -a {{ local_working_dir }}/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
+    #  --uninstall cloud-init
+    #  --run-command "useradd -m -p '' -U {{ undercloud_user }}";
+    #  --run-command "echo '{{ undercloud_user }} ALL=NOPASSWD:ALL' >> /etc/sudoers";
+    #  --run-command "echo 'Defaults:{{ undercloud_user }} !requiretty' >> /etc/sudoers"
+    url: file:///{{ local_working_dir }}/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
     type: qcow2
-undercloud_user: zuul
+qemu_bridge_conf: /etc/qemu/bridge.conf
+# https://review.openstack.org/#/c/603069/
+libvirt_use_cloud_image: true
+undercloud_user: fedora
 overcloud_as_undercloud: false
 repo_run_live: false
 ib_repo_image_inject: false
