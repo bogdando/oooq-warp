@@ -20,6 +20,7 @@ sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
 
 # FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
 ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
+rm -rf "${LWD}/config" "${LWD}/playbooks"
 ln -sf ${VPATH}/oooq/* "${LWD}/"
 
 for p in $KNOWN_PATHS; do
