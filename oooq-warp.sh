@@ -125,6 +125,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e USER=${USER} \
   -e PLAY=${PLAY} \
   -e WORKSPACE=${WORKSPACE} \
+  -e OPT_WORKDIR=${LWD} \
   -e LWD=${LWD} \
   -e IMAGECACHE=${IMAGECACHE} \
   -e IMAGECACHEBACKUP=${IMAGECACHEBACKUP:-} \
