@@ -405,6 +405,11 @@ If ``libguestfs-test-tool`` fails, try to adjust ``SUPERMIN_KERNEL``,
 Or only unset ``LIBGUESTFS_BACKEND_SETTINGS``, then quickstart picks up
 safe (and very slow) defaults.
 
+As we mount ``/boot`` for libguestfs tools, the kernel image needs to be
+world read, so run:
+```
+# chmod a+r /boot/vmlinuz*
+```
 More sysctl adjustments may be required to fix inter-VMs connectivity:
 ```
 # sysctl net.bridge.bridge-nf-call-ip6tables=0
