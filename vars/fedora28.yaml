@@ -1,0 +1,23 @@
+# Only provision fedora28 VM
+# Repose should be setup as of
+# https://github.com/mwhahaha/tripleo-f28-testbed/blob/master/pre-provision.yml
+images:
+  - name: undercloud
+    url:  https://nb02.openstack.org/images/fedora-28-0000005142.qcow2
+    type: qcow2
+undercloud_user: zuul
+overcloud_as_undercloud: false
+repo_run_live: false
+ib_repo_image_inject: false
+virthost_repo_setup: false
+update_images: false
+compressed_gating_repo: false
+gating_repo_enabled: false
+package_images: false
+build_image_isolated: true
+build_undercloud: false
+enable_vnc_console: true
+enable_vbmc: false
+use_external_images: false
+inject_instackenv: false
+overcloud_nodes: ''
