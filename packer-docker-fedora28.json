@@ -6,7 +6,7 @@
   },
   "builders": [{
     "type": "docker",
-    "image": "centos:7",
+    "image": "fedora:28",
     "commit": true,
     "run_command": [
       "-ti",
@@ -33,7 +33,7 @@
         "type": "docker-tag",
         "only": ["docker"],
         "repository": "bogdando/oooq-base",
-        "tag": "0.1",
+        "tag": "0.2",
         "keep_input_artifact": false
       }
     ]

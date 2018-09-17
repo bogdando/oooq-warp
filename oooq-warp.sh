@@ -154,6 +154,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
   -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
   -e ANSIBLE_STDOUT_CALLBACK=${ANSIBLE_STDOUT_CALLBACK:-debug} \
+  -e ANSIBLE_PYTHON_INTERPRETER=/home/${USER}/Envs/oooq/bin/python \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
@@ -177,5 +178,5 @@ docker run ${TERMOPTS} --rm --privileged \
   -v /boot:/boot:ro \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
   --entrypoint /usr/local/sbin/entry.sh \
-  --name runner bogdando/oooq-runner:0.1 \
+  --name runner bogdando/oooq-runner:0.2 \
   ${@:-}

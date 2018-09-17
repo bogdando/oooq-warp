@@ -1,7 +1,10 @@
 #!/bin/bash
 set -ux
+useradd -m -p '' -U ${USER}||:
 mkdir -p /home/${USER}/.ssh
-echo "${USER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${USER}
+echo "${USER} ALL=NOPASSWD:ALL" > /etc/sudoers.d/${USER}
+echo "Defaults:${USER} !requiretty" /etc/sudoers.d/${USER}
+chmod 0440 /etc/sudoers.d/${USER}
 set +u
 easy_install pip
 pip install -U virtualenvwrapper || exit 1
@@ -19,4 +22,4 @@ pip install -U pip || exit 1
 pip install -U pbr || exit 1
 pip install -r requirements.txt -r quickstart-extras-requirements.txt || exit 1
 pip install dumb-init || exit 1
-sudo chown -R ${USER}:${USER} /home/${USER}
+chown -R ${USER}:${USER} /home/${USER}

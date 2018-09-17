@@ -6,14 +6,10 @@
   },
   "builders": [{
     "type": "docker",
-    "image": "bogdando/oooq-base:0.1",
+    "image": "bogdando/oooq-base:0.2",
     "commit": true,
     "run_command": [
       "-ti",
-      "-v",
-      "/etc/passwd:/etc/passwd:ro",
-      "-v",
-      "/etc/group:/etc/group:ro",
       "-v",
       "{{user `oooq_path`}}:/tmp/oooq:ro",
       "-d",
@@ -37,7 +33,7 @@
         "type": "docker-tag",
         "only": ["docker"],
         "repository": "bogdando/oooq-runner",
-        "tag": "0.1",
+        "tag": "0.2",
         "keep_input_artifact": false
       }
     ]
