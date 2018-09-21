@@ -23,3 +23,5 @@ pip install -U pbr || exit 1
 pip install -r requirements.txt -r quickstart-extras-requirements.txt || exit 1
 pip install dumb-init || exit 1
 chown -R ${USER}:${USER} /home/${USER}
+# Full READ access for the venv dir is required for this container image
+chmod -R a+r /home/${USER}/Envs

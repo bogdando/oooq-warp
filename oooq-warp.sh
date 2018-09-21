@@ -166,6 +166,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v ${PWD}:${SCRIPTS_WORKPATH}:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
+  -v /etc/sudoers:/etc/sudoers:ro \
   -v /boot:/boot:ro \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
   --entrypoint /usr/local/sbin/entry.sh \

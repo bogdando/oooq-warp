@@ -19,9 +19,9 @@ sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null ||:
 sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
 
 # FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
-ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
+sudo ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
 rm -rf "${LWD}/config" "${LWD}/playbooks"
-ln -sf ${VPATH}/oooq/* "${LWD}/"
+sudo ln -sf ${VPATH}/oooq/* "${LWD}/"
 
 for p in $KNOWN_PATHS; do
   [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" ] && continue
@@ -29,6 +29,8 @@ for p in $KNOWN_PATHS; do
   sudo mkdir -p ${p}
   sudo chown -R ${USER}:${USER} ${p}
 done
+sudo chown ${USER}:${USER} ${HOME}
+sudo chown -R ${USER}:${USER} ${HOME}/.ssh
 
 cd $HOME
 . /usr/bin/virtualenvwrapper.sh

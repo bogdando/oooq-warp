@@ -44,6 +44,6 @@ See more:
 
 Some WIP deployment examples (which hopefully are still working):
 * [Example: local libvirt OVB setup](./docs/ovb-example.md)
-* TBD: Example: local libvirt AIO setup with Fedora 28
+* [Example: local libvirt AIO setup with Fedora 28](./docs/f28-example.md)
 * [Example: all-in-one undercloud to deploy openshift](./docs/openshift-example.md)
 * [Examplle: multinode on openstack pre-provisioned by traas](./docs/traas.md)

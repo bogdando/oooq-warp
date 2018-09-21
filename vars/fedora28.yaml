@@ -14,9 +14,11 @@ images:
     #  --run-command "useradd -m -p '' -U {{ undercloud_user }}";
     #  --run-command "echo '{{ undercloud_user }} ALL=NOPASSWD:ALL' >> /etc/sudoers";
     #  --run-command "echo 'Defaults:{{ undercloud_user }} !requiretty' >> /etc/sudoers"
-    url: file:///{{ local_working_dir }}/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
+    url: file://{{ local_working_dir }}/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
+    #md5sum: 184cbb40f3616f94b4413fece8e39e0d
     type: qcow2
 qemu_bridge_conf: /etc/qemu/bridge.conf
+supported_distro_check: false
 # https://review.openstack.org/#/c/603069/
 libvirt_use_cloud_image: true
 undercloud_user: fedora
