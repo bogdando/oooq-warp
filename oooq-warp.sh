@@ -107,7 +107,7 @@ fi
 set -x
 
 docker run ${TERMOPTS} --rm --privileged \
-  --cpus=4 --cpu-shares=${CPU} \
+  --cpus=1 --cpu-shares=${CPU} \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
   -e RAMFS=${RAMFS} \
