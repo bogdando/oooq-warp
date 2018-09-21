@@ -3,11 +3,6 @@
 set -uxe
 
 # Internal env vars, only used to run a container wrapper
-DEV=${DEV:-/dev/sda}
-IOPSW=${IOPSW:-0}
-IOPSR=${IOPSR:-0}
-IOW=${IOW:-0}
-IOR=${IOR:-0}
 CPU=${CPU:-0}
 MEM=${MEM:-0}
 
@@ -112,10 +107,6 @@ fi
 set -x
 
 docker run ${TERMOPTS} --rm --privileged \
-  --device-read-bps=${DEV}:${IOR} \
-  --device-write-bps=${DEV}:${IOW} \
-  --device-read-iops=${DEV}:${IOPSR} \
-  --device-write-iops=${DEV}:${IOPSW} \
   --cpus=4 --cpu-shares=${CPU} \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
