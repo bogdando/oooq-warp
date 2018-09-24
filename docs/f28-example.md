@@ -55,6 +55,8 @@ Proceed with provisioning a libvirt env:
 (oooq) sed -i -r 's/^Host undercloud(.*$)/Host node\1/g' ssh.config.local.ansible
 (oooq) git clone https://github.com/mwhahaha/tripleo-f28-testbed
 (oooq) ansible-playbook -i hosts tripleo-f28-testbed/pre-provision.yml -e@tripleo-f28-testbed/tripleo-dlrn-data.yml
+(oooq) save-state.sh
+(oooq) ssh -F $LWD/ssh.config.local.ansible node-root
 ```
 Note, adjust the default `external_network_cidr: 192.168.23.0/24`, if you have
 conflicting CIDR for libvirt networks, like ``-e external_network_cidr=192.168.24.0/24``.
