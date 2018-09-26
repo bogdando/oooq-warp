@@ -21,6 +21,8 @@ qemu_bridge_conf: /etc/qemu/bridge.conf
 supported_distro_check: false
 # https://review.openstack.org/#/c/603069/
 libvirt_use_cloud_image: true
+# https://review.openstack.org/#/c/593567/
+safe_teardown: true
 undercloud_user: fedora
 overcloud_as_undercloud: false
 repo_run_live: false
