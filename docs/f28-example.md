@@ -16,12 +16,16 @@ $ git clone -b dev https://github.com/bogdando/tripleo-quickstart-extras.git /va
 A few configurations, pick what fits your case:
 ```
 $ sudo useradd -m -p '' -U -G root bogdando # only works this way yet :)
-$ echo 'bogdando ALL=NOPASSWD:ALL' | sudo tee /etc/sudoers
+$ echo 'bogdando ALL=NOPASSWD:ALL' | sudo tee -a /etc/sudoers
 $ sudo dnf install libvirt docker qemu-kvm libguestfs wget git
 $ sudo usermod -aG libvirt bogdando
 $ sudo systemctl start libvirtd
 $ sudo systemctl start docker
 $ sudo chmod a+r /boot/vmlinuz* # or unset LIBGUESTFS_BACKEND_SETTINGS instead
+$ sudo su - bogdando
+$ git clone https://github.com/bogdando/oooq-warp.git
+$ cd oooq-warp
+$ . vars/fedora28.env
 $ mkdir -p "$LWD" "$IMAGECACHE" "$IMAGECACHEBACKUP"
 ```
 
@@ -36,10 +40,6 @@ $ cp ${IMAGECACHE}/Fedora-Cloud-Base-28-1.1.x86_64.qcow2 ${IMAGECACHEBACKUP}/${n
 
 Start the wrapper Fedora 28 container (uses the pre-built images on dockerhub):
 ```
-$ sudo su - bogdando
-$ git clone https://github.com/bogdando/oooq-warp.git
-$ cd oooq-warp
-$ . vars/fedora28.env
 $ TEARDOWN=true RAMFS=true ./oooq-warp.sh
 ```
 
