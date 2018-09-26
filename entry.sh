@@ -1,4 +1,4 @@
-#!/home/bogdando/Envs/oooq/bin/dumb-init /bin/bash
+#!/var/tmp/Envs/oooq/bin/dumb-init /bin/bash
 # Stub the given user home and ssh setup
 # Prepare to run oooq via ansible
 set -eu
@@ -11,26 +11,34 @@ set -eu
 [ "${OOOQE_PATH:-}" ] || unset OOOQE_PATH
 [ "${HOST_BREXT_IP:-}" ] || unset HOST_BREXT_IP
 export PS1='$ '
-export WORKON_HOME=~/Envs
+export WORKON_HOME=$VPATH
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
 export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
 export ARGS="${@:-}"
 sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null ||:
 sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
 
+# Ensure the wanted user setup
+sudo useradd -m -p '' -G wheel -U ${USER}||:
+sudo mkdir -p /home/${USER} /home/${USER}/.ssh
+echo "${USER} ALL=NOPASSWD:ALL" | sudo tee /etc/sudoers.d/${USER}
+echo "Defaults:${USER} !requiretty" | sudo tee -a /etc/sudoers.d/${USER}
+sudo chmod 0440 /etc/sudoers.d/${USER}
+echo 'export WORKON_HOME=/home/${USER}/Envs' | sudo tee /home/${USER}/.bashrc
+echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python' | sudo tee -a /home/${USER}/.bashrc
+echo '. /usr/bin/virtualenvwrapper.sh' | sudo tee -a /home/${USER}/.bashrc
+
 # FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
-sudo ln -sf ${VPATH}/oooq ${VPATH}/tripleo-quickstart
-rm -rf "${LWD}/config" "${LWD}/playbooks"
+sudo ln -sf ${VPATH} ${HOME}/
+sudo rm -rf "${LWD}/config" "${LWD}/playbooks"
 sudo ln -sf ${VPATH}/oooq/* "${LWD}/"
 
-for p in $KNOWN_PATHS; do
-  [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" ] && continue
+for p in $KNOWN_PATHS /home/${USER}; do
+  [ "$p" = "${VPATH}/oooq" ] && continue
   echo "Chowning images cache and working dirs for ${p} (may take a while)..."
   sudo mkdir -p ${p}
   sudo chown -R ${USER}:${USER} ${p}
 done
-sudo chown ${USER}:${USER} ${HOME}
-sudo chown -R ${USER}:${USER} ${HOME}/.ssh
 
 cd $HOME
 . /usr/bin/virtualenvwrapper.sh

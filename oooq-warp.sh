@@ -18,7 +18,7 @@ OOOQE_FORK=${OOOQE_FORK:-openstack}
 OOOQ_BRANCH=${OOOQ_BRANCH:-master}
 OOOQ_FORK=${OOOQ_FORK:-openstack}
 # oooq venv pre-created in the container
-VPATH=${VPATH:-/home/${USER}/Envs}
+VPATH=/var/tmp/Envs
 PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
@@ -145,7 +145,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
   -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
   -e ANSIBLE_STDOUT_CALLBACK=${ANSIBLE_STDOUT_CALLBACK:-debug} \
-  -e ANSIBLE_PYTHON_INTERPRETER=/home/${USER}/Envs/oooq/bin/python \
+  -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
@@ -166,6 +166,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v ${PWD}:${SCRIPTS_WORKPATH}:ro \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
+  -v /etc/shadow:/etc/shadow:ro \
   -v /etc/sudoers:/etc/sudoers:ro \
   -v /boot:/boot:ro \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
