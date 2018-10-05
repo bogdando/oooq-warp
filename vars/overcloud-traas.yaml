@@ -162,7 +162,7 @@ network_environment_args:
       fixed_ips:
         - ip_address: "{{ first_controller_ip }}"
       subnets:
-        - cidr: 24
+        - cidr: "{{ first_controller_ip }}/24"
   ControllerDeployedServerCount: 1
   ControllerDeployedServerExtraConfig:
     nova::compute::libvirt::services::libvirt_virt_type: qemu
