@@ -21,6 +21,7 @@ function with_ansible {
     --become-user=root \
     --forks=$ANSIBLE_FORKS --timeout $ANSIBLE_TIMEOUT \
     -e teardown=$TEARDOWN \
+    $UNLOCKER \
     -e @${SCRIPTS_WORKPATH}/${CUSTOMVARS} \
     ${ARGS} \
     $LOG_LEVEL $@ 2>&1

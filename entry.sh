@@ -155,6 +155,6 @@ else
     create_env_oooq.sh $ARGS
   else
     quickstart.sh --install-deps
-    quickstart.sh $ARGS
+    quickstart.sh $UNLOCKER $ARGS
   fi
 fi

@@ -9,6 +9,8 @@
 #   localhost
 
 # Must not be overrided
+qemu_bridge_conf: /etc/qemu/bridge.conf
+supported_distro_check: false
 vbmc_libvirt_uri: "qemu+ssh://{{ lookup('env','USER') }}@{{ lookup('env','HOST_BREXT_IP') }}/session?socket=/run/libvirt/libvirt-sock&keyfile=/root/.ssh/id_rsa_virt_power&no_verify=1&no_tty=1"
 libvirt_volume_path: /var/lib/libvirt/images
 local_working_dir: "{{ lookup('env','LWD') }}"

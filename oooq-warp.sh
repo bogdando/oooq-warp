@@ -104,6 +104,9 @@ if [ "$RAMFS" != "false" ]; then
 else
   KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u)
 fi
+
+# FIXME: Fedora28 support for quickstart ansible-runner
+UNLOCKER="-e qemu_bridge_conf=/etc/qemu/bridge.conf -e supported_distro_check=false"
 set -x
 
 docker run ${TERMOPTS} --rm --privileged \
@@ -147,6 +150,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e ANSIBLE_STDOUT_CALLBACK=${ANSIBLE_STDOUT_CALLBACK:-debug} \
   -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
+  -e UNLOCKER=${UNLOCKER} \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /etc/libvirt/libvirtd.conf:/etc/libvirt/libvirtd.conf:ro \
