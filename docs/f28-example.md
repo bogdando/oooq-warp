@@ -49,7 +49,8 @@ Proceed with provisioning a libvirt env:
          -E config/environments/dev_privileged_libvirt.yml \
          -E /var/tmp/scripts/vars/quickstart.yaml \
          -E /var/tmp/scripts/vars/fedora28.yaml \
-         -t provision,environment,libvirt,undercloud-inventory -T all \
+         -t provision,environment,libvirt,undercloud-inventory \
+         -T all --skip-tags teardown-virthost \
 	 localhost
 (oooq) sed -i -r 's/^undercloud(.*$)/node\1/g' hosts
 (oooq) sed -i -r 's/^Host undercloud(.*$)/Host node\1/g' ssh.config.local.ansible
