@@ -150,7 +150,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e ANSIBLE_STDOUT_CALLBACK=${ANSIBLE_STDOUT_CALLBACK:-debug} \
   -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
-  -e UNLOCKER=${UNLOCKER} \
+  -e UNLOCKER="${UNLOCKER}" \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
   -v /etc/libvirt/libvirtd.conf:/etc/libvirt/libvirtd.conf:ro \
