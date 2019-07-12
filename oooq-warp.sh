@@ -55,6 +55,7 @@ fi
 # virthost, and whatever else non-ephemeral for undercloud VM. Until then,
 # UC may not survive the VM reboot nicely (all artifacts produced by quickstart
 # will be gone)
+IMAGECACHE_REAL=/var/cache/tripleo-quickstart/images
 if [ "${RAMFS}" = "true" ]; then
   echo "Using /tmp for images cache and working dir, all stored in RAM."
   echo "WARNING: With RAMFS=true, it may eat a lot of memory, USE WITH CAUTION!"
@@ -66,16 +67,13 @@ if [ "${RAMFS}" = "true" ]; then
   echo "WARNING: UC cannot persist its /tmp working dir though. So do not reboot it"
   echo "but suspend/resume/snapshot/revert VM instead!"
   echo
-  IMAGECACHE=/var/cache/tripleo-quickstart/images
   WORKSPACE=/tmp
-  MOUNT_IMAGECACHE="-v /tmp:${IMAGECACHE}"
+  MOUNT_IMAGECACHE="-v /tmp:${IMAGECACHE_REAL}"
 elif [ "${IMAGECACHE:-}" -a -d "${IMAGECACHE:-/tmp}" -a "${IMAGECACHE:-}" != "/home/$USER" ]; then
-  MOUNT_IMAGECACHE="-v ${IMAGECACHE}:/var/cache/tripleo-quickstart/images"
+  MOUNT_IMAGECACHE="-v ${IMAGECACHE}:${IMAGECACHE_REAL}"
 else
-  echo "Not bind-mounting IMAGECACHE ${IMAGECACHE:-}"
-  echo "NOTE: it cannot take the current user's \$HOME path"
-  IMAGECACHE=/var/cache/tripleo-quickstart/images
-  echo "Using ephemeral IMAGECACHE ${IMAGECACHE} instead"
+  echo "Using ephemeral cache for images ${IMAGECACHE_REAL} instead"
+  echo "NOTE: IMAGECACHE cannot take the current user's \$HOME path!"
   echo
 fi
 
@@ -102,7 +100,7 @@ fi
 if [ "$RAMFS" != "false" ]; then
   KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}"|sort -u)
 else
-  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}"|sort -u)
+  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}\n${IMAGECACHE_REAL}"|sort -u)
 fi
 
 # FIXME: Fedora28 support for quickstart ansible-runner
@@ -121,7 +119,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e WORKSPACE=${WORKSPACE} \
   -e OPT_WORKDIR=${LWD} \
   -e LWD=${LWD} \
-  -e IMAGECACHE=${IMAGECACHE} \
+  -e IMAGECACHE=${IMAGECACHE_REAL} \
   -e IMAGECACHEBACKUP=${IMAGECACHEBACKUP:-} \
   -e OOOQ_PATH=${OOOQ_PATH:-} \
   -e OOOQE_PATH=${OOOQE_PATH:-} \
