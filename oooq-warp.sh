@@ -111,6 +111,7 @@ docker run ${TERMOPTS} --rm --privileged \
   --cpus=1 --cpu-shares=${CPU} \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
+  -e RELEASE=${RELEASE:-} \
   -e RAMFS=${RAMFS} \
   -e PATH="${OOOQ_WORKPATH}:${LWD}:${PATH}" \
   -e KNOWN_PATHS="${KNOWN_PATHS}" \

@@ -80,6 +80,8 @@ for p in $KNOWN_PATHS; do
   sudo chown -R ${USER}:${USER} ${p}
 done
 
+[ "${RELEASE:-}" ] && export IMAGECACHE="${IMAGECACHE}/${RELEASE}"
+
 set +ex
 # Restore the saved state spread across LWD/WORKSPACE/IMAGECACHE dirs
 # (ssh keys/setup, inventory, kernel images et al)
