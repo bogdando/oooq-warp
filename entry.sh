@@ -15,29 +15,45 @@ export WORKON_HOME=$VPATH
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
 export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
 export ARGS="${@:-}"
-sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null ||:
-sudo chmod +x /usr/local/sbin/* 2>/dev/null ||:
+export ANSIBLE_LOG_PATH=ansible.log
+export ANSIBLE_INVENTORY=${HOME}/tripleo-ci-reproducer/hosts
+
+set +e
+sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null
+sudo chmod +x /usr/local/sbin/* 2>/dev/null
 
 # Ensure the wanted user setup
-sudo useradd -m -p '' -G wheel -U ${USER}||:
-sudo mkdir -p /home/${USER} /home/${USER}/.ssh
+sudo useradd -m -p '' -G wheel -U ${USER}
+if [ ! -h "${HOME}" ]; then
+  sudo mkdir -p ${LWD}/.ssh
+  sudo mkdir -p ${HOME}
+  sudo ln -sf ${LWD}/.ssh ${HOME}/
+else
+  sudo ln -sf ${LWD} ${HOME}
+fi
+set -e
+
 echo "${USER} ALL=NOPASSWD:ALL" | sudo tee /etc/sudoers.d/${USER}
 echo "Defaults:${USER} !requiretty" | sudo tee -a /etc/sudoers.d/${USER}
 sudo chmod 0440 /etc/sudoers.d/${USER}
-echo 'export WORKON_HOME=/home/${USER}/Envs' | sudo tee /home/${USER}/.bashrc
-echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python' | sudo tee -a /home/${USER}/.bashrc
-echo '. /usr/bin/virtualenvwrapper.sh' | sudo tee -a /home/${USER}/.bashrc
+echo 'export WORKON_HOME=${HOME}/Envs' | sudo tee ${HOME}/.bashrc
+echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python' | sudo tee -a ${HOME}/.bashrc
+echo '. /usr/bin/virtualenvwrapper.sh' | sudo tee -a ${HOME}/.bashrc
 
 # FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
-sudo ln -sf ${VPATH} ${HOME}/
+if [ ! -h "${HOME}" ]; then
+  sudo ln -sf ${VPATH} ${HOME}/
+else
+  sudo ln -sf ${VPATH} ${LWD}/
+fi
 sudo rm -rf "${LWD}/config" "${LWD}/playbooks"
 sudo ln -sf ${VPATH}/oooq/* "${LWD}/"
 
-for p in $KNOWN_PATHS /home/${USER}; do
+for p in $KNOWN_PATHS ${HOME}; do
   [ "$p" = "${VPATH}/oooq" ] && continue
   echo "Chowning images cache and working dirs for ${p} (may take a while)..."
-  sudo mkdir -p ${p}
-  sudo chown -R ${USER}:${USER} ${p}
+  sudo mkdir -p ${p} ||:
+  sudo chown -R ${USER}:${USER} ${p} ||:
 done
 
 cd $HOME
@@ -76,8 +92,8 @@ else
   sudo rsync -aLH $OOOQE_WORKPATH/roles "${LWD}"
 fi
 for p in $KNOWN_PATHS; do
-  [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" ] && continue
-  sudo chown -R ${USER}:${USER} ${p}
+  [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" -a ! -h "$HOME" ] && continue
+  sudo chown -R ${USER}:${USER} ${p} ||:
 done
 
 [ "${RELEASE:-}" ] && export IMAGECACHE="${IMAGECACHE}/${RELEASE}"
@@ -90,6 +106,7 @@ if [ "${TEARDOWN}" = "false" ]; then
   save-state.sh --sync
   sudo mkdir -p /etc/ansible
   sudo cp -f "${LWD}/hosts" /etc/ansible/ 2>/dev/null
+  eval $(ssh-agent)
 else
   echo "Cleaning up state as TEARDOWN was requested"
   save-state.sh --purge
@@ -98,7 +115,19 @@ else
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
     cp -af ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
   fi
+  echo Pre-generate ssh keys for CI reproducer
+  eval $(ssh-agent)
+  ssh-keygen -b 1024 -t rsa -f ${HOME}/.ssh/id_rsa -N "" -q
+  ssh-keygen -yf ${HOME}/.ssh/id_rsa > ${HOME}/.ssh/id_rsa.pub
+  cp -f ${HOME}/.ssh/id_rsa ${HOME}/.ssh/id_rsa.agent
+  cp -f ${HOME}/.ssh/id_rsa.pub ${HOME}/.ssh/id_rsa.pub.agent
+  chmod 0600 ${HOME}/.ssh/id*
 fi
+ssh-add /var/tmp/.ssh/gerrit/id_rsa
+ssh-add ${HOME}/.ssh/id_rsa.agent
+ssh-add ${HOME}/.ssh/id_rsa
+sudo mkdir -p /root/.ssh
+sudo cp -f ${HOME}/.ssh/id* /root/.ssh
 
 # Regenerate the latest-* images from the existing state
 if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then

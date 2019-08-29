@@ -11,6 +11,8 @@
     "run_command": [
       "-ti",
       "-v",
+      "/var/tmp:/tmp",
+      "-v",
       "{{user `oooq_path`}}:/tmp/oooq:ro",
       "-d",
       "{{.Image}}",

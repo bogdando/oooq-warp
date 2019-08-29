@@ -34,6 +34,12 @@ $ packer build packer-docker-oooq-runner.json
 Adapt these for your case or jut use existing images. It also requires
 ``OOOQ_PATH`` set and pointing to the quickstart clonned locally.
 
+## Using it with TripleO CI reproducer
+
+* [CI reproducer](./docs/CI-reproducer.md)
+
+No longer maintainer contents:
+
 See more:
 * [Pre-flight checks for a warp jump](./docs/pre-flight.md)
 * [Libvirt virthost preparations](./docs/libvirt-prep.md)

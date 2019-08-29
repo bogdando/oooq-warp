@@ -29,11 +29,26 @@ OOOQ_WORKPATH=/var/tmp/oooq
 OOOQE_WORKPATH=/var/tmp/oooq-extras
 SCRIPTS_WORKPATH=/var/tmp/scripts
 USE_QUICKSTART_WRAP=false
+GERRITKEY=${GERRITKEY:-/home/${USER}/.ssh/id_rsa}
 
 set +x
 uid=$(id -u $USER)
-gid=$(id -g $USER)
+if [ $? -ne 0 ]; then
+  uid=0
+  USER=donkey
+fi
+gid=$(id -g $USER) || gid=1000
+set -e
+
+if [ "${USER}" = "donkey" ]; then
+  UMOUNTS="-e UMOUNTS=donkeys -v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_rsa:ro"
+else
+  UMOUNTS="-v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /etc/shadow:/etc/shadow:ro -v /etc/sudoers:/etc/sudoers:ro"
+  UMOUNTS="${UMOUNTS} -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys -v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_rsa:ro"
+fi
+
 host_libvirt_gid=$(cut -d: -f3 <(getent group libvirt))
+host_docker_gid=$(cut -d: -f3 <(getent group docker))
 
 if [ "${OOOQE_PATH:-}" -a -d "${OOOQE_PATH:-/tmp}" ]; then
   MOUNT_EXTRAS="-v ${OOOQE_PATH}:${OOOQE_WORKPATH}"
@@ -78,7 +93,7 @@ else
 fi
 
 if [ "${LWD:-}" -a -d "${LWD:-/tmp}" -a "${LWD:-}" != "/home/$USER" -a "${LWD:-}" != "$IMAGECACHE" ]; then
-  MOUNT_LWD="-v ${LWD}:${LWD}"
+  MOUNT_LWD="-v ${LWD}:${LWD}:shared"
 else
   echo "Not bind-mounting local working dir LWD ${LWD:-}"
   echo "NOTE: it cannot take the current user's \$HOME path or share IMAGECACHE dir"
@@ -88,19 +103,19 @@ else
 fi
 
 if [ "${WORKSPACE:-}" -a -d "${WORKSPACE:-/tmp}" -a "${WORKSPACE:-}" != "/home/$USER" -a "${WORKSPACE:-}" != "$IMAGECACHE" ]; then
-  MOUNT_WORKSPACE="-v ${WORKSPACE}:${WORKSPACE}"
+  MOUNT_WORKSPACE="-v ${WORKSPACE}:${WORKSPACE}:shared"
 else
   echo "Not bind-mounting working dir WORKSPACE ${WORKSPACE:-}"
   echo "NOTE: it cannot take the current user's \$HOME path or share IMAGECACHE dir"
-  WORKSPACE=/home/$USER
-  echo "Using ephemeral WORKSPACE $WORKSPACE instead"
+  WORKSPACE=$LWD
+  echo "Using LWD as WORKSPACE instead"
   echo
 fi
 
 if [ "$RAMFS" != "false" ]; then
-  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}"|sort -u)
+  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n/home/${USER}/.ssh"|sort -u)
 else
-  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n${IMAGECACHE}\n${IMAGECACHE_REAL}"|sort -u)
+  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n/home/${USER}/.ssh\n${IMAGECACHE}\n${IMAGECACHE_REAL}"|sort -u)
 fi
 
 # FIXME: Fedora28 support for quickstart ansible-runner
@@ -150,12 +165,23 @@ docker run ${TERMOPTS} --rm --privileged \
   -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
   -e UNLOCKER="${UNLOCKER}" \
+  -v /etc/docker:/etc/docker:ro \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
+  -v /var/run/docker.sock:/var/run/docker.sock \
   -v /etc/libvirt/libvirtd.conf:/etc/libvirt/libvirtd.conf:ro \
   -v /dev:/dev \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /lib/modules:/lib/modules:ro \
+  -v config:/home/${USER}/.config/openstack \
+  -v etc_nodepool:/home/${USER}/tripleo-ci-reproducer/etc_nodepool \
+  -v etc_zuul:/home/${USER}/tripleo-ci-reproducer/etc_zuul \
+  -v logs:/home/${USER}/tripleo-ci-reproducer/logs \
+  -v pki:/home/${USER}/tripleo-ci-reproducer/etc/pki/ \
+  -v playbooks:/home/${USER}/tripleo-ci-reproducer/playbooks \
+  -v projects:/home/${USER}/tripleo-ci-reproducer/projects \
+  -v httpd:/home/${USER}/tripleo-ci-reproducer/httpd \
+  -v zuul:/var/lib/zuul \
   ${MOUNT_IMAGECACHE:-} \
   ${MOUNT_QUICKSTART:-} \
   ${MOUNT_EXTRAS:-} \
@@ -173,6 +199,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v /etc/sudoers:/etc/sudoers:ro \
   -v /boot:/boot:ro \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
+  --group-add ${host_docker_gid} \
   --entrypoint /usr/local/sbin/entry.sh \
   --name runner bogdando/oooq-runner:0.2 \
   ${@:-}

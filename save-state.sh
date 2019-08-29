@@ -35,6 +35,7 @@ if [ "${cmd}" = "--sync" ]; then
       rsync -qauxH $LWD/$state ${WORKSPACE}/
     fi
   done
+  chmod 600 /home/${USER}/.ssh/id_*
   chmod 600 ${LWD}/id_*
   chmod 600 ${WORKSPACE}/id_*
   chmod 600 ${IMAGECACHE}/id_*
