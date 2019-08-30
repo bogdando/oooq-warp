@@ -31,7 +31,7 @@ SCRIPTS_WORKPATH=/var/tmp/scripts
 USE_QUICKSTART_WRAP=false
 GERRITKEY=${GERRITKEY:-/home/${USER}/.ssh/id_rsa}
 
-set +x
+set +xe
 uid=$(id -u $USER)
 if [ $? -ne 0 ]; then
   uid=0
@@ -165,6 +165,8 @@ docker run ${TERMOPTS} --rm --privileged \
   -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
   -e UNLOCKER="${UNLOCKER}" \
+  -e DOCKERGID="${host_docker_gid}" \
+  -e LIBVIRTGID="${host_libvirt_gid}" \
   -v /etc/docker:/etc/docker:ro \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
@@ -188,15 +190,11 @@ docker run ${TERMOPTS} --rm --privileged \
   ${MOUNT_IMAGECACHEBACKUP:-} \
   ${MOUNT_WORKSPACE:-} \
   ${MOUNT_LWD:-} \
+  ${UMOUNTS:-} \
   -v ${PWD}/ansible.cfg:${OOOQ_WORKPATH}/ansible.cfg:ro \
   -v ${PWD}/entry.sh:/usr/local/sbin/entry.sh:ro \
   -v ${PWD}/save-state.sh:/usr/local/sbin/save-state.sh:ro \
-  -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys \
   -v ${PWD}:${SCRIPTS_WORKPATH}:ro \
-  -v /etc/passwd:/etc/passwd:ro \
-  -v /etc/group:/etc/group:ro \
-  -v /etc/shadow:/etc/shadow:ro \
-  -v /etc/sudoers:/etc/sudoers:ro \
   -v /boot:/boot:ro \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
   --group-add ${host_docker_gid} \

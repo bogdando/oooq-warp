@@ -23,7 +23,16 @@ sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null
 sudo chmod +x /usr/local/sbin/* 2>/dev/null
 
 # Ensure the wanted user setup
-sudo useradd -m -p '' -G wheel -U ${USER}
+if [ "${UMOUNTS:-}" = "donkeys" ]; then
+  sudo useradd -p '' -G wheel -U ${USER} -u 1000
+  echo "donkey ALL=NOPASSWD:ALL" >> /etc/sudoers
+  sed -rin '/^libvirt/d' /etc/group
+  sed -rin '/^input:/d' /etc/group
+  echo "docker:x:${DOCKERGID}:donkey" >> /etc/group
+  echo "libvirt:x:${LIBVIRTGID}:donkey" >> /etc/group
+else
+  sudo useradd -p '' -G wheel -U ${USER}
+fi
 if [ ! -h "${HOME}" ]; then
   sudo mkdir -p ${LWD}/.ssh
   sudo mkdir -p ${HOME}
@@ -180,7 +189,11 @@ cd "${LWD}"
   echo Or use quickstart.sh as usual - that requires manual saving for any produced state,
   echo "like 'save-state.sh --sync' or 'save-state.sh \$LWD/\$WORKSPACE/\$IMAGECACHE'"
   echo "Use 'save-state.sh --purge' to nuke all the saved quickstart state but in \$IMAGECACHEBACKUP"
-  /bin/bash
+  if [ "${UMOUNTS:-}" = "donkeys" ]; then
+    su -p $USER
+  else
+    /bin/bash
+  fi
 else
   if [ "$USE_QUICKSTART_WRAP" = "false" ]; then
     create_env_oooq.sh $ARGS
