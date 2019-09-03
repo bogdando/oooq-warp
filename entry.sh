@@ -115,6 +115,7 @@ if [ "${TEARDOWN}" = "false" ]; then
   save-state.sh --sync
   sudo mkdir -p /etc/ansible
   sudo cp -f "${LWD}/hosts" /etc/ansible/ 2>/dev/null
+  cp -f "${LWD}/hosts" ${ANSIBLE_INVENTORY} 2>/dev/null
   eval $(ssh-agent)
 else
   echo "Cleaning up state as TEARDOWN was requested"
