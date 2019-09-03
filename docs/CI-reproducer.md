@@ -19,10 +19,25 @@ TripleO projects. And run the reproducer using the forked repo:
 (oooq) $ wget -O reproducer-zuul-based-quickstart.tar <url>
 (oooq) $ tar xf reproducer-zuul-based-quickstart.tar
 (oooq) $ sudo rm -rf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer
+(oooq) $ sudo rm -f ${LWD}/vm_images/*.bak
 (oooq) $ git clone -b in_container \
   https://github.com/bogdando/ansible-role-tripleo-ci-reproducer \
   /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer
-(oooq) $ bash -x reproducer-zuul-based-quickstart.sh   -w /var/tmp/reproduce -e @extra.yaml -l
+(oooq) $ ansible-galaxy install -f -r \
+  /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/galaxy-requirements.yaml
+(oooq) $ ln -sf ~/.ansible/roles/tripleo-quickstart-extras/tripleo-quickstart-extras/roles/* \
+  /var/tmp/reproduce/roles/
+(oooq) $ bash -x reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -l \
+  --ssh-key-path /var/tmp/.ssh/gerrit -e @extra.yaml -e create_snapshot=true
+```
+
+Or to retry it from the snapshots:
+```
+(oooq) $ sudo chmod a+r ${LWD}/vm_images/*
+(oooq) $ sudo chown root:root ${LWD}/vm_images/*.qcow2
+(oooq) $ sudo cp ~/tripleo-ci-reproducer/hosts /etc/ansible
+(oooq) $ bash -x reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -l \
+  --ssh-key-path /var/tmp/.ssh/gerrit -e @extra.yaml -e restore_snapshot=true
 ```
 
 The custom `extra.yaml` example:
@@ -43,6 +58,6 @@ toci_vxlan_networking: false
 modify_image_vc_root_password: r00tme
 libvirt_volume_path: /opt/.quickstart/vm_images
 mergers: 2
-ssh_path: /var/tmp/.ssh/gerrit # this is a mandatory, do not change
-:
 ```
+
+The ansible log can be found in `/var/tmp/reproduce/ansible.log`.
