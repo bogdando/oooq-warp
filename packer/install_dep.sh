@@ -15,5 +15,4 @@ pip install dumb-init || exit 1
 # Required for the new CI reproducer
 pip install virtualenv bindep || exit 1
 pip install docker || exit 1
-#pip install docker-py || exit 1
 pip install docker-compose || exit 1

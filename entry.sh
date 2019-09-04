@@ -16,6 +16,7 @@ export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
 export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
 export ARGS="${@:-}"
 export ANSIBLE_LOG_PATH=ansible.log
+export ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
 export ANSIBLE_INVENTORY=${HOME}/tripleo-ci-reproducer/hosts
 
 set +e
