@@ -25,6 +25,7 @@ TripleO projects. And run the reproducer using the forked repo:
   /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer
 (oooq) $ ansible-galaxy install -f -r \
   /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/galaxy-requirements.yaml
+(oooq) $ mkdir -p /var/tmp/reproduce/roles/
 (oooq) $ ln -sf ~/.ansible/roles/tripleo-quickstart-extras/tripleo-quickstart-extras/roles/* \
   /var/tmp/reproduce/roles/
 (oooq) $ bash -x reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -l \
@@ -35,7 +36,6 @@ Or to retry it from the snapshots:
 ```
 (oooq) $ sudo chmod a+r ${LWD}/vm_images/*
 (oooq) $ sudo chown root:root ${LWD}/vm_images/*.qcow2
-(oooq) $ sudo cp ~/tripleo-ci-reproducer/hosts /etc/ansible
 (oooq) $ bash -x reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -l \
   --ssh-key-path /var/tmp/.ssh/gerrit -e @extra.yaml -e restore_snapshot=true
 ```
