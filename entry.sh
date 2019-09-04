@@ -114,8 +114,8 @@ set +ex
 if [ "${TEARDOWN}" = "false" ]; then
   echo "Restoring state (syncing across known LWD/WORKSPACE/IMAGECACHE paths)"
   save-state.sh --sync
-  sudo mkdir -p /etc/ansible
-  sudo cp -f "${LWD}/hosts" /etc/ansible/ 2>/dev/null
+  sudo chmod a+r ${LWD}/vm_images/*
+  sudo chown root:root ${LWD}/vm_images/*.qcow2
   cp -f "${LWD}/hosts" ${ANSIBLE_INVENTORY} 2>/dev/null
   eval $(ssh-agent)
 else
