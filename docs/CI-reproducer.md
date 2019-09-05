@@ -25,14 +25,13 @@ TripleO projects. And run the reproducer using the forked repo:
   /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer
 (oooq) $ ansible-galaxy install -f -r \
   /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/galaxy-requirements.yaml
-(oooq) $ mkdir -p /var/tmp/reproduce/roles/
 (oooq) $ ln -sf ~/.ansible/roles/tripleo-quickstart-extras/tripleo-quickstart-extras/roles/* \
   /var/tmp/reproduce/roles/
 (oooq) $ bash -x reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -l \
   --ssh-key-path /var/tmp/.ssh/gerrit -e @extra.yaml -e create_snapshot=true
 ```
 
-Or to retry it from the snapshots:
+Or to retry it from the `${LWD}/vm_images/*.bak` snapshots:
 ```
 (oooq) $ sudo chmod a+r ${LWD}/vm_images/*
 (oooq) $ sudo chown root:root ${LWD}/vm_images/*.qcow2
@@ -58,6 +57,7 @@ toci_vxlan_networking: false
 modify_image_vc_root_password: r00tme
 libvirt_volume_path: /opt/.quickstart/vm_images
 mergers: 2
+mirror_path: mirror01.ord.rax.openstack.org
 ```
 
 The ansible log can be found in `/var/tmp/reproduce/ansible.log`.
