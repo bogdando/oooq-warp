@@ -22,6 +22,15 @@ export ANSIBLE_INVENTORY=${HOME}/tripleo-ci-reproducer/hosts
 set +e
 sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null
 sudo chmod +x /usr/local/sbin/* 2>/dev/null
+sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/etc_nodepool
+sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/etc_zuul
+sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/logs
+sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/etc/pki
+sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/playbooks
+sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/projects
+sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/httpd
+sudo chmod a+rw /home/${USER}/.config/openstack
+sudo chmod a+rw /var/lib/zuul
 
 # Ensure the wanted user setup
 if [ "${UMOUNTS:-}" = "donkeys" ]; then
