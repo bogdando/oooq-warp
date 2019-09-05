@@ -59,7 +59,7 @@ fi
 sudo rm -rf "${LWD}/config" "${LWD}/playbooks"
 sudo ln -sf ${VPATH}/oooq/* "${LWD}/"
 
-for p in $KNOWN_PATHS ${HOME}; do
+for p in $KNOWN_PATHS ${HOME} /var/tmp/reproduce; do
   [ "$p" = "${VPATH}/oooq" ] && continue
   echo "Chowning images cache and working dirs for ${p} (may take a while)..."
   sudo mkdir -p ${p} ||:
@@ -138,7 +138,9 @@ ssh-add /var/tmp/.ssh/gerrit/id_rsa
 ssh-add ${HOME}/.ssh/id_rsa.agent
 ssh-add ${HOME}/.ssh/id_rsa
 sudo mkdir -p /root/.ssh
+sudo mkdir -p /var/tmp/reproduce/.ssh
 sudo cp -f ${HOME}/.ssh/id* /root/.ssh
+sudo cp -f ${HOME}/.ssh/id* /var/tmp/reproduce/.ssh
 
 # Regenerate the latest-* images from the existing state
 if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then

@@ -184,6 +184,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v projects:/home/${USER}/tripleo-ci-reproducer/projects \
   -v httpd:/home/${USER}/tripleo-ci-reproducer/httpd \
   -v zuul:/var/lib/zuul \
+  -v reproduce:/var/tmp/reproduce \
   ${MOUNT_IMAGECACHE:-} \
   ${MOUNT_QUICKSTART:-} \
   ${MOUNT_EXTRAS:-} \
