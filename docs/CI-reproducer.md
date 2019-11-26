@@ -45,17 +45,25 @@ TripleO projects. And run the reproducer using the forked repo:
 ```
 (oooq) $ wget -O reproducer-zuul-based-quickstart.tar <url>
 (oooq) $ tar xf reproducer-zuul-based-quickstart.tar
-(oooq) $ sudo rm -rf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer
-(oooq) $ sudo rm -f ${LWD}/vm_images/*.bak
-(oooq) $ git clone -b in_container \
+(oooq) $ sudo rm -rf /var/tmp/reproduce/git /var/tmp/reproduce/roles/
+(oooq) $ git clone --depth 1 -b in_container \
   https://github.com/bogdando/ansible-role-tripleo-ci-reproducer \
   /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer
-(oooq) $ ansible-galaxy install -f -r \
-  /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/galaxy-requirements.yaml
-(oooq) $ ln -sf ~/.ansible/roles/tripleo-quickstart-extras/tripleo-quickstart-extras/roles/* \
+(oooq) $ git clone --depth 1 -b dev \
+  https://github.com/bogdando/tripleo-quickstart \
+ /var/tmp/reproduce/git/tripleo-quickstart
+(oooq) $ git clone --depth 1 -b dev \
+  https://github.com/bogdando/tripleo-quickstart-extras \
+  /var/tmp/reproduce/git/tripleo-quickstart-extras
+(oooq) $ mkdir -p /var/tmp/reproduce/roles/
+(oooq) $ ln -sf /var/tmp/reproduce/git/tripleo-quickstart-extras/roles/* \
   /var/tmp/reproduce/roles/
-(oooq) $ bash -x reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -l \
-  --ssh-key-path /var/tmp/.ssh/gerrit -e @extra.yaml -e create_snapshot=true
+
+(oooq) $ sudo rm -f ${LWD}/vm_images/*.bak
+(oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce \
+  -e @extra.yaml -l --ssh-key-path /var/tmp/.ssh/gerrit \
+  -e create_snapshot=true -e os_autohold_node=false \
+  -e zuul_build_sshkey_cleanup=false
 ```
 
 Or to retry it from the `${LWD}/vm_images/*.bak` snapshots:
@@ -93,3 +101,20 @@ The ansible log can be found in `/var/tmp/reproduce/ansible.log`.
 At the subnodes, watch for the tails of
 `*log /tmp/console* /var/log/tripleo-container-image-prepare.log
 /var/log/paunch.log`.
+
+Another example to deploy on Fedora 31 nodes:
+```
+mirror_fqdn: ftp.up.pt
+pypi_fqdn: mirror01.ord.rax.openstack.org
+ansible_python_interpreter: /usr/bin/python3
+images:
+  - name: undercloud
+    url: file://{{ local_working_dir }}/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
+    md5sum: 726b5ea57013e6a71b1cddb25356cfe5
+    type: qcow2
+  - name: overcloud
+    url: file://{{ local_working_dir }}/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
+    md5sum: 726b5ea57013e6a71b1cddb25356cfe5
+    type: qcow2
+... (the same content as above) ...
+```
