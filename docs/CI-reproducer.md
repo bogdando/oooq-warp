@@ -1,4 +1,4 @@
-# CI reproducer
+# Zuul Based TripleO CI Reproducer (Libvirt Mode)
 
 Additionally to the already present docker, install docker-compose onto your
 host. Then teardown the docker volumes, if any:
@@ -45,39 +45,28 @@ TripleO projects. And run the reproducer using the forked repo:
 ```
 (oooq) $ wget -O reproducer-zuul-based-quickstart.tar <url>
 (oooq) $ tar xf reproducer-zuul-based-quickstart.tar
-(oooq) $ sudo rm -rf /var/tmp/reproduce/git /var/tmp/reproduce/roles/
-(oooq) $ git clone --depth 1 -b in_container \
-  https://github.com/bogdando/ansible-role-tripleo-ci-reproducer \
-  /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer
-(oooq) $ git clone --depth 1 -b dev \
-  https://github.com/bogdando/tripleo-quickstart \
- /var/tmp/reproduce/git/tripleo-quickstart
-(oooq) $ git clone --depth 1 -b dev \
-  https://github.com/bogdando/tripleo-quickstart-extras \
-  /var/tmp/reproduce/git/tripleo-quickstart-extras
-(oooq) $ mkdir -p /var/tmp/reproduce/roles/
-(oooq) $ ln -sf /var/tmp/reproduce/git/tripleo-quickstart-extras/roles/* \
-  /var/tmp/reproduce/roles/
-
-(oooq) $ sudo rm -f ${LWD}/vm_images/*.bak
-(oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce \
-  -e @extra.yaml -l --ssh-key-path /var/tmp/.ssh/gerrit \
-  -e create_snapshot=true -e os_autohold_node=false \
-  -e zuul_build_sshkey_cleanup=false
+(oooq) $ git -C /var/tmp/reproduce/git/tripleo-quickstart pull
+(oooq) $ git -C /var/tmp/reproduce/git/tripleo-quickstart-extras pull
+(oooq) $ git -C /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer pull
+(oooq) $ sudo rm -f ${LWD}/vm_images/*.bak  # removes subnodes' snapshots
+(oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
+--ssh-key-path /var/tmp/.ssh/gerrit -e create_snapshot=true -e os_autohold_node=true \
+-e zuul_build_sshkey_cleanup=false -e container_mode=docker
 ```
 
 Or to retry it from the `${LWD}/vm_images/*.bak` snapshots:
 ```
-(oooq) $ sudo chmod a+r ${LWD}/vm_images/*
+(oooq) $ sudo chmod a+r ${LWD}/vm_images/*  # unsure if needed, perhaps not!..
 (oooq) $ sudo chown root:root ${LWD}/vm_images/*.qcow2
 (oooq) $ sudo chmod -R a+rwt ~/tripleo-ci-reproducer/logs
-(oooq) $ bash -x reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -l \
-  --ssh-key-path /var/tmp/.ssh/gerrit -e @extra.yaml -e restore_snapshot=true \
-  -e os_autohold_node=false -e zuul_build_sshkey_cleanup=false
+(oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
+--ssh-key-path /var/tmp/.ssh/gerrit -e restore_snapshot=true -e os_autohold_node=true \
+-e zuul_build_sshkey_cleanup=false -e container_mode=docker
 ```
 
 The custom `extra.yaml` example:
 ```
+libvirt_packages: []
 custom_nameserver:
   - 208.67.222.220
 deploy_timeout: 360
@@ -94,27 +83,22 @@ toci_vxlan_networking: false
 modify_image_vc_root_password: r00tme
 libvirt_volume_path: /opt/.quickstart/vm_images
 mergers: 2
-mirror_path: mirror01.ord.rax.openstack.org
+```
+Add the stanza below to deploy on Centos 8 subnodes:
+```
+# WTF https://github.com/ansible/ansible/issues/43286
+ansible_python_interpreter: "/usr/bin/env python3"
+images:
+  - name: undercloud
+    url: file://{{ local_working_dir }}/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
+    md5sum: d89eb49f2c264d29225cecf2b6c83322
+    type: qcow2
+  - name: overcloud
+    url: file://{{ local_working_dir }}/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
+    md5sum: d89eb49f2c264d29225cecf2b6c83322
+    type: qcow2
 ```
 
 The ansible log can be found in `/var/tmp/reproduce/ansible.log`.
 At the subnodes, watch for the tails of
-`*log /tmp/console* /var/log/tripleo-container-image-prepare.log
-/var/log/paunch.log`.
-
-Another example to deploy on Fedora 31 nodes:
-```
-mirror_fqdn: ftp.up.pt
-pypi_fqdn: mirror01.ord.rax.openstack.org
-ansible_python_interpreter: /usr/bin/python3
-images:
-  - name: undercloud
-    url: file://{{ local_working_dir }}/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
-    md5sum: 726b5ea57013e6a71b1cddb25356cfe5
-    type: qcow2
-  - name: overcloud
-    url: file://{{ local_working_dir }}/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
-    md5sum: 726b5ea57013e6a71b1cddb25356cfe5
-    type: qcow2
-... (the same content as above) ...
-```
+`*log /tmp/console*`.
