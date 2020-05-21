@@ -1,20 +1,17 @@
 # A wrapper/warper for TripleO Quickstart
 
-A wrapper centos7 container that makes
+A wrapper container (Fedora-28 based) for
 [Quickstart](https://git.openstack.org/cgit/openstack/tripleo-quickstart)
-thinking it's running at centos box.
+or for running Zuul-based CI reproducers from TripleO CI jobs.
 
-It also helps to use the quickstart/extras playbooks off-road, via direct
-ansible-playbook commands. And sometimes it works like a warp jump!
-
-It may as well be used to deploy with [traas](https://github.com/slagle/traas)
-on openstack clouds and
-[pre-provisioned/deployed servers](https://docs.openstack.org/tripleo-docs/latest/install/advanced_deployment/deployed_server.html).
+(deprecated use case) It also helps to use the quickstart/extras playbooks
+off-road, via direct ansible-playbook commands. And sometimes it works like a
+warp jump!
 
 ## Requirements for the host OS
 
 * Packer >= 0.12 (omit it, if not going to rebuild the wrapper container)
-* Docker >= 1.13
+* Docker >= 1.13 (or podman)
 * Libvirt, qemu-kvm, libguestfs (latest perhaps?) with HW access/nested
   virtualization enabled, for local deployments only.
 
@@ -28,17 +25,17 @@ For openstack clouds hosted deployments:
 
 ## Build the wrapper container
 ```
-$ packer build packer-docker-centos7.json
+$ packer build packer-docker-fedora28.json
 $ packer build packer-docker-oooq-runner.json
 ```
 Adapt these for your case or jut use existing images. It also requires
 ``OOOQ_PATH`` set and pointing to the quickstart clonned locally.
 
-## Using it with TripleO CI reproducer
+## Using it with TripleO Zuul-based CI reproducer and libvirt
 
 * [CI reproducer](./docs/CI-reproducer.md)
 
-No longer maintainer contents:
+No longer maintained obsoleted/deprecated contents:
 
 See more:
 * [Pre-flight checks for a warp jump](./docs/pre-flight.md)

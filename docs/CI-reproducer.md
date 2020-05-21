@@ -7,8 +7,8 @@ host. Then teardown the docker volumes, if any:
 $ docker volume rm httpd logs pki playbooks projects reproduce zuul
 ```
 
-If any volumes are in use, try to remove the containers that can use it and
-repeat the previous command:
+If any volumes are in use, exit the oooq-warp container, if in it, then try to
+remove the containers that can use it and repeat the previous command:
 ```
 $ docker rm -f tripleo-ci-reproducer_logs_1 tripleo-ci-reproducer_fingergw_1 \
 tripleo-ci-reproducer_executor_1 tripleo-ci-reproducer_web_1 \
@@ -18,7 +18,7 @@ tripleo-ci-reproducer_mysql_1 tripleo-ci-reproducer_zk_1 \
 tripleo-ci-reproducer_gerrit_1 tripleo-ci-reproducer_logs_1 \
 tripleo-ci-reproducer_gerritconfig_1
 ```
-or
+or maybe that one:
 ```
 $ docker rm -f tripleocireproducer_logs_1 tripleocireproducer_fingergw_1 \
 tripleocireproducer_executor_1 tripleocireproducer_web_1 \
@@ -53,8 +53,11 @@ TripleO projects. And run the reproducer using the forked repo:
 --ssh-key-path /var/tmp/.ssh/gerrit -e create_snapshot=true -e os_autohold_node=true \
 -e zuul_build_sshkey_cleanup=false -e container_mode=docker
 ```
+If you plan to keep subnode VMs for future use and exit the wrapping container,
+run ``save-state.sh`` before exiting it.
 
-Or to retry it from the `${LWD}/vm_images/*.bak` snapshots:
+## Retry from the subnodes snapshots created earlier
+To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 ```
 (oooq) $ sudo chmod a+r ${LWD}/vm_images/*  # unsure if needed, perhaps not!..
 (oooq) $ sudo chown root:root ${LWD}/vm_images/*.qcow2
@@ -64,7 +67,7 @@ Or to retry it from the `${LWD}/vm_images/*.bak` snapshots:
 -e zuul_build_sshkey_cleanup=false -e container_mode=docker
 ```
 
-The custom `extra.yaml` example:
+## An extra.yaml example
 ```
 libvirt_packages: []
 custom_nameserver:
@@ -88,6 +91,9 @@ Add the stanza below to deploy on Centos 8 subnodes:
 ```
 # WTF https://github.com/ansible/ansible/issues/43286
 ansible_python_interpreter: "/usr/bin/env python3"
+mirror_fqdn: mirror.regionone.rdo-cloud.rdoproject.org
+pypi_fqdn: mirror01.ord.rax.opendev.org
+# package_mirror: http://mirror.centos.org/centos # requires 730602
 images:
   - name: undercloud
     url: file://{{ local_working_dir }}/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
@@ -99,6 +105,7 @@ images:
     type: qcow2
 ```
 
+## Build Logs?
 The ansible log can be found in `/var/tmp/reproduce/ansible.log`.
 At the subnodes, watch for the tails of
 `*log /tmp/console*`.
