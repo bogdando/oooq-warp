@@ -1,5 +1,14 @@
 # Zuul Based TripleO CI Reproducer (Libvirt Mode)
 
+> **NOTE** This guide suggests using forks (no bueno :-( ).
+> But those are rebased from time to time, and some patches are getting merged upstream.
+> * [ansible-role-tripleo-ci-reproducer](https://github.com/bogdando/ansible-role-tripleo-ci-reproducer/tree/in_container)
+>   to run things wrapped in a container, and to support custom `mirror_fqdn` for custom images;
+> * [tripleo-quickstart-extras](https://github.com/bogdando/tripleo-quickstart-extras/tree/dev)
+    to use snapshot-libvirt, and to support custom `mirror_fqdn` for custom images;
+> * [tripleo-quickstart](https://github.com/bogdando/tripleo-quickstart/tree/dev)
+    with static multi-node libvirt nodepool and some py3 shenanigans mostly.
+
 Additionally to the already present docker, install docker-compose onto your
 host. Then teardown the docker volumes, if any:
 
