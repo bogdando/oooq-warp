@@ -38,15 +38,23 @@ tripleocireproducer_gerrit_1 tripleocireproducer_logs_1 \
 tripleocireproducer_gerritconfig_1
 ```
 
-Then start the wrapper container:
+Prepare a gerrit key for the example gerrit and local users named donkey:
+```
+$ mkdir -p /donkeys
+$ ssh-keygen -b 1024 -t rsa -f /donkeys/donkey -N "" -q
+$ ssh-keygen -yf  /donkeys/donkey > /donkeys/donkey.pub
+```
+Add that public key to the donkey's SSH keys in the opendev and rdo gerrits.
+Then start the wrapper container (or see below how to run on host):
 ```
 $ USER=donkey GERRITKEY=/donkeys/donkey TEARDOWN=true \
   LWD=/opt/.quickstart RAMFS=false \
   TERMOPTS=-it ./oooq-warp.sh
 ```
-Note, `GERRITKEY` defaults to `$HOME/.ssh/id_rsa` for the given user. It must
-point to the private SSH key used to connect the upstream opendev gerrit w/o
-a password set for the key.
+Note, `GERRITKEY` defaults to `$HOME/.ssh/id_rsa` for the given user `donkey`.
+It must point to the private SSH key used to connect the upstream opendev/rdo
+gerrits w/o a password set for the key. This assumes the gerrit user name is
+also `donkey` for opendev and rdo gerrits.
 
 Download the reproducer by `<url>`, take it from any executed Zuul CI job for
 TripleO projects. And run the reproducer using the forked repo:
@@ -60,7 +68,8 @@ TripleO projects. And run the reproducer using the forked repo:
 (oooq) $ sudo rm -f ${LWD}/vm_images/*.bak  # removes subnodes' snapshots
 (oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
 --ssh-key-path /var/tmp/.ssh/gerrit -e create_snapshot=true -e os_autohold_node=true \
--e zuul_build_sshkey_cleanup=false -e container_mode=docker
+-e zuul_build_sshkey_cleanup=false -e container_mode=docker \
+-e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey
 ```
 If you plan to keep subnode VMs for future use and exit the wrapping container,
 run ``save-state.sh`` before exiting it.
@@ -73,12 +82,56 @@ To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 (oooq) $ sudo chmod -R a+rwt ~/tripleo-ci-reproducer/logs
 (oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
 --ssh-key-path /var/tmp/.ssh/gerrit -e restore_snapshot=true -e os_autohold_node=true \
--e zuul_build_sshkey_cleanup=false -e container_mode=docker
+-e zuul_build_sshkey_cleanup=false -e container_mode=docker \
+-e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey
+```
+
+## Running on host without the wrapper container
+
+If you run CI reproducer on a disposable Centos/Fedora/RHEL host with libvirt,
+kvm, ansible and docker/podman pre-installed, a few extra steps are needed (here
+logged in as the example user donkey):
+```
+$ cat > ~/.ssh/config << EOF
+Host localhost
+        Hostname localhost
+        User zuul
+        PubkeyAuthentication yes
+        IdentityFile /donkeys/donkey # the donkey's gerrit key
+Host review.opendev.org
+        Hostname review.opendev.org
+        User donkey
+        PubkeyAuthentication yes
+        IdentityFile /donkeys/donkey # the donkey's gerrit key
+Host review.rdoproject.org
+        Hostname review.rdoproject.org
+        User donkey
+        PubkeyAuthentication yes
+        IdentityFile /donkeys/donkey # the donkey's gerrit key
+EOF
+$ chmod 600 ~/.ssh/config
+
+$ eval $(ssh-agent)
+$ ssh-keygen -b 1024 -t rsa -f ~/.ssh/id_rsa -N "" -q
+$ ssh-keygen -yf ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+$ cp -f ~/.ssh/id_rsa ~/.ssh/id_rsa.agent
+$ cp -f ~/.ssh/id_rsa.pub ~/.ssh/id_rsa.pub.agent
+$ chmod 0600 ~/.ssh/id*
+$ sudo mkdir -p /root/.ssh
+$ sudo cp -f ~/.ssh/id* /root/.ssh
+$ ssh-add ~/.ssh/id_rsa.agent
+$ ssh-add ~/.ssh/id_rsa
+
+$ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
+--ssh-key-path /donkeys -e os_autohold_node=true \
+-e zuul_build_sshkey_cleanup=false -e container_mode=docker \
+-e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey
 ```
 
 ## An extra.yaml example
 ```
-libvirt_packages: []
+libvirt_packages: [] # only when running in a wrapper container                                                                                                                                   │·······························
+mirror_path: mirror.regionone.rdo-cloud.rdoproject.org
 custom_nameserver:
   - 208.67.222.220
 deploy_timeout: 360
@@ -93,7 +146,7 @@ image_cache_expire_days: 30
 vxlan_networking: false
 toci_vxlan_networking: false
 modify_image_vc_root_password: r00tme
-libvirt_volume_path: /opt/.quickstart/vm_images
+libvirt_volume_path: /opt/.quickstart/vm_images # only when in a wrapper container
 mergers: 2
 ```
 Add the stanza below to deploy on Centos 8 subnodes:
