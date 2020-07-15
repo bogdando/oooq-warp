@@ -149,22 +149,35 @@ modify_image_vc_root_password: r00tme
 libvirt_volume_path: /opt/.quickstart/vm_images # only when in a wrapper container
 mergers: 2
 ```
+## Centos 8
+
+You can fetch images from `https://nb01.opendev.org/images`,
+`https://nb02.opendev.org/images`, or `https://nb04.opendev.org/images`.
+There is also `http://images.rdoproject.org/CentOS-8-x86_64-GenericCloud.qcow2`.
+Some of them may not have python or yum installed:
+```
+$ sudo virt-customize -a centos-8-0000070956.qcow2 --run-command \
+    'dnf -y install python3 yum screen'
+$ md5sum centos-8-0000070956.qcow2
+```
+
 Add the stanza below to deploy on Centos 8 subnodes:
 ```
 # WTF https://github.com/ansible/ansible/issues/43286
-ansible_python_interpreter: "/usr/bin/env python3"
+#ansible_python_interpreter: "/usr/bin/env python3"
+ansible_python_interpreter: /usr/bin/python3
 mirror_fqdn: mirror.regionone.rdo-cloud.rdoproject.org
 pypi_fqdn: mirror01.ord.rax.opendev.org
 # package_mirror: http://mirror.centos.org/centos # requires 730602
 images:
   - name: undercloud
-    url: file://{{ local_working_dir }}/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
-    md5sum: d89eb49f2c264d29225cecf2b6c83322
+    url: file://{{ local_working_dir }}/centos-8-0000070956.qcow2
+    md5sum: <updated md5>
     type: qcow2
   - name: overcloud
-    url: file://{{ local_working_dir }}/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
-    md5sum: d89eb49f2c264d29225cecf2b6c83322
-    type: qcow2
+    url: file://{{ local_working_dir }}/centos-8-0000070956.qcow2
+    md5sum: 5ad075b5c671a91c7c1c20b6e06dab18
+    md5sum: <updated md5>
 ```
 
 ## Build Logs?
