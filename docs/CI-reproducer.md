@@ -83,7 +83,7 @@ To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 (oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
 --ssh-key-path /var/tmp/.ssh/gerrit -e restore_snapshot=true -e os_autohold_node=true \
 -e zuul_build_sshkey_cleanup=false -e container_mode=docker \
--e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey
+-e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey -e ansible_user_id=donkey
 ```
 
 ## Running on host without the wrapper container
@@ -128,12 +128,19 @@ $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l 
 -e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey
 ```
 
+If it fails to resize undercloud VM disk, open `a+r` for `/boot/vmlinuz*` for the
+host OS, then repeat the failed command in the wrapper container manually, like:
+```
+$ virt-resize -v -x --expand /dev/sda1 \
+    ~/tripleo-ci-reproducer/undercloud.qcow2 \
+    ~/tripleo-ci-reproducer/undercloud-resized.qcow2
+```
+
 ## An extra.yaml example
 ```
 libvirt_packages: [] # only when running in a wrapper container                                                                                                                                   │·······························
 mirror_path: mirror.regionone.rdo-cloud.rdoproject.org
-custom_nameserver:
-  - 208.67.222.220
+custom_nameserver: 208.67.222.220
 deploy_timeout: 360
 compute_memory: 4096
 compute_vcpu: 1
@@ -151,32 +158,32 @@ mergers: 2
 ```
 ## Centos 8
 
-You can fetch images from `https://nb01.opendev.org/images`,
+You can [Cloud Images](https://cloud.centos.org/centos/8/x86_64/images/) or try
+OS Infra images from `https://nb01.opendev.org/images`,
 `https://nb02.opendev.org/images`, or `https://nb04.opendev.org/images`.
 There is also `http://images.rdoproject.org/CentOS-8-x86_64-GenericCloud.qcow2`.
 Some of them may not have python or yum installed:
 ```
-$ sudo virt-customize -a centos-8-0000070956.qcow2 --run-command \
+$ sudo virt-customize -a centos-8.qcow2 --run-command \
     'dnf -y install python3 yum screen'
-$ md5sum centos-8-0000070956.qcow2
+$ md5sum centos-8.qcow2
 ```
 
 Add the stanza below to deploy on Centos 8 subnodes:
 ```
 # WTF https://github.com/ansible/ansible/issues/43286
+# try whatever works for you:
 #ansible_python_interpreter: "/usr/bin/env python3"
 ansible_python_interpreter: /usr/bin/python3
 mirror_fqdn: mirror.regionone.rdo-cloud.rdoproject.org
 pypi_fqdn: mirror01.ord.rax.opendev.org
-# package_mirror: http://mirror.centos.org/centos # requires 730602
 images:
   - name: undercloud
-    url: file://{{ local_working_dir }}/centos-8-0000070956.qcow2
+    url: file://{{ local_working_dir }}/centos-8.qcow2
     md5sum: <updated md5>
     type: qcow2
   - name: overcloud
-    url: file://{{ local_working_dir }}/centos-8-0000070956.qcow2
-    md5sum: 5ad075b5c671a91c7c1c20b6e06dab18
+    url: file://{{ local_working_dir }}/centos-8.qcow2
     md5sum: <updated md5>
 ```
 
