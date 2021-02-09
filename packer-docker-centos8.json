@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "headless": "true",
+    "auser": "{{env `USER`}}",
+    "oooq_path": "{{env `OOOQ_PATH`}}"
+  },
+  "builders": [{
+    "type": "docker",
+    "image": "centos:8",
+    "commit": true,
+    "run_command": [
+      "-ti",
+      "-v",
+      "/var/tmp:/tmp",
+      "-v",
+      "{{user `oooq_path`}}:/tmp/oooq:ro",
+      "-d",
+      "{{.Image}}",
+      "/bin/bash"
+    ]
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "environment_vars": [
+      "USER={{user `auser`}}"
+    ],
+    "execute_command": "{{.Vars}} sh '{{.Path}}'",
+    "scripts": [
+      "packer/install_pkg.sh"
+    ]
+  }],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "only": ["docker"],
+        "repository": "bogdando/oooq-base",
+        "tag": "0.2",
+        "keep_input_artifact": false
+      }
+    ]
+  ]
+}
