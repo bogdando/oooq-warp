@@ -48,7 +48,7 @@ Add that public key to the donkey's SSH keys in the opendev and rdo gerrits.
 Then start the wrapper container (or see below how to run on host):
 ```
 $ USER=donkey GERRITKEY=/donkeys/donkey TEARDOWN=true \
-  LWD=/opt/.quickstart RAMFS=false \
+  LWD=/opt/.quickstart RAMFS=false RELEASE=master \
   TERMOPTS=-it ./oooq-warp.sh
 ```
 Note, `GERRITKEY` defaults to `$HOME/.ssh/id_rsa` for the given user `donkey`.
@@ -69,7 +69,7 @@ TripleO projects. And run the reproducer using the forked repo:
 (oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
 --ssh-key-path /var/tmp/.ssh/gerrit -e create_snapshot=true -e os_autohold_node=true \
 -e zuul_build_sshkey_cleanup=false -e container_mode=docker \
--e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey
+-e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey -e release=master
 ```
 If you plan to keep subnode VMs for future use and exit the wrapping container,
 run ``save-state.sh`` before exiting it.
@@ -85,6 +85,10 @@ To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 -e zuul_build_sshkey_cleanup=false -e container_mode=docker \
 -e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey -e ansible_user_id=donkey
 ```
+
+## Retry subnodes configuration without touching existing VMs
+
+To omit libvirt provision and rebooting subnodes, add ``-e teardown=false``
 
 ## Running on host without the wrapper container
 
@@ -136,9 +140,18 @@ $ virt-resize -v -x --expand /dev/sda1 \
     ~/tripleo-ci-reproducer/undercloud-resized.qcow2
 ```
 
+> **NOTE**: If docker/compose CLI fails in container and autohold cannot be set
+> for a zuul job, run it on the host e.g.:
+```
+$ docker exec tripleo-ci-reproducer_scheduler_1 zuul autohold --project test1 \
+ --tenant tripleo-ci-reproducer --job tripleo-ci-centos-8-standalone-dlrn-hash-tag \
+ --reason reproducer_forensics
+```
+
 ## An extra.yaml example
 ```
 libvirt_packages: [] # only when running in a wrapper container                                                                                                                                   │·······························
+# or mirror.mtl01.inap.opendev.org, mirror01.ord.rax.opendev.org
 mirror_path: mirror.regionone.rdo-cloud.rdoproject.org
 custom_nameserver: 208.67.222.220
 deploy_timeout: 360
@@ -155,6 +168,10 @@ toci_vxlan_networking: false
 modify_image_vc_root_password: r00tme
 libvirt_volume_path: /opt/.quickstart/vm_images # only when in a wrapper container
 mergers: 2
+play_kube: false
+rootless: false
+release: master
+virthost_provisioning_interface: noop
 ```
 ## Centos 8
 
@@ -175,8 +192,9 @@ Add the stanza below to deploy on Centos 8 subnodes:
 # try whatever works for you:
 #ansible_python_interpreter: "/usr/bin/env python3"
 ansible_python_interpreter: /usr/bin/python3
-mirror_fqdn: mirror.regionone.rdo-cloud.rdoproject.org
+mirror_fqdn: mirror.mtl01.inap.opendev.org
 pypi_fqdn: mirror01.ord.rax.opendev.org
+package_mirror: http://mirror.centos.org/centos
 images:
   - name: undercloud
     url: file://{{ local_working_dir }}/centos-8.qcow2

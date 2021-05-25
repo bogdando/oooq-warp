@@ -6,7 +6,7 @@
   },
   "builders": [{
     "type": "docker",
-    "image": "bogdando/oooq-base:0.2",
+    "image": "bogdando/oooq-base:0.3",
     "commit": true,
     "run_command": [
       "-ti",
@@ -35,7 +35,7 @@
         "type": "docker-tag",
         "only": ["docker"],
         "repository": "bogdando/oooq-runner",
-        "tag": "0.2",
+        "tag": "0.3",
         "keep_input_artifact": false
       }
     ]

@@ -43,7 +43,7 @@ set -e
 if [ "${USER}" = "donkey" ]; then
   UMOUNTS="-e UMOUNTS=donkeys -v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_rsa:ro"
 else
-  UMOUNTS="-v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /etc/shadow:/etc/shadow:ro -v /etc/sudoers:/etc/sudoers:ro"
+  UMOUNTS="-v /etc/subuid:/etc/subuid:ro -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /etc/shadow:/etc/shadow:ro -v /etc/sudoers:/etc/sudoers:ro"
   UMOUNTS="${UMOUNTS} -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys -v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_rsa:ro"
 fi
 
@@ -126,7 +126,7 @@ docker run ${TERMOPTS} --rm --privileged \
   --cpus=1 --cpu-shares=${CPU} \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
-  -e RELEASE=${RELEASE:-} \
+  -e RELEASE=${RELEASE:-master} \
   -e RAMFS=${RAMFS} \
   -e PATH="${OOOQ_WORKPATH}:${LWD}:${PATH}" \
   -e KNOWN_PATHS="${KNOWN_PATHS}" \
@@ -200,5 +200,5 @@ docker run ${TERMOPTS} --rm --privileged \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
   --group-add ${host_docker_gid} \
   --entrypoint /usr/local/sbin/entry.sh \
-  --name runner bogdando/oooq-runner:0.2 \
-  ${@:-}
+  --name runner bogdando/oooq-runner:0.3 \
+  ${@:-}  #0.2.1 for RH pkg tools

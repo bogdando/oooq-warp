@@ -1,6 +1,6 @@
 # A wrapper/warper for TripleO Quickstart
 
-A wrapper container (Fedora-28 based) for
+A wrapper container (Centos 8 Stream based) for
 [Quickstart](https://git.openstack.org/cgit/openstack/tripleo-quickstart)
 or for running Zuul-based CI reproducers from TripleO CI jobs.
 

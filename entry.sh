@@ -57,7 +57,6 @@ echo "Defaults:${USER} !requiretty" | sudo tee -a /etc/sudoers.d/${USER}
 sudo chmod 0440 /etc/sudoers.d/${USER}
 echo 'export WORKON_HOME=${HOME}/Envs' | sudo tee ${HOME}/.bashrc
 echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python' | sudo tee -a ${HOME}/.bashrc
-echo '. /usr/bin/virtualenvwrapper.sh' | sudo tee -a ${HOME}/.bashrc
 
 # FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
 if [ ! -h "${HOME}" ]; then
@@ -76,7 +75,6 @@ for p in $KNOWN_PATHS ${HOME} /var/tmp/reproduce; do
 done
 
 cd $HOME
-. /usr/bin/virtualenvwrapper.sh
 . ${VPATH}/oooq/bin/activate
 [[ "$PLAY" =~ "libvirt" ]] && (. ${SCRIPTS_WORKPATH}/ssh_config)
 
