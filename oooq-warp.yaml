@@ -1,0 +1,26 @@
+---
+# Libvirt local deployments by quickstart
+- name: Provision tasks
+  hosts: localhost
+  any_errors_fatal: true
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars/virthost-local.yaml
+  roles:
+    - { role: environment/setup, when: teardown|bool }
+    - { role: libvirt/teardown, when: teardown|bool }
+    - { role: libvirt/setup/user, when: teardown|bool, become: false }
+    #- libvirt/setup/overcloud
+    - libvirt/setup/undercloud
+
+- name: Generate new inventory
+  hosts: localhost
+  any_errors_fatal: true
+  # update ansible_user_dir from root, for ssh setup
+  gather_facts: true
+  become: false
+  vars_files:
+    - vars/virthost-local.yaml
+  roles:
+    - tripleo-inventory
