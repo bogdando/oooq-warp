@@ -6,7 +6,7 @@
   },
   "builders": [{
     "type": "docker",
-    "image": "bogdando/oooq-base:0.4",
+    "image": "quay.io/centos/centos:stream9",
     "commit": true,
     "run_command": [
       "-ti",
@@ -27,7 +27,7 @@
     ],
     "execute_command": "{{.Vars}} sh '{{.Path}}'",
     "scripts": [
-      "packer/install_dep.sh"
+      "packer/install_pkg.sh"
     ]
   }],
   "post-processors": [
@@ -35,7 +35,7 @@
       {
         "type": "docker-tag",
         "only": ["docker"],
-        "repository": "bogdando/oooq-runner",
+        "repository": "bogdando/oooq-base",
         "tag": "0.4",
         "keep_input_artifact": false
       }

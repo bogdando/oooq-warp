@@ -8,7 +8,6 @@ if [ -t 1 ] ; then
 else
   export ANSIBLE_FORCE_COLOR=false
 fi
-export ANSIBLE_STDOUT_CALLBACK=debug
 echo "## Storing outputs to ./_deploy.log"
 echo "$0 $@" > _deploy.log
 exec &> >(tee -i -a _deploy.log)

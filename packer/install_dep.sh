@@ -1,5 +1,6 @@
 #!/bin/bash
-easy_install pip || ln -sf /usr/bin/pip3 /usr/bin/pip
+dnf install -y python3-pip
+ln -sf /usr/bin/pip3 /usr/bin/pip
 pip install --upgrade virtualenvwrapper || exit 1
 dnf install -y python3-virtualenv
 export WORKON_HOME=/var/tmp/Envs
@@ -18,6 +19,8 @@ pip install dumb-init
 pip install virtualenv bindep
 pip install docker
 pip install docker-compose
+# https://review.opendev.org/c/openstack/tripleo-quickstart/+/821697
+pip install lxml
 
 # my hacks for zuul reproducer in libvirt mode from a container
 git clone -b in_container https://github.com/bogdando/ansible-role-tripleo-ci-reproducer \
@@ -32,3 +35,7 @@ ln -sf /var/tmp/oooq/playbooks/* /var/tmp/reproduce/playbooks/
 ln -sf /var/tmp/oooq/library/* /var/tmp/reproduce/library/
 ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer /var/tmp/reproduce/roles/
 ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* /var/tmp/reproduce/playbooks/
+
+ansible-galaxy collection install --force \
+    -r ansible-role-requirements.yml \
+    -p /var/tmp/Envs/oooq/share/ansible/collections

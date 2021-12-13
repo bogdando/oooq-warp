@@ -161,7 +161,6 @@ docker run ${TERMOPTS} --rm --privileged \
   -e LOG_LEVEL=${LOG_LEVEL:--v} \
   -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
   -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
-  -e ANSIBLE_STDOUT_CALLBACK=${ANSIBLE_STDOUT_CALLBACK:-debug} \
   -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
   -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
   -e UNLOCKER="${UNLOCKER}" \
@@ -200,5 +199,5 @@ docker run ${TERMOPTS} --rm --privileged \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
   --group-add ${host_docker_gid} \
   --entrypoint /usr/local/sbin/entry.sh \
-  --name runner bogdando/oooq-runner:0.3 \
+  --name runner bogdando/oooq-runner:0.4 \
   ${@:-}  #0.2.1 for RH pkg tools
