@@ -38,4 +38,4 @@ ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* /va
 
 ansible-galaxy collection install --force \
     -r ansible-role-requirements.yml \
-    -p /var/tmp/Envs/oooq/share/ansible/collections
+    -p /usr/share/ansible/collections
