@@ -18,6 +18,7 @@ export ARGS="${@:-}"
 export ANSIBLE_LOG_PATH=ansible.log
 export ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
 export ANSIBLE_INVENTORY=${HOME}/tripleo-ci-reproducer/hosts
+export ANSIBLE_CONFIG=${OOOQ_WORKPATH}/ansible.cfg
 
 set +e
 sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null

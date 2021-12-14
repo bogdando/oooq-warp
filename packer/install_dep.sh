@@ -28,11 +28,11 @@ git clone -b in_container https://github.com/bogdando/ansible-role-tripleo-ci-re
 git clone -b dev https://github.com/bogdando/tripleo-quickstart /var/tmp/reproduce/git/tripleo-quickstart
 git clone -b dev https://github.com/bogdando/tripleo-quickstart-extras /var/tmp/reproduce/git/tripleo-quickstart-extras
 mkdir -p /var/tmp/reproduce/roles/ /var/tmp/reproduce/playbooks/ /var/tmp/reproduce/library/
+ln -sf ${OOOQ_WORKPATH}/roles/* /var/tmp/reproduce/roles/
+ln -sf ${OOOQ_WORKPATH}/playbooks/* /var/tmp/reproduce/playbooks/
+ln -sf ${OOOQ_WORKPATH}/library/* /var/tmp/reproduce/library/
 ln -sf /var/tmp/reproduce/git/tripleo-quickstart-extras/roles/* /var/tmp/reproduce/roles/
-ln -sf /var/tmp/oooq/roles/* /var/tmp/reproduce/roles/
 ln -sf /var/tmp/reproduce/git/tripleo-quickstart-extras/playbooks/* /var/tmp/reproduce/playbooks/
-ln -sf /var/tmp/oooq/playbooks/* /var/tmp/reproduce/playbooks/
-ln -sf /var/tmp/oooq/library/* /var/tmp/reproduce/library/
 ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer /var/tmp/reproduce/roles/
 ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* /var/tmp/reproduce/playbooks/
 
