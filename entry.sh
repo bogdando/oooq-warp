@@ -38,11 +38,16 @@ if [ "${UMOUNTS:-}" = "donkeys" ]; then
   sudo useradd -p '' -G wheel -U ${USER} -u 1000
   echo "donkey ALL=NOPASSWD:ALL" >> /etc/sudoers
   sed -rin '/^libvirt/d' /etc/group
+  sed -rin '/^kvm/d' /etc/group
   sed -rin '/^input:/d' /etc/group
+  echo "docker:x:${KVMGID}:donkey" >> /etc/group
   echo "docker:x:${DOCKERGID}:donkey" >> /etc/group
   echo "libvirt:x:${LIBVIRTGID}:donkey" >> /etc/group
 else
   sudo useradd -p '' -G wheel -U ${USER}
+  sudo useradd -p '' -G kvm -U ${USER}
+  sudo useradd -p '' -G docker -U ${USER}
+  sudo useradd -p '' -G libvirt -U ${USER}
 fi
 if [ ! -h "${HOME}" ]; then
   sudo mkdir -p ${LWD}/.ssh

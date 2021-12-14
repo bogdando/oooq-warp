@@ -1,5 +1,5 @@
 #!/bin/bash
-dnf install -y python3-pip
+dnf install -y python3-pip guestfs-tools
 ln -sf /usr/bin/pip3 /usr/bin/pip
 pip install --upgrade virtualenvwrapper || exit 1
 dnf install -y python3-virtualenv

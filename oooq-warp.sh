@@ -47,6 +47,7 @@ else
   UMOUNTS="${UMOUNTS} -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys -v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_rsa:ro"
 fi
 
+host_kvm_gid=$(cut -d: -f3 <(getent group kvm))
 host_libvirt_gid=$(cut -d: -f3 <(getent group libvirt))
 host_docker_gid=$(cut -d: -f3 <(getent group docker))
 
@@ -166,6 +167,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -e UNLOCKER="${UNLOCKER}" \
   -e DOCKERGID="${host_docker_gid}" \
   -e LIBVIRTGID="${host_libvirt_gid}" \
+  -e KVMGID="${host_kvm_gid}" \
   -v /etc/docker:/etc/docker:ro \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /run/libvirt:/run/libvirt \
@@ -198,6 +200,7 @@ docker run ${TERMOPTS} --rm --privileged \
   -v /boot:/boot:ro \
   -u ${uid}:${gid} --group-add ${host_libvirt_gid} \
   --group-add ${host_docker_gid} \
+  --group-add ${host_kvm_gid} \
   --entrypoint /usr/local/sbin/entry.sh \
   --name runner bogdando/oooq-runner:0.4 \
   ${@:-}  #0.2.1 for RH pkg tools
