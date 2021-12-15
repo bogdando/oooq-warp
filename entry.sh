@@ -53,8 +53,10 @@ if [ ! -h "${HOME}" ]; then
   sudo mkdir -p ${LWD}/.ssh
   sudo mkdir -p ${HOME}
   sudo ln -sf ${LWD}/.ssh ${HOME}/
+  sudo ln -sf ${HOME} /home/zuul
 else
   sudo ln -sf ${LWD} ${HOME}
+  sudo ln -sf ${LWD} /home/zuul
 fi
 set -e
 
@@ -190,22 +192,13 @@ save-state.sh --sync 2>&1 > /dev/null
 if [[ "$TERMOPTS" =~ "t" ]]; then
 cd "${LWD}"
   echo Note: ansible virthost is now localhost
-  echo export PLAY=oooq-libvirt-provision.yaml to bootstrap undercloud and generate inventory - default
-  echo export PLAY=oooq-libvirt-provision-build.yaml if you plan to continue with overcloud deployments
-  echo export PLAY=oooq-libvirt-under.yaml to deploy only an undercloud
-  echo export TEARDOWN=false respin a failed local deployment omitting build/provision tasks
+  echo Run a zuul libvirt reproducer script extracted from a tarball
+  echo with 'tripleo-reproducer.sh', or 'tripleo-reproducer-restore.sh'
   echo ================================================================================================
-  echo export PLAY=oooq-traas.yaml to generate inventory for existing openstack VMs
-  echo export PLAY=oooq-traas-under.yaml to deploy an undercloud on openstack
-  echo export PLAY=oooq-traas-over.yaml to deploy an overcloud on on openstack
-  echo export PLAY=oooq-traas-kubespray.yaml to prepare overcloud for k8s on openstack
+  echo Or use quickstart.sh wrapper
   echo ================================================================================================
-  echo export CUSTOMVARS=path/file.yaml to override default '-e @custom.yaml' with it
-  echo Run create_env_oooq.sh added optional args, to either provision or to deploy on top!
-  echo ================================================================================================
-  echo Or use quickstart.sh as usual - that requires manual saving for any produced state,
-  echo "like 'save-state.sh --sync' or 'save-state.sh \$LWD/\$WORKSPACE/\$IMAGECACHE'"
-  echo "Use 'save-state.sh --purge' to nuke all the saved quickstart state but in \$IMAGECACHEBACKUP"
+  echo "Save deployed VMs state with 'save-state.sh' before exiting container"
+  echo "Destroy saved state with 'save-state.sh --purge' (but retain \$IMAGECACHEBACKUP contents)"
   if [ "${UMOUNTS:-}" = "donkeys" ]; then
     su -p $USER
   else
