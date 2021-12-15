@@ -62,14 +62,7 @@ TripleO projects. And run the reproducer using the forked repo:
 ```
 (oooq) $ wget -O reproducer-zuul-based-quickstart.tar <url>
 (oooq) $ tar xf reproducer-zuul-based-quickstart.tar
-(oooq) $ git -C /var/tmp/reproduce/git/tripleo-quickstart pull
-(oooq) $ git -C /var/tmp/reproduce/git/tripleo-quickstart-extras pull
-(oooq) $ git -C /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer pull
-(oooq) $ sudo rm -f ${LWD}/vm_images/*.bak  # removes subnodes' snapshots
-(oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
---ssh-key-path /var/tmp/.ssh/gerrit -e create_snapshot=true -e os_autohold_node=true \
--e zuul_build_sshkey_cleanup=false -e container_mode=docker \
--e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey -e release=master
+(oooq) $ tripleo-reproducer.sh
 ```
 If you plan to keep subnode VMs for future use and exit the wrapping container,
 run ``save-state.sh`` before exiting it.
@@ -77,13 +70,8 @@ run ``save-state.sh`` before exiting it.
 ## Retry from the subnodes snapshots created earlier
 To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 ```
-(oooq) $ sudo chmod a+r ${LWD}/vm_images/*  # unsure if needed, perhaps not!..
-(oooq) $ sudo chown root:root ${LWD}/vm_images/*.qcow2
 (oooq) $ sudo chmod -R a+rwt ~/tripleo-ci-reproducer/logs
-(oooq) $ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
---ssh-key-path /var/tmp/.ssh/gerrit -e restore_snapshot=true -e os_autohold_node=true \
--e zuul_build_sshkey_cleanup=false -e container_mode=docker \
--e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey -e ansible_user_id=donkey
+(oooq) $ tripleo-reproducer-restore.sh
 ```
 
 ## Retry subnodes configuration without touching existing VMs
