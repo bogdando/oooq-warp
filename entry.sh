@@ -86,6 +86,7 @@ cd $HOME
 . ${VPATH}/oooq/bin/activate
 [[ "$PLAY" =~ "libvirt" ]] && (. ${SCRIPTS_WORKPATH}/ssh_config)
 
+set +e
 # Note we pick the hacked in paths in the custom ansible.cfg bind-mounted
 if [ -z ${OOOQ_PATH} ]; then
   # Hack into oooq dev branch
@@ -123,7 +124,7 @@ done
 
 [ "${RELEASE:-}" ] && export IMAGECACHE="${IMAGECACHE}/${RELEASE}"
 
-set +ex
+set +x
 # Restore the saved state spread across LWD/WORKSPACE/IMAGECACHE dirs
 # (ssh keys/setup, inventory, kernel images et al)
 if [ "${TEARDOWN}" = "false" ]; then
