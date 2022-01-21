@@ -18,8 +18,8 @@ instackenv.json
 cmd=${1:---sync}
 if [ "${cmd}" = "--sync" ]; then
   echo "Syncing state (only update with newer files) across known paths"
-  if [ -f "${HOME}/tripleo-ci-reproducer/hosts" ]; then
-    cp "${HOME}/tripleo-ci-reproducer/hosts" "${LWD}"
+  if [ -f "${LWD}/tripleo-ci-reproducer/hosts" ]; then
+    ln -sf "${LWD}/tripleo-ci-reproducer/hosts" "${LWD}/hosts"
   fi
   for state in $STATE_ITEMS; do
     if [ "$WORKSPACE" != "$LWD" ]; then

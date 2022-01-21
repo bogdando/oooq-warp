@@ -177,13 +177,6 @@ docker run ${TERMOPTS} --rm --privileged \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /lib/modules:/lib/modules:ro \
   -v config:/home/${USER}/.config/openstack \
-  -v etc_nodepool:/home/${USER}/tripleo-ci-reproducer/etc_nodepool \
-  -v etc_zuul:/home/${USER}/tripleo-ci-reproducer/etc_zuul \
-  -v logs:/home/${USER}/tripleo-ci-reproducer/logs \
-  -v pki:/home/${USER}/tripleo-ci-reproducer/etc/pki/ \
-  -v playbooks:/home/${USER}/tripleo-ci-reproducer/playbooks \
-  -v projects:/home/${USER}/tripleo-ci-reproducer/projects \
-  -v httpd:/home/${USER}/tripleo-ci-reproducer/httpd \
   -v zuul:/var/lib/zuul \
   -v reproduce:/var/tmp/reproduce \
   ${MOUNT_IMAGECACHE:-} \

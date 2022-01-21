@@ -70,7 +70,7 @@ run ``save-state.sh`` before exiting it.
 ## Retry from the subnodes snapshots created earlier
 To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 ```
-(oooq) $ sudo chmod -R a+rwt ~/tripleo-ci-reproducer/logs
+(oooq) $ sudo chmod -R a+rwt tripleo-ci-reproducer/logs
 (oooq) $ tripleo-reproducer-restore.sh
 ```
 
@@ -124,8 +124,8 @@ If it fails to resize undercloud VM disk, open `a+r` for `/boot/vmlinuz*` for th
 host OS, then repeat the failed command in the wrapper container manually, like:
 ```
 $ virt-resize -v -x --expand /dev/sda1 \
-    ~/tripleo-ci-reproducer/undercloud.qcow2 \
-    ~/tripleo-ci-reproducer/undercloud-resized.qcow2
+    tripleo-ci-reproducer/undercloud.qcow2 \
+    tripleo-ci-reproducer/undercloud-resized.qcow2
 ```
 
 > **NOTE**: If docker/compose CLI fails in container and autohold cannot be set

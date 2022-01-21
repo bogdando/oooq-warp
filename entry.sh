@@ -17,19 +17,13 @@ export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME
 export ARGS="${@:-}"
 export ANSIBLE_LOG_PATH=ansible.log
 export ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
-export ANSIBLE_INVENTORY=${HOME}/tripleo-ci-reproducer/hosts
+export ANSIBLE_INVENTORY=${LWD}/tripleo-ci-reproducer/hosts
 export ANSIBLE_CONFIG=${OOOQ_WORKPATH}/ansible.cfg
 
 set +e
 sudo cp -f ${SCRIPTS_WORKPATH}/*.sh /usr/local/sbin/ 2>/dev/null
 sudo chmod +x /usr/local/sbin/* 2>/dev/null
-sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/etc_nodepool
-sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/etc_zuul
-sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/logs
-sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/etc/pki
-sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/playbooks
-sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/projects
-sudo chmod a+rw /home/${USER}/tripleo-ci-reproducer/httpd
+sudo chmod a+rw -R ${LWD}/tripleo-ci-reproducer
 sudo chmod a+rw /home/${USER}/.config/openstack
 sudo chmod a+rw /var/lib/zuul
 
