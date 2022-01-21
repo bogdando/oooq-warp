@@ -155,6 +155,7 @@ sudo mkdir -p /root/.ssh
 mkdir -p /var/tmp/reproduce/.ssh
 sudo cp -f ${HOME}/.ssh/id* /root/.ssh
 cp -f ${HOME}/.ssh/id* /var/tmp/reproduce/.ssh
+mkdir -p ${LWD}/tripleo-ci-reproducer
 
 # Regenerate the latest-* images from the existing state
 if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then

@@ -13,7 +13,7 @@ Additionally to the already present docker, install docker-compose onto your
 host. Then teardown the docker volumes, if any:
 
 ```
-$ docker volume rm httpd logs pki playbooks projects reproduce zuul
+$ docker volume rm config reproduce zuul
 ```
 
 If any volumes are in use, exit the oooq-warp container, if in it, then try to
@@ -29,13 +29,13 @@ tripleo-ci-reproducer_gerritconfig_1
 ```
 or maybe that one:
 ```
-$ docker rm -f tripleocireproducer_logs_1 tripleocireproducer_fingergw_1 \
-tripleocireproducer_executor_1 tripleocireproducer_web_1 \
-tripleocireproducer_merger1_1 tripleocireproducer_merger0_1 \
-tripleocireproducer_scheduler_1 tripleocireproducer_launcher_1 \
-tripleocireproducer_mysql_1 tripleocireproducer_zk_1 \
-tripleocireproducer_gerrit_1 tripleocireproducer_logs_1 \
-tripleocireproducer_gerritconfig_1
+$ docker rm -f quickstart_logs_1 quickstart_fingergw_1 \
+quickstart_executor_1 quickstart_web_1 \
+quickstart_merger1_1 quickstart_merger0_1 \
+quickstart_scheduler_1 quickstart_launcher_1 \
+quickstart_mysql_1 quickstart_zk_1 \
+quickstart_gerrit_1 quickstart_logs_1 \
+quickstart_gerritconfig_1
 ```
 
 Prepare a gerrit key for the example gerrit and local users named donkey:
