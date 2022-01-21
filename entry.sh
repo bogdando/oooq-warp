@@ -44,11 +44,13 @@ else
   sudo useradd -p '' -G libvirt -U ${USER}
 fi
 if [ ! -h "${HOME}" ]; then
-  sudo mkdir -p ${LWD}/.ssh
+  mkdir -p ${LWD}/.ssh
   sudo mkdir -p ${HOME}
-  sudo ln -sf ${LWD}/.ssh ${HOME}/
+  sudo chown -R ${USER}:${USER} ${HOME}
+  ln -sf ${LWD}/.ssh ${HOME}/
   sudo ln -sf ${HOME} /home/zuul
 else
+  sudo chown -R ${USER}:${USER} ${LWD}
   sudo ln -sf ${LWD} ${HOME}
   sudo ln -sf ${LWD} /home/zuul
 fi
@@ -57,19 +59,21 @@ set -e
 echo "${USER} ALL=NOPASSWD:ALL" | sudo tee /etc/sudoers.d/${USER}
 echo "Defaults:${USER} !requiretty" | sudo tee -a /etc/sudoers.d/${USER}
 sudo chmod 0440 /etc/sudoers.d/${USER}
-echo 'export WORKON_HOME=${HOME}/Envs' | sudo tee ${HOME}/.bashrc
-echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python' | sudo tee -a ${HOME}/.bashrc
+echo 'export WORKON_HOME=${HOME}/Envs' >> ${HOME}/.bashrc
+echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python' >> ${HOME}/.bashrc
 
 # FIXME: hack the venv as quickstart --botstrap/--clean knows/recognizes it
+rm -rf "${HOME}/etc"
+rm -rf "${LWD}/etc"
 if [ ! -h "${HOME}" ]; then
-  sudo ln -sf ${VPATH} ${HOME}/
+  ln -sf ${VPATH} ${HOME}/
 else
-  sudo ln -sf ${VPATH} ${LWD}/
+  ln -sf ${VPATH} ${LWD}/
 fi
-sudo rm -rf "${LWD}/config" "${LWD}/playbooks"
-sudo ln -sf ${VPATH}/oooq/* "${LWD}/"
+rm -rf "${LWD}/config" "${LWD}/playbooks"
+ln -sf ${VPATH}/oooq/* "${LWD}/"
 
-for p in $KNOWN_PATHS ${HOME} /var/tmp/reproduce; do
+for p in $KNOWN_PATHS /var/tmp/reproduce; do
   [ "$p" = "${VPATH}/oooq" ] && continue
   echo "Chowning images cache and working dirs for ${p} (may take a while)..."
   sudo mkdir -p ${p} ||:
@@ -85,31 +89,31 @@ set +e
 if [ -z ${OOOQ_PATH} ]; then
   # Hack into oooq dev branch
   sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart@${OOOQE_BRANCH}
-  sudo rsync -aLH /usr/config "${LWD}"
-  sudo rsync -aLH /usr/playbooks "${LWD}"
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/roles "${LWD}"
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/library "${LWD}"
-  sudo rsync -aLH /usr/local/share/tripleo-quickstart/test_plugins "${LWD}"
+  rsync -aLH /usr/config "${LWD}"
+  rsync -aLH /usr/playbooks "${LWD}"
+  rsync -aLH /usr/local/share/tripleo-quickstart/roles "${LWD}"
+  rsync -aLH /usr/local/share/tripleo-quickstart/library "${LWD}"
+  rsync -aLH /usr/local/share/tripleo-quickstart/test_plugins "${LWD}"
 elif [ "$LWD" != "$OOOQ_WORKPATH" ]; then
   # Place the local git repo under the work path
-  sudo rsync -aLH $OOOQ_WORKPATH/config "${LWD}"
-  sudo rsync -aLH $OOOQ_WORKPATH/playbooks "${LWD}"
-  sudo rsync -aLH $OOOQ_WORKPATH/roles "${LWD}"
-  sudo rsync -aLH $OOOQ_WORKPATH/library "${LWD}"
-  sudo rsync -aLH $OOOQ_WORKPATH/test_plugins "${LWD}"
+  rsync -aLH $OOOQ_WORKPATH/config "${LWD}"
+  rsync -aLH $OOOQ_WORKPATH/playbooks "${LWD}"
+  rsync -aLH $OOOQ_WORKPATH/roles "${LWD}"
+  rsync -aLH $OOOQ_WORKPATH/library "${LWD}"
+  rsync -aLH $OOOQ_WORKPATH/test_plugins "${LWD}"
 fi
 
 if [ -z ${OOOQE_PATH} ]; then
   # Hack into oooq-extras dev branch
   sudo pip install --upgrade git+https://github.com/${OOOQE_FORK}/tripleo-quickstart-extras@${OOOQE_BRANCH}
-  sudo rsync -aLH /usr/config "${LWD}"
-  sudo rsync -aLH /usr/playbooks "${LWD}"
-  sudo rsync -aLH /usr/local/share/ansible/roles "${LWD}"
+  rsync -aLH /usr/config "${LWD}"
+  rsync -aLH /usr/playbooks "${LWD}"
+  rsync -aLH /usr/local/share/ansible/roles "${LWD}"
 else
   # Place the local git repo under the work path
-  sudo rsync -aLH $OOOQE_WORKPATH/config "${LWD}"
-  sudo rsync -aLH $OOOQE_WORKPATH/playbooks "${LWD}"
-  sudo rsync -aLH $OOOQE_WORKPATH/roles "${LWD}"
+  rsync -aLH $OOOQE_WORKPATH/config "${LWD}"
+  rsync -aLH $OOOQE_WORKPATH/playbooks "${LWD}"
+  rsync -aLH $OOOQE_WORKPATH/roles "${LWD}"
 fi
 for p in $KNOWN_PATHS; do
   [ "$p" = "${VPATH}/oooq" -o "$p" = "$HOME" -a ! -h "$HOME" ] && continue
@@ -148,9 +152,9 @@ ssh-add /var/tmp/.ssh/gerrit/id_rsa
 ssh-add ${HOME}/.ssh/id_rsa.agent
 ssh-add ${HOME}/.ssh/id_rsa
 sudo mkdir -p /root/.ssh
-sudo mkdir -p /var/tmp/reproduce/.ssh
+mkdir -p /var/tmp/reproduce/.ssh
 sudo cp -f ${HOME}/.ssh/id* /root/.ssh
-sudo cp -f ${HOME}/.ssh/id* /var/tmp/reproduce/.ssh
+cp -f ${HOME}/.ssh/id* /var/tmp/reproduce/.ssh
 
 # Regenerate the latest-* images from the existing state
 if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then
@@ -182,6 +186,8 @@ if [ "${IMAGECACHEBACKUP:-}" ]; then
   fi
 fi
 # Silent sync for the regenerated hardlinks
+rm -f ${LWD}/etc
+rm -f ${HOME}/etc
 save-state.sh --sync 2>&1 > /dev/null
 
 if [[ "$TERMOPTS" =~ "t" ]]; then

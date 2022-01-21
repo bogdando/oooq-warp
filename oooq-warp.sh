@@ -1,6 +1,6 @@
 #!/bin/bash
 # Wrap OS of the given active user with the centos7 box and oooq
-set -uxe
+set -ue
 
 # Internal env vars, only used to run a container wrapper
 CPU=${CPU:-0}
