@@ -70,7 +70,6 @@ run ``save-state.sh`` before exiting it.
 ## Retry from the subnodes snapshots created earlier
 To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 ```
-(oooq) $ sudo chmod -R a+rwt tripleo-ci-reproducer/logs
 (oooq) $ tripleo-reproducer-restore.sh
 ```
 
@@ -114,10 +113,7 @@ $ sudo cp -f ~/.ssh/id* /root/.ssh
 $ ssh-add ~/.ssh/id_rsa.agent
 $ ssh-add ~/.ssh/id_rsa
 
-$ ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
---ssh-key-path /donkeys -e os_autohold_node=true \
--e zuul_build_sshkey_cleanup=false -e container_mode=docker \
--e upstream_gerrit_user=donkey -e rdo_gerrit_user=donkey
+$ tripleo-reproducer.sh donkey
 ```
 
 If it fails to resize undercloud VM disk, open `a+r` for `/boot/vmlinuz*` for the
@@ -131,9 +127,13 @@ $ virt-resize -v -x --expand /dev/sda1 \
 > **NOTE**: If docker/compose CLI fails in container and autohold cannot be set
 > for a zuul job, run it on the host e.g.:
 ```
-$ docker exec tripleo-ci-reproducer_scheduler_1 zuul autohold --project test1 \
+$ docker exec quickstart_scheduler_1 zuul autohold --project test1 \
  --tenant tripleo-ci-reproducer --job tripleo-ci-centos-8-standalone-dlrn-hash-tag \
  --reason reproducer_forensics
+```
+To delete an autohold by ID use
+```
+$ docker exec quickstart_scheduler_1 zuul autohold-delete <id> #see list-autohold
 ```
 
 ## An extra.yaml example
@@ -197,3 +197,10 @@ images:
 The ansible log can be found in `/var/tmp/reproduce/ansible.log`.
 At the subnodes, watch for the tails of
 `*log /tmp/console*`.
+
+## Zuul logs?
+Use ``finger`` by ID you can get from [Zuul status](http://localhost:9000/t/tripleo-ci-reproducer/status), e.g.: ``finger 23418d2191074f4ab7ee4fc4c08e7a75@localhost``.
+Also helps to filter the executor logs, like:
+```
+$ docker logs quickstart_executor_1 -f | grep Ansible | awk -F'Ansible output' '{if ($2) print $2}'
+```
