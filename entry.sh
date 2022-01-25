@@ -157,6 +157,17 @@ sudo cp -f ${HOME}/.ssh/id* /root/.ssh
 cp -f ${HOME}/.ssh/id* /var/tmp/reproduce/.ssh
 mkdir -p ${LWD}/tripleo-ci-reproducer
 
+cat >${HOME}/.vimrc<<EOF
+set updatetime=100
+set encoding=UTF-8
+set expandtab
+set shiftwidth=2
+set tabstop=2
+set softtabstop=2
+set autoindent
+set cindent
+EOF
+
 # Regenerate the latest-* images from the existing state
 if [ -f ${IMAGECACHE}/undercloud.qcow2 -a -f ${IMAGECACHE}/undercloud.qcow2.md5 ]; then
   echo "Symlinking the latest undercloud images from restored md5 hashes"

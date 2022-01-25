@@ -7,6 +7,6 @@ dnf -y install python3-libvirt python3-lxml python3-virtualenv \
 dnf -y install podman docker osinfo-db-tools virt-install wget \
   gcc which sudo openssl-devel qemu-kvm git libvirt \
   libguestfs-tools polkit-pkla-compat libyaml libffi-devel \
-  redhat-rpm-config rsync yum yum-utils NetworkManager
+  redhat-rpm-config rsync yum yum-utils NetworkManager vim
 wget https://releases.pagure.org/libosinfo/osinfo-db-20210202.tar.xz
 osinfo-db-import -v osinfo-db-20210202.tar.xz
