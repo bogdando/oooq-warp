@@ -1,7 +1,7 @@
 # Examplle: multinode on openstack pre-provisioned by traas
 
-Follow an [all-in-one undercloud example guide](./docs/rdocloud-guide.md)
-(RDO cloud), or read below for advanced deployment scenarios.
+Follow an [all-in-one undercloud example guide](./docs/psi-guide.md)
+(PSI cloud), or read below for advanced deployment scenarios.
 
 > **NOTE** the private key from the generated Nova keypair should be
 > copied under the ``$LWD`` path.
