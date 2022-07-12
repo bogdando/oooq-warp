@@ -13,7 +13,7 @@ set -e
 pip install --upgrade pip
 pip install --upgrade pbr
 pip install --upgrade setuptools
-pip install --no-use-pep517 -r requirements.txt -r quickstart-extras-requirements.txt
+pip install --use-deprecated=legacy-resolver -r requirements.txt -r quickstart-extras-requirements.txt
 pip install dumb-init
 # Required for the new CI reproducer
 pip install virtualenv bindep
