@@ -37,5 +37,5 @@ ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer /var/tmp/reprod
 ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* /var/tmp/reproduce/playbooks/
 
 ansible-galaxy collection install --force \
-    -r ansible-role-requirements.yml \
+    -r ansible-collection-requirements.yml \
     -p /usr/share/ansible/collections
