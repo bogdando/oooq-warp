@@ -16,6 +16,7 @@ if [ "$TEARDOWN" = "true" ]; then
   ln -sf /var/tmp/oooq/playbooks/* /var/tmp/reproduce/playbooks/
   ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer /var/tmp/reproduce/roles/
   ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* /var/tmp/reproduce/playbooks/
+  ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* ${LWD}/playbooks/
 
   tar xf reproducer-zuul-based-quickstart.tar ||:
 else
