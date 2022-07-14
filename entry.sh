@@ -138,7 +138,8 @@ else
   rm -f "${LWD}"_deploy.log "${LWD}"_deploy_nice.log
   if [ "${IMAGECACHEBACKUP:-}" ]; then
     echo "Restoring all files from backup ${IMAGECACHEBACKUP} dir to ${IMAGECACHE}"
-    cp -af ${IMAGECACHEBACKUP}/* ${IMAGECACHE}
+    mkdir -p ${IMAGECACHE}
+    cp -af ${IMAGECACHEBACKUP}/* ${IMAGECACHE}/
   fi
   echo Pre-generate ssh keys for CI reproducer
   eval $(ssh-agent)
