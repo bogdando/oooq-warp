@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo chmod -R a+rwt tripleo-ci-reproducer/logs
+sudo chmod -R a+rwt ${LWD}/logs
 cp -f "${LWD}/hosts" "${LWD}/tripleo-ci-reproducer/"
 mkdir -p "${LWD}/etc/pki/tls/certs/"
 cp -f "${LWD}/ca-bundle.crt" "${LWD}/etc/pki/tls/certs/"
