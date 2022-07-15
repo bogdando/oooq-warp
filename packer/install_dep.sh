@@ -39,3 +39,5 @@ ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* /va
 ansible-galaxy collection install --force \
     -r ansible-collection-requirements.yml \
     -p /usr/share/ansible/collections
+
+update-crypto-policies --set LEGACY
