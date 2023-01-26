@@ -143,15 +143,14 @@ else
   fi
   echo Pre-generate ssh keys for CI reproducer
   eval $(ssh-agent)
-  ssh-keygen -b 1024 -t rsa -f ${HOME}/.ssh/id_rsa -N "" -q
-  ssh-keygen -yf ${HOME}/.ssh/id_rsa > ${HOME}/.ssh/id_rsa.pub
-  cp -f ${HOME}/.ssh/id_rsa ${HOME}/.ssh/id_rsa.agent
-  cp -f ${HOME}/.ssh/id_rsa.pub ${HOME}/.ssh/id_rsa.pub.agent
-  chmod 0600 ${HOME}/.ssh/id*
+  ssh-keygen -b 2048 -t ed25519 -f ${HOME}/.ssh/id_ed25519 -N "" -q
+  cp -f ${HOME}/.ssh/id_ed25519 ${HOME}/.ssh/id_ed25519.agent
+  cp -f ${HOME}/.ssh/id_ed25519.pub ${HOME}/.ssh/id_ed25519.pub.agent
+  chmod 0600 ${HOME}/.ssh/id_*
 fi
-ssh-add /var/tmp/.ssh/gerrit/id_rsa
-ssh-add ${HOME}/.ssh/id_rsa.agent
-ssh-add ${HOME}/.ssh/id_rsa
+ssh-add /var/tmp/.ssh/gerrit/id_ed25519
+ssh-add ${HOME}/.ssh/id_ed25519.agent
+ssh-add ${HOME}/.ssh/id_ed25519
 sudo mkdir -p /root/.ssh
 mkdir -p /var/tmp/reproduce/.ssh
 sudo cp -f ${HOME}/.ssh/id* /root/.ssh

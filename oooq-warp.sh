@@ -23,13 +23,13 @@ PLAY=${PLAY:-oooq-libvirt-provision.yaml}
 CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
 LIBGUESTFS_BACKEND_SETTINGS=${LIBGUESTFS_BACKEND_SETTINGS:-force_tcg}
-SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-~/.ssh/id_rsa}
+SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-/home/${USER}/.ssh/id_ed25519}
 # Known work paths inside of the container
 OOOQ_WORKPATH=/var/tmp/oooq
 OOOQE_WORKPATH=/var/tmp/oooq-extras
 SCRIPTS_WORKPATH=/var/tmp/scripts
 USE_QUICKSTART_WRAP=false
-GERRITKEY=${GERRITKEY:-/home/${USER}/.ssh/id_rsa}
+GERRITKEY=${GERRITKEY:-/home/${USER}/.ssh/id_ed25519}
 
 set +xe
 uid=$(id -u $USER)
@@ -40,11 +40,12 @@ fi
 gid=$(id -g $USER) || gid=1000
 set -e
 
+KEYSMOUNTS="-v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_ed25519:ro -v ${GERRITKEY}.pub:/var/tmp/.ssh/gerrit/id_ed25519.pub:ro"
 if [ "${USER}" = "donkey" ]; then
-  UMOUNTS="-e UMOUNTS=donkeys -v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_rsa:ro"
+  UMOUNTS="-e UMOUNTS=donkeys ${KEYSMOUNTS}"
 else
   UMOUNTS="-v /etc/subuid:/etc/subuid:ro -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro -v /etc/shadow:/etc/shadow:ro -v /etc/sudoers:/etc/sudoers:ro"
-  UMOUNTS="${UMOUNTS} -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys -v ${GERRITKEY}:/var/tmp/.ssh/gerrit/id_rsa:ro"
+  UMOUNTS="${UMOUNTS} -v /home/${USER}/.ssh/authorized_keys:/var/tmp/.ssh/authorized_keys ${KEYSMOUNTS}"
 fi
 
 host_kvm_gid=$(cut -d: -f3 <(getent group kvm))

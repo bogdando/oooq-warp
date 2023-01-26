@@ -41,7 +41,7 @@ quickstart_gerritconfig_1
 Prepare a gerrit key for the example gerrit and local users named donkey:
 ```
 $ mkdir -p /donkeys
-$ ssh-keygen -b 1024 -t rsa -f /donkeys/donkey -N "" -q
+$ ssh-keygen -b 2048 -t ed25519 -f /donkeys/donkey -N "" -q
 $ ssh-keygen -yf  /donkeys/donkey > /donkeys/donkey.pub
 ```
 Add that public key to the donkey's SSH keys in the opendev and rdo gerrits.
@@ -51,7 +51,7 @@ $ USER=donkey GERRITKEY=/donkeys/donkey TEARDOWN=true \
   LWD=/opt/.quickstart RAMFS=false RELEASE=master \
   TERMOPTS=-it ./oooq-warp.sh
 ```
-Note, `GERRITKEY` defaults to `$HOME/.ssh/id_rsa` for the given user `donkey`.
+Note, `GERRITKEY` defaults to `$HOME/.ssh/id_ed25519` for the given user `donkey`.
 It must point to the private SSH key used to connect the upstream opendev/rdo
 gerrits w/o a password set for the key. This assumes the gerrit user name is
 also `donkey` for opendev and rdo gerrits.
@@ -102,17 +102,6 @@ Host review.rdoproject.org
 EOF
 $ chmod 600 ~/.ssh/config
 
-$ eval $(ssh-agent)
-$ ssh-keygen -b 1024 -t rsa -f ~/.ssh/id_rsa -N "" -q
-$ ssh-keygen -yf ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
-$ cp -f ~/.ssh/id_rsa ~/.ssh/id_rsa.agent
-$ cp -f ~/.ssh/id_rsa.pub ~/.ssh/id_rsa.pub.agent
-$ chmod 0600 ~/.ssh/id*
-$ sudo mkdir -p /root/.ssh
-$ sudo cp -f ~/.ssh/id* /root/.ssh
-$ ssh-add ~/.ssh/id_rsa.agent
-$ ssh-add ~/.ssh/id_rsa
-
 $ tripleo-reproducer.sh donkey
 ```
 
@@ -160,6 +149,8 @@ play_kube: false
 rootless: false
 release: master
 virthost_provisioning_interface: noop
+pub_key: "~/.ssh/id_ed25519.pub"
+user_pri_key: id_ed25519
 ```
 ## Centos 8
 
