@@ -13,6 +13,7 @@ ironic*
 undercloud*
 volume_pool.xml
 instackenv.json
+tripleo-ci-reproducer/hosts
 "
 
 cmd=${1:---sync}
