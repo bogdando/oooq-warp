@@ -72,6 +72,11 @@ To retry it from the `${LWD}/vm_images/*.bak` snapshots:
 ```
 (oooq) $ tripleo-reproducer-restore.sh
 ```
+## Commit changes to the snapshots
+```
+sudo qemu-img commit -f qcow2 -b /opt/.quickstart/vm_images/subnode-1.qcow2.bak  /opt/.quickstart/vm_images/subnode-1.qcow2
+sudo qemu-img commit -f qcow2 -b /opt/.quickstart/vm_images/subnode-0.qcow2.bak  /opt/.quickstart/vm_images/subnode-0.qcow2
+```
 
 ## Retry subnodes configuration without touching existing VMs
 
