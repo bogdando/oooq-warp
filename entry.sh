@@ -5,8 +5,6 @@ set -eu
 [ "${SUPERMIN_KERNEL:-}" ] || unset SUPERMIN_KERNEL
 [ "${SUPERMIN_MODULES:-}" ] || unset SUPERMIN_MODULES
 [ "${SUPERMIN_KERNEL_VERSION:-}" ] || unset SUPERMIN_KERNEL_VERSION
-[ "${CONTROLLER_HOSTS:-}" ] || unset CONTROLLER_HOSTS
-[ "${COMPUTE_HOSTS:-}" ] || unset COMPUTE_HOSTS
 [ "${OOOQ_PATH:-}" ] || unset OOOQ_PATH
 [ "${OOOQE_PATH:-}" ] || unset OOOQE_PATH
 [ "${HOST_BREXT_IP:-}" ] || unset HOST_BREXT_IP
@@ -82,7 +80,6 @@ done
 
 cd $HOME
 . ${VPATH}/oooq/bin/activate
-[[ "$PLAY" =~ "libvirt" ]] && (. ${SCRIPTS_WORKPATH}/ssh_config)
 
 set +e
 # Note we pick the hacked in paths in the custom ansible.cfg bind-mounted
@@ -202,26 +199,17 @@ rm -f ${LWD}/etc
 rm -f ${HOME}/etc
 save-state.sh --sync 2>&1 > /dev/null
 
-if [[ "$TERMOPTS" =~ "t" ]]; then
 cd "${LWD}"
-  echo Note: ansible virthost is now localhost
-  echo Run a zuul libvirt reproducer script extracted from a tarball
-  echo with 'tripleo-reproducer.sh', or 'tripleo-reproducer-restore.sh'
-  echo ================================================================================================
-  echo Or use quickstart.sh wrapper
-  echo ================================================================================================
-  echo "Save deployed VMs state with 'save-state.sh' before exiting container"
-  echo "Destroy saved state with 'save-state.sh --purge' (but retain \$IMAGECACHEBACKUP contents)"
-  if [ "${UMOUNTS:-}" = "donkeys" ]; then
-    su -p $USER
-  else
-    /bin/bash
-  fi
+echo Note: ansible virthost is now localhost
+echo Run a zuul libvirt reproducer script extracted from a tarball
+echo with 'tripleo-reproducer.sh', or 'tripleo-reproducer-restore.sh'
+echo ================================================================================================
+echo Or use quickstart.sh wrapper
+echo ================================================================================================
+echo "Save deployed VMs state with 'save-state.sh' before exiting container"
+echo "Destroy saved state with 'save-state.sh --purge' (but retain \$IMAGECACHEBACKUP contents)"
+if [ "${UMOUNTS:-}" = "donkeys" ]; then
+  su -p $USER
 else
-  if [ "$USE_QUICKSTART_WRAP" = "false" ]; then
-    create_env_oooq.sh $ARGS
-  else
-    quickstart.sh --install-deps
-    quickstart.sh $UNLOCKER $ARGS
-  fi
+  /bin/bash
 fi

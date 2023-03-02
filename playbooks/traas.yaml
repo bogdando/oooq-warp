@@ -1,0 +1,20 @@
+---
+# TODO Provision tasks with heat templates
+
+- name: Generate new inventory for openstack provider
+  hosts: localhost
+  any_errors_fatal: true
+  gather_facts: true
+  become: false
+  vars_files:
+    - ../vars/inventory-traas.yaml
+  vars:
+    os_username: bdobreli
+    os_password: Bfslkfdjgh_45937#asd
+    os_tenant_name: bdobreli
+    os_auth_url: https://phx2.cloud.rdoproject.org:13000/
+    cloud_name: rdo-cloud
+    overcloud_key: '{{ working_dir }}/bdobreli-rdo-cloud.pem'
+    undercloud_key: '{{ working_dir }}/bdobreli-rdo-cloud.pem'
+  roles:
+    - tripleo-inventory

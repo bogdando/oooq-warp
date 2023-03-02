@@ -49,7 +49,7 @@ Then start the wrapper container (or see below how to run on host):
 ```
 $ USER=donkey GERRITKEY=/donkeys/donkey TEARDOWN=true \
   LWD=/opt/.quickstart RAMFS=false RELEASE=master \
-  TERMOPTS=-it ./oooq-warp.sh
+  ./oooq-warp.sh
 ```
 Note, `GERRITKEY` defaults to `$HOME/.ssh/id_ed25519` for the given user `donkey`.
 It must point to the private SSH key used to connect the upstream opendev/rdo

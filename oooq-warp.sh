@@ -8,7 +8,6 @@ MEM=${MEM:-0}
 
 # Defines global env defaults in the wrapper container
 RAMFS=${RAMFS:-false}
-TERMOPTS=${TERMOPTS:--it}
 TEARDOWN=${TEARDOWN:-true}
 # non_root_user et al
 USER=${USER:-bogdando}
@@ -19,16 +18,12 @@ OOOQ_BRANCH=${OOOQ_BRANCH:-master}
 OOOQ_FORK=${OOOQ_FORK:-openstack}
 # oooq venv pre-created in the container
 VPATH=/var/tmp/Envs
-PLAY=${PLAY:-oooq-libvirt-provision.yaml}
-CUSTOMVARS=${CUSTOMVARS:-custom.yaml}
 LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND:-direct}
 LIBGUESTFS_BACKEND_SETTINGS=${LIBGUESTFS_BACKEND_SETTINGS:-force_tcg}
-SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY:-/home/${USER}/.ssh/id_ed25519}
 # Known work paths inside of the container
 OOOQ_WORKPATH=/var/tmp/oooq
 OOOQE_WORKPATH=/var/tmp/oooq-extras
 SCRIPTS_WORKPATH=/var/tmp/scripts
-USE_QUICKSTART_WRAP=false
 GERRITKEY=${GERRITKEY:-/home/${USER}/.ssh/id_ed25519}
 
 set +xe
@@ -120,11 +115,9 @@ else
   KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n/home/${USER}/.ssh\n${IMAGECACHE}\n${IMAGECACHE_REAL}"|sort -u)
 fi
 
-# FIXME: Fedora28 support for quickstart ansible-runner
-UNLOCKER="-e qemu_bridge_conf=/etc/qemu/bridge.conf -e supported_distro_check=false"
 set -x
 
-docker run ${TERMOPTS} --rm --privileged \
+docker run -it --rm --privileged \
   --cpus=1 --cpu-shares=${CPU} \
   --memory-swappiness=0 --memory=${MEM} \
   --net=host --pid=host --uts=host --ipc=host \
@@ -133,7 +126,6 @@ docker run ${TERMOPTS} --rm --privileged \
   -e PATH="${OOOQ_WORKPATH}:${LWD}:${PATH}" \
   -e KNOWN_PATHS="${KNOWN_PATHS}" \
   -e USER=${USER} \
-  -e PLAY=${PLAY} \
   -e WORKSPACE=${WORKSPACE} \
   -e OPT_WORKDIR=${LWD} \
   -e LWD=${LWD} \
@@ -146,27 +138,20 @@ docker run ${TERMOPTS} --rm --privileged \
   -e TEARDOWN=${TEARDOWN} \
   -e OOOQE_BRANCH=${OOOQE_BRANCH} \
   -e OOOQE_FORK=${OOOQE_FORK} \
-  -e CONTROLLER_HOSTS=${CONTROLLER_HOSTS:-} \
-  -e COMPUTE_HOSTS=${COMPUTE_HOSTS:-} \
-  -e SUBNODES_SSH_KEY=${SUBNODES_SSH_KEY} \
-  -e CUSTOMVARS=${CUSTOMVARS} \
   -e LIBGUESTFS_BACKEND=${LIBGUESTFS_BACKEND} \
   -e LIBGUESTFS_BACKEND_SETTINGS=${LIBGUESTFS_BACKEND_SETTINGS} \
   -e SUPERMIN_KERNEL=${SUPERMIN_KERNEL:-} \
   -e SUPERMIN_MODULES=${SUPERMIN_MODULES:-} \
   -e SUPERMIN_KERNEL_VERSION=${SUPERMIN_KERNEL_VERSION:-} \
   -e HOST_BREXT_IP=${HOST_BREXT_IP:-} \
-  -e TERMOPTS=${TERMOPTS} \
   -e SCRIPTS_WORKPATH=${SCRIPTS_WORKPATH} \
   -e OOOQ_WORKPATH=${OOOQ_WORKPATH} \
   -e OOOQE_WORKPATH=${OOOQE_WORKPATH} \
   -e LOG_LEVEL=${LOG_LEVEL:--v} \
   -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
   -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
-  -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
-  -e USE_QUICKSTART_WRAP=${USE_QUICKSTART_WRAP} \
-  -e UNLOCKER="${UNLOCKER}" \
-  -e DOCKERGID="${host_docker_gid}" \
+  -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/e \
+  -python DOCKERGID="${host_docker_gid}" \
   -e LIBVIRTGID="${host_libvirt_gid}" \
   -e KVMGID="${host_kvm_gid}" \
   -v /etc/docker:/etc/docker:ro \
@@ -197,4 +182,4 @@ docker run ${TERMOPTS} --rm --privileged \
   --group-add ${host_kvm_gid} \
   --entrypoint /usr/local/sbin/entry.sh \
   --name runner bogdando/oooq-runner:0.4 \
-  ${@:-}  #0.2.1 for RH pkg tools
+  ${@:-}
