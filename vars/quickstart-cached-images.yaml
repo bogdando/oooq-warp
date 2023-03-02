@@ -1,8 +1,0 @@
-# Use this to reprovision quickstart env with the cached VM images
-# omitting libvirt build steps completely
-undercloud_use_custom_boot_images: true
-undercloud_custom_initrd: "{{ lookup('env', 'IMAGECACHE') }}/overcloud-full.initrd"
-undercloud_custom_vmlinuz: "{{ lookup('env', 'IMAGECACHE') }}/overcloud-full.vmlinuz"
-force_cached_images: true
-image_cache_dir_cleanup: false
-image_cache_expire_days: 300
