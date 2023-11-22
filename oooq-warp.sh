@@ -110,9 +110,9 @@ else
 fi
 
 if [ "$RAMFS" != "false" ]; then
-  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n/home/${USER}/.ssh"|sort -u)
+  KNOWN_PATHS="$LWD $WORKSPACE /home/${USER}/.ssh"
 else
-  KNOWN_PATHS=$(printf %"b\n" "${LWD}\n${WORKSPACE}\n/home/${USER}/.ssh\n${IMAGECACHE}\n${IMAGECACHE_REAL}"|sort -u)
+  KNOWN_PATHS="$LWD $WORKSPACE /home/${USER}/.ssh $IMAGECACHE $IMAGECACHE_REAL"
 fi
 
 set -x
@@ -150,8 +150,8 @@ docker run -it --rm --privileged \
   -e LOG_LEVEL=${LOG_LEVEL:--v} \
   -e ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT:-900} \
   -e ANSIBLE_FORKS=${ANSIBLE_FORKS:-20} \
-  -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/e \
-  -python DOCKERGID="${host_docker_gid}" \
+  -e ANSIBLE_PYTHON_INTERPRETER=${VPATH}/oooq/bin/python \
+  -e DOCKERGID="${host_docker_gid}" \
   -e LIBVIRTGID="${host_libvirt_gid}" \
   -e KVMGID="${host_kvm_gid}" \
   -v /etc/docker:/etc/docker:ro \

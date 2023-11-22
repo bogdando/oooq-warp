@@ -1,22 +1,10 @@
 #!/bin/bash
 set -u
 exec 2>/dev/null
-STATE_ITEMS="
-id_*
-ironic*
-hosts
-ssh.*
-overcloud*
-ironic*
-*.tar*
-*.qcow2*
-undercloud*
-volume_pool.xml
-instackenv.json
-tripleo-ci-reproducer/hosts
-"
+STATE_ITEMS="id_* ironic* hosts ssh.* overcloud* ironic* *.tar* *.qcow2* undercloud* volume_pool.xml instackenv.json tripleo-ci-reproducer/hosts"
 
 cmd=${1:---sync}
+IFS=$' '
 if [ "${cmd}" = "--sync" ]; then
   echo "Syncing state (only update with newer files) across known paths"
   cp "${LWD}/etc/pki/tls/certs/ca-bundle.crt" "$LWD"
