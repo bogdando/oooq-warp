@@ -27,6 +27,8 @@ ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer /var/tmp/reprod
 ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* /var/tmp/reproduce/playbooks/
 ln -sf /var/tmp/reproduce/git/ansible-role-tripleo-ci-reproducer/playbooks/* ${LWD}/playbooks/
 
+rm -f "${HOME}/.ssh/known_hosts"
+rm -rf "${LWD}/testproject"
 ./reproducer-zuul-based-quickstart.sh -w /var/tmp/reproduce -e @extra.yaml -l \
 --ssh-key-path /var/tmp/.ssh/gerrit -e restore_snapshot=true -e os_autohold_node=false \
 -e zuul_build_sshkey_cleanup=false -e container_mode=docker \
